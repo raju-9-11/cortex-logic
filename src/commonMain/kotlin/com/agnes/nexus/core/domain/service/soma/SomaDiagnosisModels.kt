@@ -93,7 +93,7 @@ fun com.agnes.nexus.core.domain.models.SomaProfile.toHealthSnapshot(userId: Stri
         stressPhysical = stressPhysical,
         biomarkerSummary = bioSummary,
         clearanceStatus = clearanceStatus,
-        capturedAt = System.currentTimeMillis()
+        capturedAt = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
     )
 }
 
