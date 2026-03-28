@@ -1,0 +1,42 @@
+-- WorkoutSession: persists each Titan training or recovery session.
+-- mode column tracks whether the session was PERFORMANCE or RECOVERY (SystemMode).
+
+CREATE TABLE IF NOT EXISTS WorkoutSession (
+    id              TEXT    PRIMARY KEY,
+    timestamp       INTEGER NOT NULL,           -- epoch ms
+    routine_name    TEXT,
+    total_tonnage   REAL,                       -- kg lifted (sum weight × reps across all sets)
+    subjective_rpe  INTEGER,                    -- 1–10 Rate of Perceived Exertion
+    mode            TEXT    NOT NULL DEFAULT 'PERFORMANCE'  -- PERFORMANCE | RECOVERY
+);
+
+-- Insert a new session
+insertSession:
+INSERT INTO WorkoutSession (id, timestamp, routine_name, total_tonnage, subjective_rpe, mode)
+VALUES (?, ?, ?, ?, ?, ?);
+
+-- Fetch all sessions ordered by most recent first
+selectAllSessions:
+SELECT * FROM WorkoutSession ORDER BY timestamp DESC;
+
+-- Fetch sessions within a time window (for weekly tonnage calculations)
+selectSessionsInRange:
+SELECT * FROM WorkoutSession
+WHERE timestamp >= :from AND timestamp <= :to
+ORDER BY timestamp ASC;
+
+-- Fetch the most recent session
+selectLatestSession:
+SELECT * FROM WorkoutSession ORDER BY timestamp DESC LIMIT 1;
+
+-- Fetch sessions by mode (e.g. only RECOVERY sessions)
+selectSessionsByMode:
+SELECT * FROM WorkoutSession WHERE mode = :mode ORDER BY timestamp DESC;
+
+-- Update total tonnage after all sets are logged
+updateTonnage:
+UPDATE WorkoutSession SET total_tonnage = :tonnage WHERE id = :id;
+
+-- Delete a session
+deleteSession:
+DELETE FROM WorkoutSession WHERE id = :id;

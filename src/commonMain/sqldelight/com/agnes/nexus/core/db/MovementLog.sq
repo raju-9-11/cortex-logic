@@ -1,0 +1,47 @@
+-- MovementLog: stores each movement performed within a WorkoutSession.
+-- sets_data is serialized JSON: [{"reps": 5, "weight": 225, "rpe": 8}]
+-- movement_id references a Movement domain object (not a DB table — movements
+-- live in the non-rigid AliveEntity / Movement model layer).
+
+CREATE TABLE IF NOT EXISTS MovementLog (
+    id          TEXT    PRIMARY KEY,
+    session_id  TEXT    NOT NULL REFERENCES WorkoutSession(id) ON DELETE CASCADE,
+    movement_id TEXT,                   -- nullable: custom/unnamed movements allowed
+    movement_label TEXT,                -- denormalized label for fast display
+    sets_data   TEXT    NOT NULL,       -- JSON array of set objects
+    demand_tags TEXT,                   -- serialized JSON list of demandTags (cns_heavy, etc.)
+    volume_type TEXT    NOT NULL DEFAULT 'WEIGHT_REPS'  -- WEIGHT_REPS | TIME | DISTANCE
+);
+
+-- Insert a movement log entry
+insertMovementLog:
+INSERT INTO MovementLog (id, session_id, movement_id, movement_label, sets_data, demand_tags, volume_type)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+-- Fetch all movement logs for a session
+selectLogsForSession:
+SELECT * FROM MovementLog WHERE session_id = :sessionId ORDER BY rowid ASC;
+
+-- Fetch movement logs for a specific movement across all sessions (for PR tracking)
+selectLogsForMovement:
+SELECT ml.*, ws.timestamp
+FROM MovementLog ml
+JOIN WorkoutSession ws ON ml.session_id = ws.id
+WHERE ml.movement_id = :movementId
+ORDER BY ws.timestamp DESC;
+
+-- Fetch CNS-heavy movement logs in a time window (for Delayed Fatigue calculation)
+selectCnsHeavyLogsInRange:
+SELECT ml.*, ws.timestamp, ws.total_tonnage
+FROM MovementLog ml
+JOIN WorkoutSession ws ON ml.session_id = ws.id
+WHERE ws.timestamp >= :from AND ws.timestamp <= :to
+  AND ml.demand_tags LIKE '%cns_heavy%';
+
+-- Update sets data (e.g. after editing a set post-session)
+updateSetsData:
+UPDATE MovementLog SET sets_data = :setsData WHERE id = :id;
+
+-- Delete logs for a session (cascade handled by FK, but available for explicit calls)
+deleteLogsForSession:
+DELETE FROM MovementLog WHERE session_id = :sessionId;

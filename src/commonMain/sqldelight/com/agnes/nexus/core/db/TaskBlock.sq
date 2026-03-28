@@ -1,0 +1,40 @@
+-- TaskBlock: An atomic unit of cognitive work on the daily Blueprint.
+-- cognitive_weight ∈ [0.1, 1.0] — Atlas enforces Σw_active ≤ C_day.
+
+CREATE TABLE IF NOT EXISTS TaskBlock (
+    id TEXT NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    cognitive_weight REAL NOT NULL DEFAULT 0.3,
+    priority INTEGER NOT NULL DEFAULT 2,      -- 1=Critical, 2=Standard, 3=Low
+    status TEXT NOT NULL DEFAULT 'TODO',       -- TODO, DOING, DONE, DEFERRED
+    goal_id TEXT,
+    deadline INTEGER,                          -- epoch ms
+    defer_count INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+upsertTask:
+INSERT OR REPLACE INTO TaskBlock(id, title, cognitive_weight, priority, status, goal_id, deadline, defer_count, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+selectActive:
+SELECT * FROM TaskBlock WHERE status IN ('TODO', 'DOING') ORDER BY priority ASC, created_at ASC;
+
+selectByGoal:
+SELECT * FROM TaskBlock WHERE goal_id = ? ORDER BY priority ASC;
+
+markDone:
+UPDATE TaskBlock SET status = 'DONE', updated_at = ? WHERE id = ?;
+
+deferTask:
+UPDATE TaskBlock SET status = 'DEFERRED', defer_count = defer_count + 1, updated_at = ? WHERE id = ?;
+
+selectOverdeferred:
+SELECT * FROM TaskBlock WHERE defer_count > 3 AND status = 'DEFERRED';
+
+totalActiveWeight:
+SELECT COALESCE(SUM(cognitive_weight), 0.0) FROM TaskBlock WHERE status IN ('TODO', 'DOING');
+
+deleteTask:
+DELETE FROM TaskBlock WHERE id = ?;

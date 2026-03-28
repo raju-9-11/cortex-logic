@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS global_soul_snapshots (
+    user_id TEXT NOT NULL PRIMARY KEY,
+    resilience REAL NOT NULL DEFAULT 0.5,
+    bandwidth REAL NOT NULL DEFAULT 0.5,
+    vitality REAL NOT NULL DEFAULT 0.5,
+    output REAL NOT NULL DEFAULT 0.5,
+    friction REAL NOT NULL DEFAULT 0.5,
+    autopilot_level INTEGER NOT NULL DEFAULT 0,
+    stale_flag INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL
+);
+
+upsertGlobalSoul:
+INSERT OR REPLACE INTO global_soul_snapshots(user_id, resilience, bandwidth, vitality, output, friction, autopilot_level, stale_flag, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+selectByUserId:
+SELECT * FROM global_soul_snapshots WHERE user_id = ?;
+
+deleteByUserId:
+DELETE FROM global_soul_snapshots WHERE user_id = ?;

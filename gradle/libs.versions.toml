@@ -1,0 +1,71 @@
+[versions]
+# Kotlin & Android
+kotlin = "2.0.21"
+ksp = "2.0.21-1.0.27"
+android-gradle-plugin = "8.7.3"
+compileSdk = "35"
+minSdk = "26"
+
+# Networking
+kotlinx-serialization = "1.7.3"
+
+# Encryption
+android-security-crypto = "1.1.0-alpha06"
+
+# Coroutines & Flow
+coroutines = "1.9.0"
+
+# SQLDelight
+sqldelight = "2.0.2"
+
+# Ktor
+ktor = "3.0.3"
+
+# Koin
+koin = "4.0.0"
+
+# Datetime
+kotlinx-datetime = "0.6.1"
+
+# Testing
+coroutines-test-version = "1.9.0"
+
+[libraries]
+# Kotlin
+kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+
+# Encryption
+android-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "android-security-crypto" }
+
+# Coroutines
+coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
+
+# SQLDelight
+sqldelight-runtime = { group = "app.cash.sqldelight", name = "runtime", version.ref = "sqldelight" }
+sqldelight-coroutines-extensions = { group = "app.cash.sqldelight", name = "coroutines-extensions", version.ref = "sqldelight" }
+sqldelight-android-driver = { group = "app.cash.sqldelight", name = "android-driver", version.ref = "sqldelight" }
+sqldelight-js-driver = { group = "app.cash.sqldelight", name = "web-worker-driver", version.ref = "sqldelight" }
+
+# Ktor
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-js = { group = "io.ktor", name = "ktor-client-js", version.ref = "ktor" }
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+
+# Koin
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+
+# Testing
+coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+
+[bundles]
+ktor-common = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-serialization-kotlinx-json", "ktor-client-logging"]
+
+[plugins]
+android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }

@@ -1,0 +1,28 @@
+-- AuditTrail: Silent history log for Ghost Mode (Level 5) autonomous actions.
+-- Every action executed without user approval at Level 5 is recorded here
+-- for Atlas Weekly Review and post-hoc transparency.
+
+CREATE TABLE IF NOT EXISTS audit_trail (
+    id TEXT NOT NULL PRIMARY KEY,
+    timestamp INTEGER NOT NULL,
+    agent_source TEXT NOT NULL,
+    action_summary TEXT NOT NULL,
+    raw_payload TEXT NOT NULL DEFAULT '{}',
+    soul_snapshot TEXT NOT NULL DEFAULT '{}'
+);
+
+insertAuditEntry:
+INSERT INTO audit_trail(id, timestamp, agent_source, action_summary, raw_payload, soul_snapshot)
+VALUES (?, ?, ?, ?, ?, ?);
+
+selectRecent:
+SELECT * FROM audit_trail ORDER BY timestamp DESC LIMIT ?;
+
+selectByAgent:
+SELECT * FROM audit_trail WHERE agent_source = ? ORDER BY timestamp DESC LIMIT ?;
+
+selectSince:
+SELECT * FROM audit_trail WHERE timestamp >= ? ORDER BY timestamp ASC;
+
+deleteOlderThan:
+DELETE FROM audit_trail WHERE timestamp < ?;
