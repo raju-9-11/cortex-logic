@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.sqldelight)
+    id("maven-publish")
 }
 
 kotlin {
@@ -13,6 +14,7 @@ kotlin {
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
         }
+        publishLibraryVariants("release")
     }
 
     js(IR) {
@@ -71,5 +73,18 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/raju-9-11/cortex-logic")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: findProperty("gpr.user") as String?
+                password = System.getenv("GITHUB_TOKEN") ?: findProperty("gpr.token") as String?
+            }
+        }
     }
 }
