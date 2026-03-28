@@ -1,0 +1,28 @@
+-- MirrorEntry: Raw ingestion point for Blabber and structured log entries.
+-- raw_content is saved immediately to Vault on ingestion.
+-- extracted_tags is populated post-LLM extraction as serialized JSON array.
+
+CREATE TABLE IF NOT EXISTS MirrorEntry (
+    id TEXT NOT NULL PRIMARY KEY,
+    timestamp INTEGER NOT NULL,
+    raw_content TEXT NOT NULL,
+    extracted_tags TEXT,                   -- JSON array e.g. '["strength","completed","atlas"]'
+    attributed_entity_id TEXT,             -- TaskBlock.id or habit id if attributed
+    bandwidth_delta REAL NOT NULL DEFAULT 0.0  -- soul update: GlobalSoul.bandwidth delta applied
+);
+
+insertEntry:
+INSERT INTO MirrorEntry(id, timestamp, raw_content, extracted_tags, attributed_entity_id, bandwidth_delta)
+VALUES (?, ?, ?, ?, ?, ?);
+
+updateExtraction:
+UPDATE MirrorEntry SET extracted_tags = ?, attributed_entity_id = ?, bandwidth_delta = ? WHERE id = ?;
+
+selectRecent:
+SELECT * FROM MirrorEntry ORDER BY timestamp DESC LIMIT ?;
+
+selectSince:
+SELECT * FROM MirrorEntry WHERE timestamp >= ? ORDER BY timestamp ASC;
+
+selectUnattributed:
+SELECT * FROM MirrorEntry WHERE attributed_entity_id IS NULL ORDER BY timestamp ASC;

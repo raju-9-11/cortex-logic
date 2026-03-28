@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS module_soul_cache (
+    user_id TEXT NOT NULL,
+    module_id TEXT NOT NULL,
+    profile_json TEXT NOT NULL,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (user_id, module_id)
+);
+
+upsertModuleCache:
+INSERT OR REPLACE INTO module_soul_cache(user_id, module_id, profile_json, updated_at)
+VALUES (?, ?, ?, ?);
+
+selectModuleCache:
+SELECT * FROM module_soul_cache WHERE user_id = ? AND module_id = ?;
+
+selectAllForUser:
+SELECT * FROM module_soul_cache WHERE user_id = ?;
+
+deleteModuleCache:
+DELETE FROM module_soul_cache WHERE user_id = ? AND module_id = ?;

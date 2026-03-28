@@ -1,0 +1,30 @@
+-- Goal: Strategic objective with confidence-gated projection.
+-- confidence_score is updated by the Goal Projection Algorithm (linear regression).
+-- Atlas only displays projections when confidence_score > 0.7.
+
+CREATE TABLE IF NOT EXISTS Goal (
+    id TEXT NOT NULL PRIMARY KEY,
+    label TEXT NOT NULL,
+    target_date INTEGER,                          -- epoch ms deadline
+    confidence_score REAL NOT NULL DEFAULT 0.0,  -- 0.0-1.0; projection shown only if > 0.7
+    progress_percent REAL NOT NULL DEFAULT 0.0,
+    velocity REAL NOT NULL DEFAULT 0.0,           -- weekly task completion rate
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+upsertGoal:
+INSERT OR REPLACE INTO Goal(id, label, target_date, confidence_score, progress_percent, velocity, created_at, updated_at)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+selectAll:
+SELECT * FROM Goal ORDER BY target_date ASC;
+
+selectById:
+SELECT * FROM Goal WHERE id = ?;
+
+updateProjection:
+UPDATE Goal SET confidence_score = ?, progress_percent = ?, velocity = ?, updated_at = ? WHERE id = ?;
+
+deleteGoal:
+DELETE FROM Goal WHERE id = ?;
