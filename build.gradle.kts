@@ -3,7 +3,7 @@ version = "1.0.0"
 
 plugins {
     alias(libs.plugins.android.library)
-    kotlin("multiplatform")
+    alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.sqldelight)
 }
