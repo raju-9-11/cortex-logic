@@ -1,7 +1,7 @@
 [versions]
 # Kotlin & Android
-kotlin = "2.0.21"
-ksp = "2.0.21-1.0.27"
+kotlin = "2.1.20"
+ksp = "2.1.20-1.0.32"
 android-gradle-plugin = "8.7.3"
 compileSdk = "35"
 minSdk = "26"
