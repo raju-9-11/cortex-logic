@@ -64,6 +64,14 @@ class AgnesSessionLifecycleService(
                     data = mapOf("sessionId" to sessionId)
                 ).toSpineEvent())
             }
+            AgnesSessionMode.SOMATIC -> {
+                eventBus.emit(SpineEventPayload(
+                    type = "AGNES_SESSION_SOMATIC_START",
+                    source = "agnes",
+                    priority = "info",
+                    data = mapOf("sessionId" to sessionId, "previous" to previous.name)
+                ).toSpineEvent())
+            }
         }
     }
 

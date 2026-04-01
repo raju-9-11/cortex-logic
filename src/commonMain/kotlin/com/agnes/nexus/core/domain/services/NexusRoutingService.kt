@@ -27,7 +27,7 @@ private data class Keyword(
 
 class NexusRoutingService(
     private val llmSanitizer: LlmSanitizer = LlmSanitizer(),
-    private val commandIntelligenceService: CommandIntelligenceService = CommandIntelligenceService()
+    private val commandIntelligenceService: CommandIntelligenceService = CommandIntelligenceService
 ) {
     fun decideRoute(
         prompt: String,

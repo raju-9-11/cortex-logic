@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.agnes.nexus.core.domain.services.SpineCascadeRulesTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-03-31T13:45:01.160Z" hostname="raj-13766" time="0.001">
+  <properties/>
+  <testcase name="testBurnoutWarningCascade[js, node]" classname="com.agnes.nexus.core.domain.services.SpineCascadeRulesTest" time="0.0"/>
+  <testcase name="testCrisisCascade[js, node]" classname="com.agnes.nexus.core.domain.services.SpineCascadeRulesTest" time="0.0"/>
+  <testcase name="testHighStressLowResilienceTriggersBurnout[js, node]" classname="com.agnes.nexus.core.domain.services.SpineCascadeRulesTest" time="0.0"/>
+  <testcase name="testCascadeEventDataPropagation[js, node]" classname="com.agnes.nexus.core.domain.services.SpineCascadeRulesTest" time="0.001"/>
+  <testcase name="testCascadeRuleConditionFiltering[js, node]" classname="com.agnes.nexus.core.domain.services.SpineCascadeRulesTest" time="0.0"/>
+  <testcase name="testAllCascadeRulesRegistered[js, node]" classname="com.agnes.nexus.core.domain.services.SpineCascadeRulesTest" time="0.0"/>
+  <testcase name="testCascadeEventPriorityPreservation[js, node]" classname="com.agnes.nexus.core.domain.services.SpineCascadeRulesTest" time="0.0"/>
+  <testcase name="testHabitStreakBrokenCascade[js, node]" classname="com.agnes.nexus.core.domain.services.SpineCascadeRulesTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

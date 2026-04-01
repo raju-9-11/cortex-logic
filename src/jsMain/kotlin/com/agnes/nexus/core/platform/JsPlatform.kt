@@ -4,3 +4,5 @@ package com.agnes.nexus.core.platform
 actual object Platform {
     actual val name: String = "JavaScript/Web"
 }
+
+actual fun generateUuid(): String = js("crypto.randomUUID()").unsafeCast<String>()

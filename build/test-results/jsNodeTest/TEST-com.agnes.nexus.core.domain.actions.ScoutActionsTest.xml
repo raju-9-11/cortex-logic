@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.agnes.nexus.core.domain.actions.ScoutActionsTest" tests="14" skipped="0" failures="7" errors="0" timestamp="2026-03-31T13:45:01.086Z" hostname="raj-13766" time="0.013">
+  <properties/>
+  <testcase name="add_knowledge_node persists node and emits KNOWLEDGE_NODE_ADDED[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.001">
+    <failure message="AssertionError: Node should be persisted to scout_knowledge subcollection. Expected value to be not null." type="AssertionError">AssertionError: Node should be persisted to scout_knowledge subcollection. Expected value to be not null.
+	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
+	at DefaultJsAsserter.assertNotNull(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:758)
+	at DefaultJsAsserter.protoOf.assertNotNull_i3opa6(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:55)
+	at &lt;global&gt;.assertNotNull(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:145)
+	at slambda_um2o4s.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/actions/ScoutActionsTest.kt:162)
+	at slambda_um2o4s.protoOf.invoke_blawzt(kotlin/cortex-test.js:12805)
+	at slambda.$testBody(kotlin/cortex-test.js:12906)
+	at slambda.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:318)
+	at slambda.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at slambda.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at StandardTestDispatcherImpl.protoOf.processEvent_53mmqp(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestDispatcher.kt:24)
+	at TestCoroutineScheduler.protoOf.tryRunNextTaskUnless_463vnb(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestCoroutineScheduler.kt:99)
+	at slambda_1.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:327)
+	at slambda_1.protoOf.invoke_d9fzmj(kotlin/kotlinx-coroutines-test.js:411)
+	at &lt;global&gt;.l(kotlin/kotlinx-coroutines-test.js:487)
+	at 1.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/intrinsics/IntrinsicsJs.kt:194)
+	at 1.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at 1.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at ScheduledMessageQueue.protoOf.process_myqcf5(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/jsAndWasmJsShared/src/internal/JSDispatcher.kt:127)
+	at &lt;global&gt;.&lt;unknown&gt;(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/js/src/JSDispatcher.kt:21)
+	at &lt;global&gt;.processTicksAndRejections(node:internal/process/task_queues:77)
+</failure>
+  </testcase>
+  <testcase name="add_knowledge_node sets status=verified for type=verified[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.001">
+    <failure message="AssertionError: Expected &lt;verified&gt;, actual &lt;null&gt;." type="AssertionError">AssertionError: Expected &lt;verified&gt;, actual &lt;null&gt;.
+	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
+	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
+	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
+	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
+	at slambda_3nlepm.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/actions/ScoutActionsTest.kt:181)
+	at slambda_3nlepm.protoOf.invoke_blawzt(kotlin/cortex-test.js:12919)
+	at slambda.$testBody(kotlin/cortex-test.js:12990)
+	at slambda.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:318)
+	at slambda.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at slambda.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at StandardTestDispatcherImpl.protoOf.processEvent_53mmqp(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestDispatcher.kt:24)
+	at TestCoroutineScheduler.protoOf.tryRunNextTaskUnless_463vnb(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestCoroutineScheduler.kt:99)
+	at slambda_1.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:327)
+	at slambda_1.protoOf.invoke_d9fzmj(kotlin/kotlinx-coroutines-test.js:411)
+	at &lt;global&gt;.l(kotlin/kotlinx-coroutines-test.js:487)
+	at 1.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/intrinsics/IntrinsicsJs.kt:194)
+	at 1.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at 1.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at ScheduledMessageQueue.protoOf.process_myqcf5(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/jsAndWasmJsShared/src/internal/JSDispatcher.kt:127)
+	at &lt;global&gt;.&lt;unknown&gt;(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/js/src/JSDispatcher.kt:21)
+	at &lt;global&gt;.processTicksAndRejections(node:internal/process/task_queues:77)
+</failure>
+  </testcase>
+  <testcase name="add_knowledge_node with unverified type sets status=pending[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.001">
+    <failure message="AssertionError: Expected &lt;pending&gt;, actual &lt;null&gt;." type="AssertionError">AssertionError: Expected &lt;pending&gt;, actual &lt;null&gt;.
+	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
+	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
+	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
+	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
+	at slambda_wqo95o.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/actions/ScoutActionsTest.kt:200)
+	at slambda_wqo95o.protoOf.invoke_blawzt(kotlin/cortex-test.js:13003)
+	at slambda.$testBody(kotlin/cortex-test.js:13074)
+	at slambda.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:318)
+	at slambda.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at slambda.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at StandardTestDispatcherImpl.protoOf.processEvent_53mmqp(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestDispatcher.kt:24)
+	at TestCoroutineScheduler.protoOf.tryRunNextTaskUnless_463vnb(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestCoroutineScheduler.kt:99)
+	at slambda_1.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:327)
+	at slambda_1.protoOf.invoke_d9fzmj(kotlin/kotlinx-coroutines-test.js:411)
+	at &lt;global&gt;.l(kotlin/kotlinx-coroutines-test.js:487)
+	at 1.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/intrinsics/IntrinsicsJs.kt:194)
+	at 1.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at 1.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at ScheduledMessageQueue.protoOf.process_myqcf5(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/jsAndWasmJsShared/src/internal/JSDispatcher.kt:127)
+	at &lt;global&gt;.&lt;unknown&gt;(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/js/src/JSDispatcher.kt:21)
+	at &lt;global&gt;.processTicksAndRejections(node:internal/process/task_queues:77)
+</failure>
+  </testcase>
+  <testcase name="extract_citation persists citation and emits VITAL_UPDATED[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.008">
+    <failure message="AssertionError: Expected &lt;extract_citation&gt;, actual &lt;null&gt;." type="AssertionError">AssertionError: Expected &lt;extract_citation&gt;, actual &lt;null&gt;.
+	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
+	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
+	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
+	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
+	at slambda_644oi3.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/actions/ScoutActionsTest.kt:226)
+	at slambda_644oi3.protoOf.invoke_blawzt(kotlin/cortex-test.js:13087)
+	at slambda.$testBody(kotlin/cortex-test.js:13186)
+	at slambda.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:318)
+	at slambda.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at slambda.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at StandardTestDispatcherImpl.protoOf.processEvent_53mmqp(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestDispatcher.kt:24)
+	at TestCoroutineScheduler.protoOf.tryRunNextTaskUnless_463vnb(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestCoroutineScheduler.kt:99)
+	at slambda_1.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:327)
+	at slambda_1.protoOf.invoke_d9fzmj(kotlin/kotlinx-coroutines-test.js:411)
+	at &lt;global&gt;.l(kotlin/kotlinx-coroutines-test.js:487)
+	at 1.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/intrinsics/IntrinsicsJs.kt:194)
+	at 1.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at 1.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at ScheduledMessageQueue.protoOf.process_myqcf5(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/jsAndWasmJsShared/src/internal/JSDispatcher.kt:127)
+	at &lt;global&gt;.&lt;unknown&gt;(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/js/src/JSDispatcher.kt:21)
+	at &lt;global&gt;.processTicksAndRejections(node:internal/process/task_queues:77)
+</failure>
+  </testcase>
+  <testcase name="extract_citation with missing text is ignored gracefully[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.0"/>
+  <testcase name="extract_finding persists finding and emits KNOWLEDGE_NODE_ADDED[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.001">
+    <failure message="AssertionError: Finding should be persisted. Expected value to be not null." type="AssertionError">AssertionError: Finding should be persisted. Expected value to be not null.
+	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
+	at DefaultJsAsserter.assertNotNull(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:758)
+	at DefaultJsAsserter.protoOf.assertNotNull_i3opa6(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:55)
+	at &lt;global&gt;.assertNotNull(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:145)
+	at slambda_kmav1p.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/actions/ScoutActionsTest.kt:273)
+	at slambda_kmav1p.protoOf.invoke_blawzt(kotlin/cortex-test.js:13290)
+	at slambda.$testBody(kotlin/cortex-test.js:13369)
+	at slambda.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:318)
+	at slambda.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at slambda.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at StandardTestDispatcherImpl.protoOf.processEvent_53mmqp(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestDispatcher.kt:24)
+	at TestCoroutineScheduler.protoOf.tryRunNextTaskUnless_463vnb(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestCoroutineScheduler.kt:99)
+	at slambda_1.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:327)
+	at slambda_1.protoOf.invoke_d9fzmj(kotlin/kotlinx-coroutines-test.js:411)
+	at &lt;global&gt;.l(kotlin/kotlinx-coroutines-test.js:487)
+	at 1.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/intrinsics/IntrinsicsJs.kt:194)
+	at 1.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at 1.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at ScheduledMessageQueue.protoOf.process_myqcf5(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/jsAndWasmJsShared/src/internal/JSDispatcher.kt:127)
+	at &lt;global&gt;.&lt;unknown&gt;(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/js/src/JSDispatcher.kt:21)
+	at &lt;global&gt;.processTicksAndRejections(node:internal/process/task_queues:77)
+</failure>
+  </testcase>
+  <testcase name="commit_research_session persists session summary and emits VITAL_UPDATED[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.0"/>
+  <testcase name="add_source persists source and emits VITAL_UPDATED[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.0"/>
+  <testcase name="add_source with missing url is ignored[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.0">
+    <failure message="AssertionError: No source should be persisted for missing url" type="AssertionError">AssertionError: No source should be persisted for missing url
+	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
+	at DefaultJsAsserter.protoOf.assertTrue_dqb114(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:67)
+	at &lt;global&gt;.assertTrue(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:44)
+	at slambda_rfgbr7.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/actions/ScoutActionsTest.kt:23)
+	at slambda_rfgbr7.protoOf.invoke_blawzt(kotlin/cortex-test.js:13578)
+	at slambda.$testBody(kotlin/cortex-test.js:13656)
+	at slambda.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:318)
+	at slambda.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at slambda.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at StandardTestDispatcherImpl.protoOf.processEvent_53mmqp(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestDispatcher.kt:24)
+	at TestCoroutineScheduler.protoOf.tryRunNextTaskUnless_463vnb(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestCoroutineScheduler.kt:99)
+	at slambda_1.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:327)
+	at slambda_1.protoOf.invoke_d9fzmj(kotlin/kotlinx-coroutines-test.js:411)
+	at &lt;global&gt;.l(kotlin/kotlinx-coroutines-test.js:487)
+	at 1.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/intrinsics/IntrinsicsJs.kt:194)
+	at 1.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at 1.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at ScheduledMessageQueue.protoOf.process_myqcf5(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/jsAndWasmJsShared/src/internal/JSDispatcher.kt:127)
+	at &lt;global&gt;.&lt;unknown&gt;(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/js/src/JSDispatcher.kt:21)
+	at &lt;global&gt;.processTicksAndRejections(node:internal/process/task_queues:77)
+</failure>
+  </testcase>
+  <testcase name="generate_digest persists digest and emits DIGEST_GENERATED[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.0"/>
+  <testcase name="export_research persists export record and emits RESEARCH_EXPORTED[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.0"/>
+  <testcase name="start_deep_research emits DEEP_RESEARCH_REQUESTED and persists session[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.0"/>
+  <testcase name="start_deep_research with blank query emits rejection[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.0">
+    <failure message="AssertionError: No DEEP_RESEARCH_REQUESTED for blank query" type="AssertionError">AssertionError: No DEEP_RESEARCH_REQUESTED for blank query
+	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
+	at DefaultJsAsserter.protoOf.assertTrue_dqb114(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:67)
+	at &lt;global&gt;.assertTrue(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:44)
+	at slambda_95eecd.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/actions/ScoutActionsTest.kt:23)
+	at slambda_95eecd.protoOf.invoke_blawzt(kotlin/cortex-test.js:13997)
+	at slambda.$testBody(kotlin/cortex-test.js:14075)
+	at slambda.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:318)
+	at slambda.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at slambda.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at StandardTestDispatcherImpl.protoOf.processEvent_53mmqp(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestDispatcher.kt:24)
+	at TestCoroutineScheduler.protoOf.tryRunNextTaskUnless_463vnb(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestCoroutineScheduler.kt:99)
+	at slambda_1.protoOf.doResume_5yljmg(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-test/common/src/TestBuilders.kt:327)
+	at slambda_1.protoOf.invoke_d9fzmj(kotlin/kotlinx-coroutines-test.js:411)
+	at &lt;global&gt;.l(kotlin/kotlinx-coroutines-test.js:487)
+	at 1.protoOf.doResume_5yljmg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/intrinsics/IntrinsicsJs.kt:194)
+	at 1.protoOf.resumeWith_b9cu3x(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/kotlin/coroutines/CoroutineImpl.kt:42)
+	at 1.protoOf.resumeWith_dtxwbr(kotlin/kotlin-kotlin-stdlib.js:9869)
+	at DispatchedContinuation.protoOf.run_mvkpxh(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/src/kotlin/coroutines/Continuation.kt:45)
+	at ScheduledMessageQueue.protoOf.process_myqcf5(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/jsAndWasmJsShared/src/internal/JSDispatcher.kt:127)
+	at &lt;global&gt;.&lt;unknown&gt;(/mnt/agent/work/44ec6e850d5c63f0/kotlinx-coroutines-core/js/src/JSDispatcher.kt:21)
+	at &lt;global&gt;.processTicksAndRejections(node:internal/process/task_queues:77)
+</failure>
+  </testcase>
+  <testcase name="complete_scout_onboarding emits ONBOARDING_COMPLETED with moduleId=scout[js, node]" classname="com.agnes.nexus.core.domain.actions.ScoutActionsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

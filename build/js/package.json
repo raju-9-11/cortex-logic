@@ -1,0 +1,17 @@
+{
+  "name": "cortex",
+  "version": "1.4.0",
+  "private": true,
+  "workspaces": [
+    "packages/cortex",
+    "packages/cortex-test",
+    "packages_imported/Kotlin-DateTime-library-kotlinx-datetime/0.6.1",
+    "packages_imported/ktor-ktor-client-ktor-client-core/3.0.3"
+  ],
+  "devDependencies": {},
+  "dependencies": {},
+  "peerDependencies": {},
+  "optionalDependencies": {},
+  "bundledDependencies": [],
+  "resolutions": {}
+}

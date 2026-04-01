@@ -1,0 +1,2 @@
+
+<com.agnes.nexus:cortex_test>:#com.agnes.nexus.core.domain.actions:"com.agnes.nexus.core.domain.models:$com.agnes.nexus.core.domain.services:*com.agnes.nexus.core.domain.services.atlas:*com.agnes.nexus.core.domain.services.titan:com.agnes.nexus.core.engine:$com.agnes.nexus.core.engine.personas

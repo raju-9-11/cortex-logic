@@ -17,6 +17,7 @@ import com.agnes.nexus.core.domain.services.VaultBoundary
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.BeforeTest
@@ -70,13 +71,13 @@ class ScoutActionsTest {
             documents[collection]?.keys?.toList() ?: emptyList()
 
         override suspend fun createDocument(collection: String, data: Map<String, Any?>, id: String?): String {
-            val docId = id ?: "doc_${System.currentTimeMillis()}"
-            documents.computeIfAbsent(collection) { mutableMapOf() }[docId] = data
+            val docId = id ?: "doc_${Clock.System.now().toEpochMilliseconds()}"
+            documents.getOrPut(collection) { mutableMapOf() }[docId] = data
             return docId
         }
 
         override suspend fun setDocument(collection: String, id: String, data: Map<String, Any?>) {
-            documents.computeIfAbsent(collection) { mutableMapOf() }[id] = data
+            documents.getOrPut(collection) { mutableMapOf() }[id] = data
         }
 
         override suspend fun updateDocument(collection: String, id: String, updates: Map<String, Any?>) {

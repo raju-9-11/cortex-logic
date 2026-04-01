@@ -7,6 +7,22 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlin.js.JsExport
+
+@JsExport
+data class SanitizedResult(
+    val publicText: String,
+    val internalThoughts: String? = null,
+    val isThinking: Boolean = false,
+    val isActing: Boolean = false,
+    val currentActionType: String? = null
+)
+
+@JsExport
+data class ExtractedMutation(
+    val vector: String,  // GlobalSoulVector name
+    val delta: Float     // e.g. -0.15
+)
 
 /**
  * KMP LLM Sanitizer - extracts internal tags and cleans public output.
@@ -17,7 +33,8 @@ class LlmSanitizer {
 
     private val providerControlPatterns = listOf(Regex("\\[user interrupted\\]", RegexOption.IGNORE_CASE))
     private val technicalFillerPatterns = listOf(
-        Regex("^(?:Query(?:\\s+Module)?|Searching(?:\\s+Memory)?|Delegating(?:\\s+to\\s+module)?|Consulting(?:\\s+module)?|Proposing(?:\\s+reminder)?)\\.?\\s*", RegexOption.IGNORE_CASE)
+        Regex("^(?:Query(?:\\s+Module)?|Searching(?:\\s+Memory)?|Delegating(?:\\s+to\\s+module)?|Consulting(?:\\s+module)?|Proposing(?:\\s+reminder)?)\\.?\\s*", RegexOption.IGNORE_CASE),
+        Regex("^(?:Public\\s+response|Response):\\s*", RegexOption.IGNORE_CASE)
     )
 
     /**
@@ -53,11 +70,16 @@ class LlmSanitizer {
         return next
     }
 
-    data class SanitizedResult(
-        val publicText: String,
-        val internalThoughts: String? = null,
-        val isThinking: Boolean = false
-    )
+    /**
+     * Strips an incomplete XML/HTML tag fragment from the END of a streaming chunk.
+     * Prevents raw angle-bracket artefacts from reaching the UI during streaming.
+     *
+     * Examples:
+     *   stripPartialLeadingTag("Hello <")     -> "Hello "
+     *   stripPartialLeadingTag("Hello <br")   -> "Hello "
+     *   stripPartialLeadingTag("Hello <br>")  -> "Hello <br>"  (complete — unchanged)
+     */
+    fun stripPartialLeadingTag(text: String): String = text.replace(Regex("<[^>]*$"), "")
 
     /**
      * Aggressively cleans public text of all internal tags.
@@ -81,6 +103,12 @@ class LlmSanitizer {
         val hasThoughtCloser = content.contains("</thought>") || content.contains("</think>") || content.contains("</thinking>")
         val isThinking = hasThoughtOpener && !hasThoughtCloser
 
+        // Check if currently acting — unclosed <action type="..."> present with no </action> yet (streaming)
+        val actionOpenMatch = Regex("""<action\s+type=["']?([^"'\s>]+)["']?>[\s\S]*$""", RegexOption.IGNORE_CASE).find(content)
+        val isActing = actionOpenMatch != null &&
+            content.lowercase().indexOf("</action>", actionOpenMatch.range.first) == -1
+        val currentActionType = actionOpenMatch?.groupValues?.get(1)
+
         // 3. Clean public text - replace closed tags with space
         var publicText = content
             .replace(Regex("<thought>[\\s\\S]*?</thought>"), " ")
@@ -92,6 +120,8 @@ class LlmSanitizer {
             .replace(Regex("<thought>[\\s\\S]*?</think>"), " ")
             .replace(Regex("<action[\\s\\S]*?</action>"), " ")
             .replace(Regex("""<mutation[^/]*/>\s*""", RegexOption.IGNORE_CASE), " ")
+            .replace(Regex("<tool_calls_begin>[\\s\\S]*?<tool_calls_end>"), " ")
+            .replace(Regex("<tool_call_begin>[\\s\\S]*?<tool_call_end>"), " ")
             .replace(Regex("<tool_call>[\\s\\S]*?</tool_call>"), " ")
 
         // 4. Remove unclosed tags at the end (crucial for streaming)
@@ -103,12 +133,19 @@ class LlmSanitizer {
         }
         publicText = publicText
             .replace(Regex("<action[\\s\\S]*"), " ")
+            .replace(Regex("<tool_calls_begin>[\\s\\S]*"), " ")
+            .replace(Regex("<tool_call_begin>[\\s\\S]*"), " ")
             .replace(Regex("<tool_call>[\\s\\S]*"), " ")
             // Remove partial tag fragments at the very end
-            .replace(Regex("<(?:t(?:h(?:o(?:u(?:g(?:ht?)?)?)?|i(?:n(?:k(?:ing?)?)?)?)?)?|a(?:c(?:t(?:i(?:on?)?)?)?)?|tool_call)$"), "")
+            .replace(Regex("<(?:t(?:h(?:o(?:u(?:g(?:ht?)?)?)?|i(?:n(?:k(?:ing?)?)?)?)?)?|a(?:c(?:t(?:i(?:on?)?)?)?)?|tool_call(?:s_begin|_begin)?)$"), "")
 
         if (!retainSpacings) {
             publicText = publicText.replace(Regex("\\s+"), " ").trim()
+        } else {
+            // Remove leading whitespace (prevents ghost space if model starts with a tag)
+            publicText = publicText.replace(Regex("^\\s+"), "")
+            // Collapse 3+ consecutive newlines into exactly 2
+            publicText = publicText.replace(Regex("\\n{3,}"), "\n\n")
         }
 
         publicText = stripTechnicalFiller(publicText)
@@ -116,7 +153,9 @@ class LlmSanitizer {
         return SanitizedResult(
             publicText = publicText,
             internalThoughts = thoughtText,
-            isThinking = isThinking
+            isThinking = isThinking,
+            isActing = isActing,
+            currentActionType = currentActionType
         )
     }
 
@@ -148,7 +187,10 @@ class LlmSanitizer {
 
         if (dedup.isEmpty()) {
             // [action type="delegate_to_module"]{ ... }
-            val bracketActionRegex = Regex("\\[action\\s+type=[\"']?([a-z_]+)[\"']?]\\s*(\\{[\\s\\S]*?\\})", RegexOption.IGNORE_CASE)
+            val bracketActionRegex = Regex(
+                """\[action\s+type=["']?([a-z_]+)["']?\]\s*(\{[\s\S]*?\})""",
+                RegexOption.IGNORE_CASE
+            )
             bracketActionRegex.findAll(normalized).forEach { match ->
                 val type = match.groupValues[1]
                 val payload = runCatching {
@@ -180,11 +222,6 @@ class LlmSanitizer {
      * Represents a soul mutation extracted from an LLM <mutation> tag.
      * Format: <mutation vector="RESILIENCE" delta="-0.15"/>
      */
-    data class ExtractedMutation(
-        val vector: String,  // GlobalSoulVector name
-        val delta: Float     // e.g. -0.15
-    )
-
     /**
      * Extracts all <mutation> tags from the LLM response.
      * Spec §2: The Orchestrator parses XML <mutation> tags from the LLM and routes
@@ -215,10 +252,41 @@ class LlmSanitizer {
         content.replace(Regex("""<mutation[^/]*/>\s*""", RegexOption.IGNORE_CASE), "").trim()
 
     /**
+     * Extracts the first well-balanced JSON object or array from [text].
+     * Correctly handles LLM output like `{...}}` by stopping at the matching closer.
+     * Port of the TypeScript extractBalancedJson from agnes sanitize.ts.
+     */
+    private fun extractBalancedJson(text: String): String? {
+        if (text.isEmpty()) return null
+        val opener = text[0]
+        val closer = when (opener) {
+            '{' -> '}'
+            '[' -> ']'
+            else -> return null
+        }
+        var depth = 0
+        var inString = false
+        var escaped = false
+        for (i in text.indices) {
+            val ch = text[i]
+            if (escaped) { escaped = false; continue }
+            if (ch == '\\' && inString) { escaped = true; continue }
+            if (ch == '"') { inString = !inString; continue }
+            if (inString) continue
+            if (ch == opener) depth++
+            else if (ch == closer) {
+                depth--
+                if (depth == 0) return text.substring(0, i + 1)
+            }
+        }
+        return null
+    }
+
+    /**
      * Attempts to fix common JSON errors from LLMs (trailing commas, markdown blocks).
      */
     fun sanitizeJsonPayload(content: String): String {
-        if (content.isEmpty()) return "{}"
+        if (content.isEmpty()) return ""
         
         // 1. Remove markdown code blocks
         var sanitized = content.replace(Regex("```(?:json)?\\s*([\\s\\S]*?)```", RegexOption.IGNORE_CASE), "$1")
@@ -228,10 +296,10 @@ class LlmSanitizer {
         
         sanitized = sanitized.trim()
 
-        // 3. Extract just the JSON object/array
-        val jsonMatch = Regex("^(\\{[\\s\\S]*\\}|\\[[\\s\\S]*\\])").find(sanitized)
-        if (jsonMatch != null) {
-            sanitized = jsonMatch.groupValues[1]
+        // 3. Extract just the JSON object/array (balanced, to handle double-close artefacts)
+        if (sanitized.firstOrNull() == '{' || sanitized.firstOrNull() == '[') {
+            val balanced = extractBalancedJson(sanitized)
+            if (balanced != null) sanitized = balanced
         }
 
         // 4. Basic repair for trailing commas

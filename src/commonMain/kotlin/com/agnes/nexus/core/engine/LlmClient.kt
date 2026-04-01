@@ -50,7 +50,7 @@ class LlmClient(
         if (keys.openrouterKey.isNotBlank()) {
             return ProviderConfig(
                 endpoint = OPENROUTER_ENDPOINT,
-                authorization = "Bearer ${keys.openrouterKey}",
+                authorization = keys.openrouterKey,
                 model = model
             )
         }
@@ -59,14 +59,14 @@ class LlmClient(
             val geminiModel = if (model.startsWith("gemini-")) model else "gemini-2.0-flash-001"
             return ProviderConfig(
                 endpoint = GEMINI_ENDPOINT,
-                authorization = "Bearer ${keys.geminiKey}",
+                authorization = keys.geminiKey,
                 model = geminiModel
             )
         }
 
         return ProviderConfig(
             endpoint = GROK_ENDPOINT,
-            authorization = "Bearer ${keys.grokKey}",
+            authorization = keys.grokKey,
             model = model
         )
     }

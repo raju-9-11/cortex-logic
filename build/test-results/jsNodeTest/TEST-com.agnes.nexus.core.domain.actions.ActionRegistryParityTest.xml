@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.agnes.nexus.core.domain.actions.ActionRegistryParityTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-03-31T13:45:00.927Z" hostname="raj-13766" time="0.001">
+  <properties/>
+  <testcase name="agnesParityActions_arePresent[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionRegistryParityTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

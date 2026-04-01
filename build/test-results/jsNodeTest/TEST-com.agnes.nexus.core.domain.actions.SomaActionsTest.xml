@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.agnes.nexus.core.domain.actions.SomaActionsTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-03-31T13:45:01.100Z" hostname="raj-13766" time="0.011">
+  <properties/>
+  <testcase name="completeSomaOnboarding_emitsOnboardingCompleted[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.0"/>
+  <testcase name="completeSomaOnboarding_persistsFlag[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.0"/>
+  <testcase name="grantClearance_emitsClearanceGrantedAndChanged[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.001"/>
+  <testcase name="grantClearance_updatesNsvClearanceStatus[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.001"/>
+  <testcase name="denyClearance_emitsAlertPriorityEvents[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.001"/>
+  <testcase name="setConditionalClearance_emitsConditionalStatus[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.0"/>
+  <testcase name="logAssessment_emitsBiomarkerCommitted[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.0"/>
+  <testcase name="logAssessment_blankObservation_noEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.001"/>
+  <testcase name="parseHealthReport_emitsLabReportParsed[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.0"/>
+  <testcase name="parseBiometricData_emitsBiomarkerCommittedAndUpdatesNsv[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.0"/>
+  <testcase name="parseBiometricData_emptyPayload_noEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.001"/>
+  <testcase name="analyzeMedicalImage_emitsDiagnosisMerged[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.0"/>
+  <testcase name="logLabResult_emitsLabReportParsed[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.001"/>
+  <testcase name="logLabResult_missingNameOrValue_noEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.0"/>
+  <testcase name="logMedication_emitsProfileUpdated[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.001"/>
+  <testcase name="logCondition_emitsProfileUpdated[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.001"/>
+  <testcase name="logVital_emitsSomaVitalLogged[js, node]" classname="com.agnes.nexus.core.domain.actions.SomaActionsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

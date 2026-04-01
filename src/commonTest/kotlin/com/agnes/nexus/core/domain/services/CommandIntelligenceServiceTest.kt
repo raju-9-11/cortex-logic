@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 
 class CommandIntelligenceServiceTest {
 
-    private val service = CommandIntelligenceService()
+    private val service = CommandIntelligenceService
     private val fixedNow = Instant.parse("2026-03-24T13:00:00Z")
 
     @Test

@@ -91,7 +91,7 @@ data class AgentResponse(
     val content: String,
     val internalThoughts: String? = null,
     val actions: List<ActionCall> = emptyList(),
-    val mutations: List<LlmSanitizer.ExtractedMutation> = emptyList(),
+    val mutations: List<ExtractedMutation> = emptyList(),
     val isStreaming: Boolean = false,
     val isThinking: Boolean = false
 )

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.agnes.nexus.core.domain.actions.ActionHubTest" tests="24" skipped="0" failures="0" errors="0" timestamp="2026-03-31T13:45:00.844Z" hostname="raj-13766" time="0.083">
+  <properties/>
+  <testcase name="focusTask_setsPendingFocusInSettings[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.014"/>
+  <testcase name="focusSession_setsPendingFocusInSettings[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.002"/>
+  <testcase name="broadcastSpineEvent_emitsEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.002"/>
+  <testcase name="updateNsvFields_updatesNsv[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.001"/>
+  <testcase name="nexusAlias_executesOrchestratorHandlers[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.002"/>
+  <testcase name="scoutWebSearch_emitsRequestEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.001"/>
+  <testcase name="crisisFlag_writesStressLoadToNsvAndEmitsEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.001"/>
+  <testcase name="createTransaction_persistsToProfileAndEmitsEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.006"/>
+  <testcase name="createTransaction_withoutUserId_doesNotPersist[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.003"/>
+  <testcase name="updateTransaction_patchesExistingTransaction[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.003"/>
+  <testcase name="deleteTransaction_removesTransactionFromProfile[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.002"/>
+  <testcase name="addTransaction_persistsAndEmitsEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.001"/>
+  <testcase name="createBudget_persistsToBudgetCategoriesAndEmitsEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.002"/>
+  <testcase name="updateBudget_patchesExistingCategory[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.001"/>
+  <testcase name="setFinancialGoal_persistsGoalAndEmitsEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.002"/>
+  <testcase name="updateGoalProgress_appliesDeltaToCurrentAmount[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.001"/>
+  <testcase name="updateGoalProgress_setsNewAmountDirectly[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.002"/>
+  <testcase name="completeGoal_setsCurrentAmountToTarget[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.001"/>
+  <testcase name="goalProgress_updatesCurrentAmountWhenDeltaProvided[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.001"/>
+  <testcase name="habitStreakBroken_resetsStreakToZeroAndUpdatesNsv[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.004"/>
+  <testcase name="habitStreakBroken_withoutHabitId_stillUpdatesNsvAndEmitsEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.001"/>
+  <testcase name="journalEntryCreated_persistsEntryAndEmitsEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.001"/>
+  <testcase name="journalEntryCreated_capsAtFiveHundredEntries[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.024"/>
+  <testcase name="suggestField_extendsSchemaAndEmitsEvent[js, node]" classname="com.agnes.nexus.core.domain.actions.ActionHubTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

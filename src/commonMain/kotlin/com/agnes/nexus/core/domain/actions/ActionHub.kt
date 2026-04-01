@@ -5,6 +5,7 @@ import com.agnes.nexus.core.domain.models.FieldDefinition
 import com.agnes.nexus.core.domain.models.FieldOption
 import com.agnes.nexus.core.domain.models.FieldType
 import com.agnes.nexus.core.domain.models.ValidationRules
+import com.agnes.nexus.core.domain.models.AtlasJournalEntry
 import com.agnes.nexus.core.domain.models.AtlasProfile
 import com.agnes.nexus.core.domain.models.ForgeArtifact
 import com.agnes.nexus.core.domain.models.ForgeExecutionRecord
@@ -34,6 +35,7 @@ import com.agnes.nexus.core.domain.models.DebtItem
 import com.agnes.nexus.core.domain.models.DebtType
 import com.agnes.nexus.core.domain.models.LedgerExpense
 import com.agnes.nexus.core.domain.models.LedgerTransaction
+import com.agnes.nexus.core.domain.models.LedgerBudgetCategory
 import com.agnes.nexus.core.domain.models.LedgerFinancialGoal
 import com.agnes.nexus.core.domain.models.AtlasTask
 import com.agnes.nexus.core.domain.models.AtlasHabit
@@ -205,11 +207,42 @@ class ActionHub(
         // 5. Titan Workout Logging
         register("titan", "log_workout") { call ->
             val fatigue = call.payload["cnsFatigue"]?.jsonPrimitive?.doubleOrNull ?: 5.0
-            
+
             // Side-effect 1: Update NSV
             nsvService.updateNsv(mapOf("biological.cnsFatigue" to fatigue))
-            
-            // Side-effect 2: Spine Event
+
+            // Side-effect 2: Persist to cardioLog when an activity name is present
+            val activity = call.payload["activity"]?.jsonPrimitive?.content?.trim()
+            if (!activity.isNullOrBlank()) {
+                call.userId?.let { uid ->
+                    val durationRaw = call.payload["duration"]?.jsonPrimitive?.content
+                    val durationMinutes = durationRaw?.toIntOrNull()
+                        ?: durationRaw?.filter { it.isDigit() }?.toIntOrNull()
+                        ?: 0
+                    val date = call.payload["date"]?.jsonPrimitive?.content
+                        ?.takeIf { it.length >= 10 } ?: nowIso().take(10)
+                    val rpe = call.payload["rpe"]?.jsonPrimitive?.doubleOrNull
+                        ?.toInt()?.coerceIn(1, 10)
+                    val session = CardioSession(
+                        id = "wl-${Clock.System.now().toEpochMilliseconds()}-${Random.nextInt(0xFFFF)}",
+                        date = date,
+                        type = "other",
+                        durationMinutes = durationMinutes,
+                        notes = activity,
+                        rpe = rpe,
+                        status = "completed",
+                        recordedAt = nowIso(),
+                    )
+                    val profile = loadTrainerProfile(uid, call.encryptionKey)
+                    val updated = profile.copy(
+                        cardioLog = listOf(session) + (profile.cardioLog ?: emptyList()).take(499),
+                        updatedAt = nowIso(),
+                    )
+                    saveTrainerProfile(uid, updated, call.encryptionKey)
+                }
+            }
+
+            // Side-effect 3: Spine Event
             eventBus.emit(SpineEventPayload(
                 type = "WORKOUT_LOGGED",
                 source = "titan",
@@ -223,6 +256,7 @@ class ActionHub(
         register("agnes", "crisis_flag") { call ->
             val trigger = call.payload["trigger"]?.jsonPrimitive?.content ?: "unknown"
             val severity = call.payload["severity"]?.jsonPrimitive?.content ?: "high"
+            nsvService.updateNsv(mapOf("emotional.stressLoad" to 10.0))
             eventBus.emit(SpineEventPayload(
                 type = "CRISIS_DETECTED",
                 source = "agnes",
@@ -915,6 +949,17 @@ class ActionHub(
                     mapOf("planning.streakHealth" to value)
                 )
             }
+            // Persist streak reset to profile
+            val habitId = call.payload["habitId"]?.jsonPrimitive?.contentOrNull
+            if (habitId != null) {
+                call.userId?.let { uid ->
+                    val profile = loadAtlasProfile(uid, call.encryptionKey)
+                    val updated = profile.habits.map { h ->
+                        if (h.id != habitId) h else h.copy(currentStreak = 0, updatedAt = nowIso())
+                    }
+                    saveAtlasProfile(uid, profile.copy(habits = updated, updatedAt = nowIso()), call.encryptionKey)
+                }
+            }
             eventBus.emit(SpineEventPayload(
                 type = "HABIT_STREAK_BROKEN",
                 source = "atlas",
@@ -924,6 +969,29 @@ class ActionHub(
             ))
         }
         register("atlas", "journal_entry_created") { call ->
+            call.userId?.let { uid ->
+                val profile = loadAtlasProfile(uid, call.encryptionKey)
+                val id = call.payload["id"]?.jsonPrimitive?.contentOrNull
+                    ?: Clock.System.now().toEpochMilliseconds().toString()
+                val now = nowIso()
+                val entry = AtlasJournalEntry(
+                    id = id,
+                    date = call.payload["date"]?.jsonPrimitive?.contentOrNull ?: now.take(10),
+                    mode = call.payload["mode"]?.jsonPrimitive?.contentOrNull ?: "free",
+                    freeText = call.payload["freeText"]?.jsonPrimitive?.contentOrNull
+                        ?: call.payload["content"]?.jsonPrimitive?.contentOrNull,
+                    emojiRating = call.payload["emojiRating"]?.jsonPrimitive?.intOrNull ?: 3,
+                    reflectiveTone = call.payload["reflectiveTone"]?.jsonPrimitive?.contentOrNull ?: "cheerful",
+                    reflectivePrompt = call.payload["reflectivePrompt"]?.jsonPrimitive?.contentOrNull ?: "",
+                    tags = (call.payload["tags"] as? JsonArray)?.mapNotNull { it.jsonPrimitive.contentOrNull } ?: emptyList(),
+                    createdAt = now,
+                    updatedAt = now
+                )
+                saveAtlasProfile(uid, profile.copy(
+                    journalEntries = (listOf(entry) + profile.journalEntries).take(500),
+                    updatedAt = now
+                ), call.encryptionKey)
+            }
             eventBus.emit(SpineEventPayload(
                 type = "JOURNAL_ENTRY_CREATED",
                 source = "atlas",
@@ -966,57 +1034,120 @@ class ActionHub(
         // Ledger spine event hooks
         // -------------------------
         register("ledger", "create_transaction") { call ->
+            val uid = call.userId ?: return@register
+            val profile = loadLedgerProfile(uid, call.encryptionKey)
+            val amount = call.payload["amount"]?.jsonPrimitive?.doubleOrNull ?: return@register
+            val description = call.payload["description"]?.jsonPrimitive?.contentOrNull ?: ""
+            val type = call.payload["type"]?.jsonPrimitive?.contentOrNull ?: "expense"
+            val category = call.payload["category"]?.jsonPrimitive?.contentOrNull ?: "Other"
+            val date = call.payload["date"]?.jsonPrimitive?.contentOrNull ?: nowIso().take(10)
+            val id = call.payload["id"]?.jsonPrimitive?.contentOrNull
+                ?: Clock.System.now().toEpochMilliseconds().toString()
+            val transaction = LedgerTransaction(
+                id = id, date = date, description = description,
+                amount = amount, type = type, category = category,
+                notes = call.payload["notes"]?.jsonPrimitive?.contentOrNull
+            )
+            saveLedgerProfile(uid, profile.copy(
+                transactions = profile.transactions + transaction, updatedAt = nowIso()
+            ), call.encryptionKey)
             eventBus.emit(SpineEventPayload(
-                type = "TRANSACTION_CREATED",
-                source = "ledger",
-                domain = "R",
-                data = call.payload.toMap(),
+                type = "TRANSACTION_CREATED", source = "ledger", domain = "R",
+                data = mapOf("moduleId" to "ledger", "transactionId" to id, "amount" to amount, "type" to type),
                 priority = "info"
             ))
         }
         register("ledger", "update_transaction") { call ->
+            val uid = call.userId ?: return@register
+            val profile = loadLedgerProfile(uid, call.encryptionKey)
+            val id = call.payload["id"]?.jsonPrimitive?.contentOrNull ?: return@register
+            val updated = profile.transactions.map { t ->
+                if (t.id != id) t else t.copy(
+                    amount = call.payload["amount"]?.jsonPrimitive?.doubleOrNull ?: t.amount,
+                    description = call.payload["description"]?.jsonPrimitive?.contentOrNull ?: t.description,
+                    category = call.payload["category"]?.jsonPrimitive?.contentOrNull ?: t.category,
+                    type = call.payload["type"]?.jsonPrimitive?.contentOrNull ?: t.type,
+                    date = call.payload["date"]?.jsonPrimitive?.contentOrNull ?: t.date,
+                    notes = call.payload["notes"]?.jsonPrimitive?.contentOrNull ?: t.notes
+                )
+            }
+            saveLedgerProfile(uid, profile.copy(transactions = updated, updatedAt = nowIso()), call.encryptionKey)
             eventBus.emit(SpineEventPayload(
-                type = "TRANSACTION_UPDATED",
-                source = "ledger",
-                domain = "R",
-                data = call.payload.toMap(),
+                type = "TRANSACTION_UPDATED", source = "ledger", domain = "R",
+                data = mapOf("moduleId" to "ledger", "transactionId" to id),
                 priority = "info"
             ))
         }
         register("ledger", "delete_transaction") { call ->
+            val uid = call.userId ?: return@register
+            val profile = loadLedgerProfile(uid, call.encryptionKey)
+            val id = call.payload["id"]?.jsonPrimitive?.contentOrNull ?: return@register
+            saveLedgerProfile(uid, profile.copy(
+                transactions = profile.transactions.filter { it.id != id }, updatedAt = nowIso()
+            ), call.encryptionKey)
             eventBus.emit(SpineEventPayload(
-                type = "TRANSACTION_DELETED",
-                source = "ledger",
-                domain = "R",
-                data = call.payload.toMap(),
+                type = "TRANSACTION_DELETED", source = "ledger", domain = "R",
+                data = mapOf("moduleId" to "ledger", "transactionId" to id),
                 priority = "info"
             ))
         }
         register("ledger", "update_budget") { call ->
+            val uid = call.userId ?: return@register
+            val profile = loadLedgerProfile(uid, call.encryptionKey)
+            val id = call.payload["id"]?.jsonPrimitive?.contentOrNull ?: return@register
+            val updated = profile.budgetCategories.map { b ->
+                if (b.id != id) b else b.copy(
+                    name = call.payload["name"]?.jsonPrimitive?.contentOrNull ?: b.name,
+                    allocated = call.payload["allocated"]?.jsonPrimitive?.doubleOrNull ?: b.allocated,
+                    spent = call.payload["spent"]?.jsonPrimitive?.doubleOrNull ?: b.spent,
+                    color = call.payload["color"]?.jsonPrimitive?.contentOrNull ?: b.color
+                )
+            }
+            saveLedgerProfile(uid, profile.copy(budgetCategories = updated, updatedAt = nowIso()), call.encryptionKey)
             eventBus.emit(SpineEventPayload(
-                type = "BUDGET_UPDATED",
-                source = "ledger",
-                domain = "R",
-                data = call.payload.toMap(),
+                type = "BUDGET_UPDATED", source = "ledger", domain = "R",
+                data = mapOf("moduleId" to "ledger", "budgetId" to id),
                 priority = "info"
             ))
         }
         register("ledger", "create_budget") { call ->
+            val uid = call.userId ?: return@register
+            val profile = loadLedgerProfile(uid, call.encryptionKey)
+            val name = call.payload["name"]?.jsonPrimitive?.contentOrNull ?: return@register
+            val allocated = call.payload["allocated"]?.jsonPrimitive?.doubleOrNull ?: 0.0
+            val id = call.payload["id"]?.jsonPrimitive?.contentOrNull
+                ?: Clock.System.now().toEpochMilliseconds().toString()
+            val budget = LedgerBudgetCategory(
+                id = id, name = name, allocated = allocated,
+                spent = call.payload["spent"]?.jsonPrimitive?.doubleOrNull ?: 0.0,
+                color = call.payload["color"]?.jsonPrimitive?.contentOrNull ?: "#06b6d4"
+            )
+            saveLedgerProfile(uid, profile.copy(
+                budgetCategories = profile.budgetCategories + budget, updatedAt = nowIso()
+            ), call.encryptionKey)
             eventBus.emit(SpineEventPayload(
-                type = "BUDGET_CREATED",
-                source = "ledger",
-                domain = "R",
-                data = call.payload.toMap(),
+                type = "BUDGET_CREATED", source = "ledger", domain = "R",
+                data = mapOf("moduleId" to "ledger", "budgetId" to id, "name" to name, "allocated" to allocated),
                 priority = "info"
             ))
         }
         register("ledger", "goal_progress") { call ->
+            val uid = call.userId ?: return@register
+            val profile = loadLedgerProfile(uid, call.encryptionKey)
+            val goalId = call.payload["goalId"]?.jsonPrimitive?.contentOrNull ?: return@register
+            val delta = call.payload["delta"]?.jsonPrimitive?.doubleOrNull
+            val newAmount = call.payload["newAmount"]?.jsonPrimitive?.doubleOrNull
+            if (delta != null || newAmount != null) {
+                val updated = profile.financialGoals.map { g ->
+                    if (g.id != goalId) g else g.copy(
+                        currentAmount = newAmount ?: (g.currentAmount + (delta ?: 0.0))
+                    )
+                }
+                saveLedgerProfile(uid, profile.copy(financialGoals = updated, updatedAt = nowIso()), call.encryptionKey)
+            }
             eventBus.emit(SpineEventPayload(
-                type = "GOAL_PROGRESS",
-                source = "ledger",
-                domain = "R",
-                data = call.payload.toMap(),
-                priority = "info"
+                type = "GOAL_PROGRESS", source = "ledger", domain = "R",
+                data = call.payload.toMap(), priority = "info"
             ))
         }
         register("ledger", "risk_detected") { call ->
@@ -1067,36 +1198,48 @@ class ActionHub(
         }
 
         register("ledger", "set_financial_goal") { call ->
+            val uid = call.userId ?: return@register
+            val profile = loadLedgerProfile(uid, call.encryptionKey)
             val name = call.payload["name"]?.jsonPrimitive?.contentOrNull ?: return@register
             val targetAmount = call.payload["targetAmount"]?.jsonPrimitive?.doubleOrNull ?: return@register
             val type = call.payload["type"]?.jsonPrimitive?.contentOrNull ?: "savings"
-            val monthlyContribution = call.payload["monthlyContribution"]?.jsonPrimitive?.doubleOrNull ?: 0.0
-            val priority = call.payload["priority"]?.jsonPrimitive?.contentOrNull ?: "medium"
+            val id = call.payload["id"]?.jsonPrimitive?.contentOrNull
+                ?: Clock.System.now().toEpochMilliseconds().toString()
+            val goal = LedgerFinancialGoal(
+                id = id, name = name, type = type, targetAmount = targetAmount,
+                currentAmount = call.payload["currentAmount"]?.jsonPrimitive?.doubleOrNull ?: 0.0,
+                monthlyContribution = call.payload["monthlyContribution"]?.jsonPrimitive?.doubleOrNull ?: 0.0,
+                targetDate = call.payload["targetDate"]?.jsonPrimitive?.contentOrNull,
+                priority = call.payload["priority"]?.jsonPrimitive?.contentOrNull ?: "medium",
+                notes = call.payload["notes"]?.jsonPrimitive?.contentOrNull,
+                createdAt = nowIso()
+            )
+            saveLedgerProfile(uid, profile.copy(
+                financialGoals = profile.financialGoals + goal, updatedAt = nowIso()
+            ), call.encryptionKey)
             eventBus.emit(SpineEventPayload(
-                type = "GOAL_CREATED",
-                source = "ledger",
-                domain = "R",
-                data = mapOf(
-                    "name" to name,
-                    "type" to type,
-                    "targetAmount" to targetAmount,
-                    "monthlyContribution" to monthlyContribution,
-                    "priority" to priority
-                ),
+                type = "GOAL_CREATED", source = "ledger", domain = "R",
+                data = mapOf("moduleId" to "ledger", "goalId" to id, "name" to name, "targetAmount" to targetAmount),
                 priority = "info"
             ))
         }
 
         register("ledger", "update_goal_progress") { call ->
+            val uid = call.userId ?: return@register
+            val profile = loadLedgerProfile(uid, call.encryptionKey)
             val goalId = call.payload["goalId"]?.jsonPrimitive?.contentOrNull ?: return@register
             val delta = call.payload["delta"]?.jsonPrimitive?.doubleOrNull
             val newAmount = call.payload["newAmount"]?.jsonPrimitive?.doubleOrNull
+            val updated = profile.financialGoals.map { g ->
+                if (g.id != goalId) g else g.copy(
+                    currentAmount = newAmount ?: (g.currentAmount + (delta ?: 0.0))
+                )
+            }
+            saveLedgerProfile(uid, profile.copy(financialGoals = updated, updatedAt = nowIso()), call.encryptionKey)
             eventBus.emit(SpineEventPayload(
-                type = "GOAL_PROGRESS",
-                source = "ledger",
-                domain = "R",
+                type = "GOAL_PROGRESS", source = "ledger", domain = "R",
                 data = buildMap {
-                    put("goalId", goalId)
+                    put("moduleId", "ledger"); put("goalId", goalId)
                     if (delta != null) put("delta", delta)
                     if (newAmount != null) put("newAmount", newAmount)
                 },
@@ -1105,35 +1248,42 @@ class ActionHub(
         }
 
         register("ledger", "complete_goal") { call ->
+            val uid = call.userId ?: return@register
+            val profile = loadLedgerProfile(uid, call.encryptionKey)
             val goalId = call.payload["goalId"]?.jsonPrimitive?.contentOrNull ?: return@register
+            // Mark complete by setting currentAmount = targetAmount
+            val updated = profile.financialGoals.map { g ->
+                if (g.id != goalId) g else g.copy(currentAmount = g.targetAmount)
+            }
+            saveLedgerProfile(uid, profile.copy(financialGoals = updated, updatedAt = nowIso()), call.encryptionKey)
             eventBus.emit(SpineEventPayload(
-                type = "GOAL_COMPLETED",
-                source = "ledger",
-                domain = "R",
-                data = mapOf("goalId" to goalId),
+                type = "GOAL_COMPLETED", source = "ledger", domain = "R",
+                data = mapOf("moduleId" to "ledger", "goalId" to goalId),
                 priority = "alert"
             ))
         }
 
         register("ledger", "add_transaction") { call ->
+            val uid = call.userId ?: return@register
+            val profile = loadLedgerProfile(uid, call.encryptionKey)
             val amount = call.payload["amount"]?.jsonPrimitive?.doubleOrNull ?: return@register
             val type = call.payload["type"]?.jsonPrimitive?.contentOrNull ?: "expense"
             val category = call.payload["category"]?.jsonPrimitive?.contentOrNull ?: "Other"
             val description = call.payload["description"]?.jsonPrimitive?.contentOrNull ?: ""
-            val date = call.payload["date"]?.jsonPrimitive?.contentOrNull ?: ""
-            val note = call.payload["note"]?.jsonPrimitive?.contentOrNull
+            val date = call.payload["date"]?.jsonPrimitive?.contentOrNull ?: nowIso().take(10)
+            val id = Clock.System.now().toEpochMilliseconds().toString()
+            val transaction = LedgerTransaction(
+                id = id, date = date, description = description,
+                amount = amount, type = type, category = category,
+                notes = call.payload["note"]?.jsonPrimitive?.contentOrNull
+                    ?: call.payload["notes"]?.jsonPrimitive?.contentOrNull
+            )
+            saveLedgerProfile(uid, profile.copy(
+                transactions = profile.transactions + transaction, updatedAt = nowIso()
+            ), call.encryptionKey)
             eventBus.emit(SpineEventPayload(
-                type = "TRANSACTION_CREATED",
-                source = "ledger",
-                domain = "R",
-                data = buildMap {
-                    put("amount", amount)
-                    put("type", type)
-                    put("category", category)
-                    put("description", description)
-                    put("date", date)
-                    if (note != null) put("note", note)
-                },
+                type = "TRANSACTION_CREATED", source = "ledger", domain = "R",
+                data = mapOf("moduleId" to "ledger", "transactionId" to id, "amount" to amount, "type" to type),
                 priority = "info"
             ))
         }
@@ -1526,6 +1676,16 @@ class ActionHub(
         register("scout", "generate_digest") { call -> handleScoutGenerateDigest(call) }
         register("scout", "export_research") { call -> handleScoutExportResearch(call) }
         register("scout", "flag_anomaly") { call -> handleScoutFlagAnomaly(call) }
+        register("scout", "web_search") { call ->
+            val query = call.payload["query"]?.jsonPrimitive?.contentOrNull ?: return@register
+            eventBus.emit(SpineEventPayload(
+                type = "SCOUT_WEB_SEARCH_REQUESTED",
+                source = "scout",
+                domain = "R",
+                data = mapOf("query" to query, "moduleId" to "scout"),
+                priority = "info"
+            ))
+        }
 
         // -------------------------
         // Forge onboarding parity
@@ -1788,6 +1948,22 @@ class ActionHub(
         NexusLogger.warn("ActionHub", "No handler for \"${action.type}\" in module \"$moduleId\"")
     }
 
+    /**
+     * Returns true if [actionType] has a registered handler reachable from [moduleId]
+     * (module's own registry, its declared dependencies, or the orchestrator fallback).
+     * Used by [ActionHubJs] to signal to the TS bridge whether delegation was handled.
+     */
+    fun isRegistered(moduleId: String, actionType: String): Boolean {
+        if (registry[moduleId]?.containsKey(actionType) == true) return true
+        val deps = dependencies[moduleId]
+        if (deps != null) {
+            for (dep in deps) {
+                if (registry[dep]?.containsKey(actionType) == true) return true
+            }
+        }
+        return registry["orchestrator"]?.containsKey(actionType) == true
+    }
+
     private fun JsonObject.toMap(): Map<String, Any?> {
         return entries.associate { (key, value) ->
             key to value.toAny()
@@ -1796,10 +1972,25 @@ class ActionHub(
 
     private fun JsonElement.toAny(): Any? {
         return when (this) {
-            is JsonPrimitive -> doubleOrNull ?: booleanOrNull ?: content
+            is JsonPrimitive -> {
+                // Use toString() (JSON repr) to detect string primitives.
+                // doubleOrNull / booleanOrNull lose type info for numeric-content strings
+                // (e.g. timestamp IDs) in Kotlin/JS IR — they coerce "1774963752017" → Double.
+                val repr = toString()
+                when {
+                    repr == "null"        -> null
+                    repr == "true"        -> true
+                    repr == "false"       -> false
+                    repr.startsWith("\"") ->
+                        repr.substring(1, repr.length - 1)
+                            .replace("\\\"", "\"")
+                            .replace("\\\\", "\\")
+                    else -> doubleOrNull ?: content
+                }
+            }
             is JsonObject -> this.toMap()
-            is JsonArray -> this.map { it.toAny() }
-            else -> toString()
+            is JsonArray  -> this.map { it.toAny() }
+            else          -> toString()
         }
     }
 
@@ -2285,13 +2476,20 @@ class ActionHub(
         val layer = dataLayer ?: return AtlasProfile()
         val doc = layer.getDocument("atlas_profiles", uid) { Json.parseToJsonElement(it).jsonObject }
             ?: return AtlasProfile()
+        val payloadMode = doc["payloadMode"]?.jsonPrimitive?.content
+        val plaintextData = doc["plaintextData"]?.jsonPrimitive?.content
+        if (payloadMode == "plaintext" && !plaintextData.isNullOrBlank()) {
+            return runCatching {
+                json.decodeFromString(AtlasProfile.serializer(), plaintextData)
+            }.getOrElse { AtlasProfile() }
+        }
         val encryptedData = doc["encryptedData"]?.jsonPrimitive?.content
         val iv = doc["iv"]?.jsonPrimitive?.content
         if (!encryptedData.isNullOrBlank() && !iv.isNullOrBlank()) {
             val vault = vaultBoundary
-            if (encryptionKey != null && vault != null) {
+            if (vault != null) {
                 val decrypted = runCatching {
-                    vault.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey)
+                    vault.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey ?: "")
                 }.getOrNull()
                 if (!decrypted.isNullOrBlank()) {
                     return runCatching {
@@ -2310,9 +2508,9 @@ class ActionHub(
         val layer = dataLayer ?: return
         val updatedProfile = profile.copy(updatedAt = nowIso())
         val vault = vaultBoundary
-        if (encryptionKey != null && vault != null) {
+        if (vault != null) {
             val payloadJson = json.encodeToString(AtlasProfile.serializer(), updatedProfile)
-            val encrypted = runCatching { vault.encrypt(payloadJson, encryptionKey) }.getOrNull() ?: return
+            val encrypted = runCatching { vault.encrypt(payloadJson, encryptionKey ?: "") }.getOrNull() ?: return
             val metadata = mapOf(
                 "onboardingComplete" to updatedProfile.onboardingComplete,
                 "lastActive" to nowIso(),
@@ -2327,10 +2525,12 @@ class ActionHub(
             layer.setDocument("atlas_profiles", uid, payload)
             return
         }
-        val payload = json.encodeToJsonElement(AtlasProfile.serializer(), updatedProfile)
-            .jsonObject
-            .toMap()
-        layer.setDocument("atlas_profiles", uid, payload)
+        val profileJson = json.encodeToString(AtlasProfile.serializer(), updatedProfile)
+        layer.setDocument("atlas_profiles", uid, mapOf(
+            "payloadMode" to "plaintext",
+            "plaintextData" to profileJson,
+            "metadata" to mapOf("onboardingComplete" to updatedProfile.onboardingComplete, "lastActive" to nowIso())
+        ))
     }
 
     private suspend fun loadLedgerProfile(uid: String, encryptionKey: String? = null): LedgerProfile {
@@ -2338,13 +2538,20 @@ class ActionHub(
         val doc = layer.getDocument("ledger_profiles", uid) { Json.parseToJsonElement(it).jsonObject }
             ?: return LedgerProfile()
 
+        val payloadMode = doc["payloadMode"]?.jsonPrimitive?.content
+        val plaintextData = doc["plaintextData"]?.jsonPrimitive?.content
+        if (payloadMode == "plaintext" && !plaintextData.isNullOrBlank()) {
+            return runCatching {
+                json.decodeFromString(LedgerProfile.serializer(), plaintextData)
+            }.getOrElse { LedgerProfile() }
+        }
         val encryptedData = doc["encryptedData"]?.jsonPrimitive?.content
         val iv = doc["iv"]?.jsonPrimitive?.content
         if (!encryptedData.isNullOrBlank() && !iv.isNullOrBlank()) {
             val vault = vaultBoundary
-            if (encryptionKey != null && vault != null) {
+            if (vault != null) {
                 val decrypted = runCatching {
-                    vault.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey)
+                    vault.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey ?: "")
                 }.getOrNull()
                 if (!decrypted.isNullOrBlank()) {
                     return runCatching {
@@ -2365,9 +2572,9 @@ class ActionHub(
         val updatedProfile = profile.copy(updatedAt = nowIso())
         val vault = vaultBoundary
 
-        if (encryptionKey != null && vault != null) {
+        if (vault != null) {
             val payloadJson = json.encodeToString(LedgerProfile.serializer(), updatedProfile)
-            val encrypted = runCatching { vault.encrypt(payloadJson, encryptionKey) }.getOrNull() ?: return
+            val encrypted = runCatching { vault.encrypt(payloadJson, encryptionKey ?: "") }.getOrNull() ?: return
 
             val metadata = mapOf(
                 "onboardingComplete" to updatedProfile.onboardingComplete,
@@ -2385,10 +2592,12 @@ class ActionHub(
             return
         }
 
-        val payload = json.encodeToJsonElement(LedgerProfile.serializer(), updatedProfile)
-            .jsonObject
-            .toMap()
-        layer.setDocument("ledger_profiles", uid, payload)
+        val profileJson = json.encodeToString(LedgerProfile.serializer(), updatedProfile)
+        layer.setDocument("ledger_profiles", uid, mapOf(
+            "payloadMode" to "plaintext",
+            "plaintextData" to profileJson,
+            "metadata" to mapOf("onboardingComplete" to updatedProfile.onboardingComplete, "lastActive" to nowIso())
+        ))
     }
 
     private fun parseBoundedDouble(value: JsonElement?, fallback: Double = 0.0): Double {
@@ -2543,11 +2752,16 @@ class ActionHub(
     private suspend fun loadTrainerProfile(uid: String, encryptionKey: String? = null): TrainerProfile {
         val layer = dataLayer ?: return TrainerProfile()
         val doc = layer.getDocument("titan_profiles", uid) { Json.parseToJsonElement(it).jsonObject } ?: return TrainerProfile()
+        val payloadMode = doc["payloadMode"]?.jsonPrimitive?.content
+        val plaintextData = doc["plaintextData"]?.jsonPrimitive?.content
+        if (payloadMode == "plaintext" && !plaintextData.isNullOrBlank()) {
+            return runCatching { json.decodeFromString(TrainerProfile.serializer(), plaintextData) }.getOrElse { TrainerProfile() }
+        }
         val encryptedData = doc["encryptedData"]?.jsonPrimitive?.content
         val iv = doc["iv"]?.jsonPrimitive?.content
-        if (!encryptedData.isNullOrBlank() && !iv.isNullOrBlank() && encryptionKey != null && vaultBoundary != null) {
+        if (!encryptedData.isNullOrBlank() && !iv.isNullOrBlank() && vaultBoundary != null) {
             val decrypted = runCatching {
-                vaultBoundary!!.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey)
+                vaultBoundary!!.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey ?: "")
             }.getOrNull()
             if (!decrypted.isNullOrBlank()) {
                 return runCatching { json.decodeFromString(TrainerProfile.serializer(), decrypted) }.getOrElse { TrainerProfile() }
@@ -2560,9 +2774,9 @@ class ActionHub(
     private suspend fun saveTrainerProfile(uid: String, profile: TrainerProfile, encryptionKey: String? = null) {
         val layer = dataLayer ?: return
         val updated = profile.copy(updatedAt = nowIso())
-        if (encryptionKey != null && vaultBoundary != null) {
+        if (vaultBoundary != null) {
             val payloadJson = json.encodeToString(TrainerProfile.serializer(), updated)
-            val encrypted = runCatching { vaultBoundary!!.encrypt(payloadJson, encryptionKey) }.getOrNull() ?: return
+            val encrypted = runCatching { vaultBoundary!!.encrypt(payloadJson, encryptionKey ?: "") }.getOrNull() ?: return
             layer.setDocument("titan_profiles", uid, mapOf(
                 "encryptedData" to encrypted.ciphertext,
                 "iv" to encrypted.iv,
@@ -2571,8 +2785,12 @@ class ActionHub(
             ))
             return
         }
-        val payload = json.encodeToJsonElement(TrainerProfile.serializer(), updated).jsonObject.toMap()
-        layer.setDocument("titan_profiles", uid, payload)
+        val profileJson = json.encodeToString(TrainerProfile.serializer(), updated)
+        layer.setDocument("titan_profiles", uid, mapOf(
+            "payloadMode" to "plaintext",
+            "plaintextData" to profileJson,
+            "metadata" to mapOf("onboardingComplete" to updated.onboardingComplete, "lastActive" to nowIso())
+        ))
     }
 
     private suspend fun handleTitanUpdateOnboardingProfile(call: ActionCall) {
@@ -3667,11 +3885,16 @@ class ActionHub(
     private suspend fun loadTherapyProfile(uid: String, encryptionKey: String? = null): TherapyProfile {
         val layer = dataLayer ?: return TherapyProfile()
         val doc = layer.getDocument("agnes_profiles", uid) { Json.parseToJsonElement(it).jsonObject } ?: return TherapyProfile()
+        val payloadMode = doc["payloadMode"]?.jsonPrimitive?.content
+        val plaintextData = doc["plaintextData"]?.jsonPrimitive?.content
+        if (payloadMode == "plaintext" && !plaintextData.isNullOrBlank()) {
+            return runCatching { json.decodeFromString(TherapyProfile.serializer(), plaintextData) }.getOrElse { TherapyProfile() }
+        }
         val encryptedData = doc["encryptedData"]?.jsonPrimitive?.content
         val iv = doc["iv"]?.jsonPrimitive?.content
-        if (!encryptedData.isNullOrBlank() && !iv.isNullOrBlank() && encryptionKey != null && vaultBoundary != null) {
+        if (!encryptedData.isNullOrBlank() && !iv.isNullOrBlank() && vaultBoundary != null) {
             val decrypted = runCatching {
-                vaultBoundary!!.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey)
+                vaultBoundary!!.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey ?: "")
             }.getOrNull()
             if (!decrypted.isNullOrBlank()) {
                 return runCatching { json.decodeFromString(TherapyProfile.serializer(), decrypted) }.getOrElse { TherapyProfile() }
@@ -3684,9 +3907,9 @@ class ActionHub(
     private suspend fun saveTherapyProfile(uid: String, profile: TherapyProfile, encryptionKey: String? = null) {
         val layer = dataLayer ?: return
         val updated = profile.copy(updatedAt = nowIso())
-        if (encryptionKey != null && vaultBoundary != null) {
+        if (vaultBoundary != null) {
             val payloadJson = json.encodeToString(TherapyProfile.serializer(), updated)
-            val encrypted = runCatching { vaultBoundary!!.encrypt(payloadJson, encryptionKey) }.getOrNull() ?: return
+            val encrypted = runCatching { vaultBoundary!!.encrypt(payloadJson, encryptionKey ?: "") }.getOrNull() ?: return
             layer.setDocument("agnes_profiles", uid, mapOf(
                 "encryptedData" to encrypted.ciphertext,
                 "iv" to encrypted.iv,
@@ -3695,8 +3918,12 @@ class ActionHub(
             ))
             return
         }
-        val payload = json.encodeToJsonElement(TherapyProfile.serializer(), updated).jsonObject.toMap()
-        layer.setDocument("agnes_profiles", uid, payload)
+        val profileJson = json.encodeToString(TherapyProfile.serializer(), updated)
+        layer.setDocument("agnes_profiles", uid, mapOf(
+            "payloadMode" to "plaintext",
+            "plaintextData" to profileJson,
+            "metadata" to mapOf("onboardingComplete" to updated.onboardingComplete, "lastActive" to nowIso())
+        ))
     }
 
     private suspend fun handleAgnesUpdateOnboardingProfile(call: ActionCall) {
@@ -3845,15 +4072,16 @@ class ActionHub(
 
     private suspend fun handleAgnesUpdateBeliefGraph(call: ActionCall) {
         val uid = call.userId ?: return
-        val encryptionKey = call.encryptionKey ?: return
         val layer = dataLayer ?: return
-        val vault = vaultBoundary ?: return
+        val vault = vaultBoundary ?: return  // vault callbacks carry the real key in their closure
 
         val next = normalizeBeliefGraph(call.payload)
 
         // Persist belief graph into the dedicated collection (web parity).
         val graphJson = json.encodeToString(BeliefGraph.serializer(), next)
-        val encrypted = runCatching { vault.encrypt(graphJson, encryptionKey) }.getOrNull() ?: return
+        // call.encryptionKey is null on JS/web — pass "" as the key string; it is ignored
+        // by JsVaultBoundary which uses the CryptoKey from the callback closure instead.
+        val encrypted = runCatching { vault.encrypt(graphJson, call.encryptionKey ?: "") }.getOrNull() ?: return
 
         layer.setDocument(
             "belief_graphs",
@@ -3870,8 +4098,8 @@ class ActionHub(
         )
 
         // Also update profile field so Android UI panels update immediately.
-        val profile = loadTherapyProfile(uid, encryptionKey)
-        saveTherapyProfile(uid, profile.copy(beliefGraph = next, updatedAt = nowIso()), encryptionKey)
+        val profile = loadTherapyProfile(uid, call.encryptionKey)
+        saveTherapyProfile(uid, profile.copy(beliefGraph = next, updatedAt = nowIso()), call.encryptionKey)
 
         // Emit BELIEF_UPDATED so downstream listeners (ViewModel, analytics) react.
         eventBus.emit(

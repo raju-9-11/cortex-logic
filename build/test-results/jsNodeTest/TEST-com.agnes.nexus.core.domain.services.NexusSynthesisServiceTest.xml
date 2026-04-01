@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" tests="19" skipped="0" failures="0" errors="0" timestamp="2026-03-31T13:45:01.146Z" hostname="raj-13766" time="0.006">
+  <properties/>
+  <testcase name="detectConflicts_highCnsFatigueAndLowResilience_returnsTherapyFatigueConflict[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="detectConflicts_moderateFatigueAndResilience_noTherapyFatigueConflict[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="detectConflicts_highFinancialFrictionAndStress_returnsFinancialStressConflict[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="detectConflicts_lowFinancialFrictionOrStress_noFinancialStressConflict[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="detectConflicts_compoundCrisis_returns3WayConflict[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="detectConflicts_partialCrisis_no3WayConflict[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="shouldSurface_blockSeverity_alwaysTrue[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="shouldSurface_warnSeverity_throttledToFourHours[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.001"/>
+  <testcase name="shouldSurface_warnSeverity_differentConflictsNotThrottled[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="resolveConflict_reroute_emitsBlockHighIntensity[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.001"/>
+  <testcase name="resolveConflict_reroute_financialConflict_emitsFinancialStress[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="resolveConflict_reroute_compound3Way_emitsCrisisMode[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.001"/>
+  <testcase name="resolveConflict_proceed_noRerouteEvent[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="resolveConflict_defer_noRerouteEvent[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="detectConflicts_emptyNsv_noConflicts[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="detectConflicts_multipleConflictsDetected[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.001"/>
+  <testcase name="detectConflicts_reroutedConflictsExcluded[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="markSurfaced_emitsConflictDetectedEvent[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <testcase name="markSurfaced_warnSeverity_infoPriority[js, node]" classname="com.agnes.nexus.core.domain.services.NexusSynthesisServiceTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

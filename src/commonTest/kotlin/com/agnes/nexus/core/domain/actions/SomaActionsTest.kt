@@ -72,11 +72,11 @@ class SomaActionsTest {
         override suspend fun listDocuments(collection: String): List<String> = docs[collection]?.keys?.toList() ?: emptyList()
         override suspend fun createDocument(collection: String, data: Map<String, Any?>, id: String?): String {
             val docId = id ?: "doc_${docs.size}"
-            docs.computeIfAbsent(collection) { mutableMapOf() }[docId] = data
+            docs.getOrPut(collection) { mutableMapOf() }[docId] = data
             return docId
         }
         override suspend fun setDocument(collection: String, id: String, data: Map<String, Any?>) {
-            docs.computeIfAbsent(collection) { mutableMapOf() }[id] = data
+            docs.getOrPut(collection) { mutableMapOf() }[id] = data
         }
         override suspend fun updateDocument(collection: String, id: String, updates: Map<String, Any?>) {
             val existing = docs[collection]?.get(id) ?: return
