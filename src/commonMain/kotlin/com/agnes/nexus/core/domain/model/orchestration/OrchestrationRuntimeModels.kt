@@ -135,6 +135,48 @@ enum class InteractionDecisionReason {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// Interaction Gate Inputs / Outputs
+// Used by InteractionGate to decide how an interaction should be dispatched.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@Serializable
+data class InteractionCandidate(
+    val kind: InteractionKind,
+    val sourceModuleId: String,
+    val confidence: Double? = null,
+    val requiresApproval: Boolean = false,
+    val highRisk: Boolean = false,
+    val hasConflict: Boolean = false,
+    val canAutoDispatch: Boolean = true
+)
+
+@Serializable
+data class InteractionDecision(
+    val kind: InteractionKind,
+    val mode: InteractionDecisionMode,
+    val reason: InteractionDecisionReason,
+    val confidence: Double,
+    val historyMode: HistoryMode,
+    val shouldPersistDraft: Boolean,
+    val shouldNotifyUser: Boolean,
+    val shouldRenderHudSignal: Boolean
+)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Spec Vector Key
+// Five composite vectors derived from NeuralStateVector for orchestration decisions.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@Serializable
+enum class SpecVectorKey(val key: String) {
+    @SerialName("resilience") RESILIENCE("resilience"),
+    @SerialName("bandwidth") BANDWIDTH("bandwidth"),
+    @SerialName("vitality") VITALITY("vitality"),
+    @SerialName("output") OUTPUT("output"),
+    @SerialName("friction") FRICTION("friction")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // Thread Routing & Planning Suggestion Drafts
 // Richer suggestion objects stored per-thread in OrchestrationStore.
 // ═══════════════════════════════════════════════════════════════════════════════

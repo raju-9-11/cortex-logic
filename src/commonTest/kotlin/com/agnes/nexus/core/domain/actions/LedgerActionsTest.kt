@@ -82,12 +82,12 @@ class LedgerActionsTest {
 
         override suspend fun createDocument(collection: String, data: Map<String, Any?>, id: String?): String {
             val docId = id ?: "doc_${documents.size}"
-            documents.computeIfAbsent(collection) { mutableMapOf() }[docId] = data
+            documents.getOrPut(collection) { mutableMapOf() }[docId] = data
             return docId
         }
 
         override suspend fun setDocument(collection: String, id: String, data: Map<String, Any?>) {
-            documents.computeIfAbsent(collection) { mutableMapOf() }[id] = data
+            documents.getOrPut(collection) { mutableMapOf() }[id] = data
         }
 
         override suspend fun updateDocument(collection: String, id: String, updates: Map<String, Any?>) {

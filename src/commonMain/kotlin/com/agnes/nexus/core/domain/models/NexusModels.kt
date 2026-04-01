@@ -19,7 +19,9 @@ data class NeuralStateVector(
     val cognitive: CognitiveState = CognitiveState(),
     val planning: PlanningState = PlanningState(),
     val resource: ResourceState = ResourceState(),
-    val lastUpdated: Map<String, String> = emptyMap()
+    val lastUpdated: Map<String, String> = emptyMap(),
+    /** Schema version for migration compatibility with TypeScript web layer. */
+    val version: Int = 1
 ) {
     fun formatForPrompt(includeTrauma: Boolean = false): String {
         val lines = mutableListOf<String>()
@@ -68,7 +70,11 @@ data class BiologicalState(
     val weight: Double? = null,
     val bodyFatPct: Double? = null,
     val heartRate: Double? = null,
-    val hrv: Double? = null
+    val hrv: Double? = null,
+    /** Composite physical readiness score (0–100). Written by Soma compute_readiness action. */
+    val readinessScore: Double? = null,
+    /** Unix epoch timestamp of the last Soma/Titan session (ms). */
+    val lastSessionTimestamp: Long? = null
 )
 
 @Serializable
@@ -118,7 +124,11 @@ data class PlanningState(
 @Serializable
 data class ResourceState(
     val financialFriction: Double? = null,
-    val resonanceROI: Double? = null
+    val resonanceROI: Double? = null,
+    /** Ledger-owned: composite automation health score (0-10). */
+    val automationHealthScore: Double? = null,
+    /** Ledger-owned: estimated days until cash flow goes negative. */
+    val cashFlowRunwayDays: Double? = null
 )
 
 // ═══════════════════════════════════════════════
@@ -176,19 +186,37 @@ fun NeuralStateVector.lastBiologicalSyncAtEpochMillis(): Long? =
 
 fun kotlinx.serialization.json.JsonObject.toMap(): Map<String, Any?> {
     return entries.associate { (key, value) ->
-        key to when (value) {
-            is kotlinx.serialization.json.JsonPrimitive -> {
-                if (value.isString) value.content
-                else value.doubleOrNull ?: value.booleanOrNull ?: value.content
+        key to jsonElementToAny(value)
+    }
+}
+
+private fun jsonElementToAny(value: kotlinx.serialization.json.JsonElement): Any? {
+    return when (value) {
+        is kotlinx.serialization.json.JsonPrimitive -> {
+            // toString() returns the canonical JSON representation:
+            //   "\"hello\""  for string primitives (starts with '"')
+            //   "42.5"       for number primitives
+            //   "true/false" for booleans
+            //   "null"       for null
+            // We use this to distinguish types because JsonPrimitive.content can return
+            // a JS Number (not a String) in Kotlin/JS IR for numeric-content string fields.
+            val repr = value.toString()
+            when {
+                repr == "null"         -> null
+                repr == "true"         -> true
+                repr == "false"        -> false
+                repr.startsWith("\"") ->
+                    // Strip outer JSON quotes and unescape — avoids calling .content which
+                    // may return a JS Number in Kotlin/JS IR for numeric-content strings.
+                    repr.substring(1, repr.length - 1)
+                        .replace("\\\"", "\"")
+                        .replace("\\\\", "\\")
+                else -> value.doubleOrNull ?: value.content
             }
-            is kotlinx.serialization.json.JsonObject -> value.toMap()
-            is kotlinx.serialization.json.JsonArray -> value.map { 
-                if (it is kotlinx.serialization.json.JsonObject) it.toMap() 
-                else if (it is kotlinx.serialization.json.JsonPrimitive) it.content
-                else it.toString() 
-            }
-            else -> value.toString()
         }
+        is kotlinx.serialization.json.JsonObject -> value.toMap()
+        is kotlinx.serialization.json.JsonArray -> value.map { jsonElementToAny(it) }
+        else -> value.toString()
     }
 }
 

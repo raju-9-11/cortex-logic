@@ -1,0 +1,1586 @@
+{
+  "actions": [
+    {
+      "actionType": "complete_agnes_onboarding",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_emotional_support_session",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "crisis_flag",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_background",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_goals",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_identity",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_preferences",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_struggles",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "propose_reminder",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "query_reminders",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "sync_vitals",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_agnes_profile",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_belief_graph",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_emotional_resilience",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_emotional_state",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_mood_trend",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_soul_resilience",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_stress_load",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_therapy_context",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_trauma_markers",
+      "moduleId": "agnes",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "atlas_state_changed",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "complete_atlas_onboarding",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "complete_task",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_field",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_goal",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_habit",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_project",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_recovery_window",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_task",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "daily_plan",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "deadline_pressure_changed",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "delegate_to_module",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "delete_field",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "delete_goal",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "delete_habit",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "delete_project",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "delete_recovery_window",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "delete_task",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "flatten_schedule",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_energy_wave",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_execution_baseline",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_journal",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_load_pressure",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_recovery_constraints",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_task",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "generate_daily_schedule",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "habit_streak_broken",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "journal_entry_created",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "move_task",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "pause_habit",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "planning_state_updated",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "prioritize",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "propose_reminder",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "query_reminders",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "request_nsv_calibration",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "routine_updated",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "schedule_block",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "set_daily_intention",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "set_deadline",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "set_task_recurrence",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "suggest_daily_plan",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "suggest_field",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "sync_vitals",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "temporal_review",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_atlas_profile",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_energy_wave",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_field",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_field_value",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_global_base_context",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_goal",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_goal_progress",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_habit",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_habit_streak",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_project",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_recovery_window",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_task",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_task_graph",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "weekly_review",
+      "moduleId": "atlas",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "budget_event",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "complete_forge_onboarding",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_checklist",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_document",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "draft_email",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "edit_section",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "execute_code",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_environment",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_reporting",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_safety",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_summary",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "format_for_export",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "nexus_link_command",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "plan_trip",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "propose_draft",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "propose_reminder",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "query_reminders",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "read_file",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "suggest_reply",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "summarize_thread",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_forge_profile",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_global_base_context",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "write_file",
+      "moduleId": "forge",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "complete_ledger_onboarding",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "compute_resonance_roi",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_budget",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_field",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_transaction",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "delete_field",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "delete_transaction",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_debt_goals",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_expenses",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_income",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_plan_horizon",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_transaction",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "goal_progress",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "propose_reminder",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "query_reminders",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "risk_detected",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "set_field_value",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "suggest_field",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_budget",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_field",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_field_value",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_financial_friction",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_global_base_context",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_ledger_profile",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_transaction",
+      "moduleId": "ledger",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "broadcast_spine_event",
+      "moduleId": "nexus",
+      "source": "OrchestratorActions"
+    },
+    {
+      "actionType": "create_module_handoff",
+      "moduleId": "nexus",
+      "source": "OrchestratorActions"
+    },
+    {
+      "actionType": "navigate_to_module",
+      "moduleId": "nexus",
+      "source": "OrchestratorActions"
+    },
+    {
+      "actionType": "sync_personality_provision",
+      "moduleId": "nexus",
+      "source": "OrchestratorActions"
+    },
+    {
+      "actionType": "sync_vitals",
+      "moduleId": "nexus",
+      "source": "OrchestratorActions"
+    },
+    {
+      "actionType": "update_global_identity",
+      "moduleId": "nexus",
+      "source": "OrchestratorActions"
+    },
+    {
+      "actionType": "broadcast_spine_event",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "complete_orchestrator_onboarding",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "delegate_to_module",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "execute_draft",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_bio",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_identity",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_review",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "propose_reminder",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "query_module",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "query_module_data",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "query_reminders",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "search_memory",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "sync_personality_provision",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "sync_vitals",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_global_identity",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_nsv_fields",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_orchestrator_intake",
+      "moduleId": "orchestrator",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "add_sources",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "complete_scout_onboarding",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_baseline_summary",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_evidence_quality",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_output_shape",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_research_focus",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "list_sessions",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "propose_reminder",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "query_knowledge",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "query_reminders",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "resume_session",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "search_web",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "start_deep_research",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "start_session",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "synthesize_knowledge",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_global_base_context",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_scout_profile",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "web_search",
+      "moduleId": "scout",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "approve_diagnosis_merge",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "approve_health_entry",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "commit_biomarker",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "compute_readiness",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_field",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "delete_field",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "issue_clearance",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "log_vital",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "parse_lab_report",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "propose_reminder",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "query_reminders",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "reject_diagnosis_merge",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "reject_health_entry",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "suggest_field",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_conditions",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_field",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_field_value",
+      "moduleId": "soma",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "advance_cycle_phase",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "complete_cycle",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "complete_titan_onboarding",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "create_cycle",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_history_goals",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_nutrition",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_physical_data",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "focus_session",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "log_body_weight",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "log_cardio_session",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "log_sleep",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "log_workout",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "log_workout_session",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "log_workout_set",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "propose_reminder",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "query_reminders",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_global_base_context",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_routine",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    },
+    {
+      "actionType": "update_titan_profile",
+      "moduleId": "titan",
+      "source": "ActionHub"
+    }
+  ],
+  "cascades": [
+    {
+      "id": "ledger-transaction-to-budget",
+      "source": "SpineCascadeDefaults",
+      "target": "BUDGET_UPDATED",
+      "trigger": "TRANSACTION_CREATED"
+    },
+    {
+      "id": "ledger-goal-progress-to-health",
+      "source": "SpineCascadeDefaults",
+      "target": "FINANCIAL_HEALTH_CHECK",
+      "trigger": "GOAL_PROGRESS"
+    },
+    {
+      "id": "ledger-risk-to-alert",
+      "source": "SpineCascadeDefaults",
+      "target": "FINANCIAL_FRICTION_CHANGED",
+      "trigger": "RISK_DETECTED"
+    },
+    {
+      "id": "ledger-friction-threshold-atlas-audit",
+      "source": "SpineCascadeDefaults",
+      "target": "ATLAS_AUDIT_REQUEST_RUNWAY",
+      "trigger": "FRICTION_THRESHOLD_EXCEEDED"
+    },
+    {
+      "id": "ledger-runway-critical-autopilot-lock",
+      "source": "SpineCascadeDefaults",
+      "target": "NEXUS_AUTOPILOT_LOCK",
+      "trigger": "RUNWAY_UPDATED"
+    },
+    {
+      "id": "ledger-impulse-friction-agnes-scarcity-ping",
+      "source": "SpineCascadeDefaults",
+      "target": "AGNES_SCARCITY_NODE_PING",
+      "trigger": "RESONANCE_FRICTION_UPDATED"
+    },
+    {
+      "id": "soma-clinical-upload-user-titan-clearance-revoke",
+      "source": "SpineCascadeDefaults",
+      "target": "TITAN_CLEARANCE_VETOED",
+      "trigger": "CLINICAL_UPLOAD_PROCESSED"
+    },
+    {
+      "id": "soma-override-veto-weekly-review-flag",
+      "source": "SpineCascadeDefaults",
+      "target": "WEEKLY_REVIEW_FLAG",
+      "trigger": "OVERRIDE_VETO"
+    },
+    {
+      "id": "titan-workout-completed-to-vital-updated",
+      "source": "SpineCascadeDefaults",
+      "target": "VITAL_UPDATED",
+      "trigger": "WORKOUT_COMPLETED"
+    },
+    {
+      "id": "titan-recovery-needed-to-flatten-energy-wave",
+      "source": "SpineCascadeDefaults",
+      "target": "FLATTEN_ENERGY_WAVE",
+      "trigger": "TITAN_RECOVERY_NEEDED"
+    },
+    {
+      "id": "titan-recovery-mode-cache-routine-to-horizon",
+      "source": "SpineCascadeDefaults",
+      "target": "TITAN_CACHE_ROUTINE_TO_HORIZON",
+      "trigger": "TITAN_UI_MODE_RECOVERY"
+    },
+    {
+      "id": "titan-clearance-vetoed-cache-routine",
+      "source": "SpineCascadeDefaults",
+      "target": "TITAN_CACHE_ROUTINE_TO_HORIZON",
+      "trigger": "TITAN_CLEARANCE_VETOED"
+    },
+    {
+      "id": "titan-to-the-dot-success-agnes-dopamine-anchor",
+      "source": "SpineCascadeDefaults",
+      "target": "AGNES_DOPAMINE_ANCHOR",
+      "trigger": "TO_THE_DOT_SUCCESS"
+    },
+    {
+      "id": "atlas-weekly-review-due-session",
+      "source": "SpineCascadeDefaults",
+      "target": "WEEKLY_REVIEW_DUE",
+      "trigger": "SESSION_STARTED"
+    },
+    {
+      "id": "atlas-weekly-review-due-state",
+      "source": "SpineCascadeDefaults",
+      "target": "WEEKLY_REVIEW_DUE",
+      "trigger": "ATLAS_STATE_CHANGED"
+    },
+    {
+      "id": "agnes-burnout-to-somatic-support",
+      "source": "SpineCascadeDefaults",
+      "target": "SOMATIC_SUPPORT_REQUESTED",
+      "trigger": "BURNOUT_WARNING"
+    },
+    {
+      "id": "agnes-stress-spike-to-financial-health-check",
+      "source": "SpineCascadeDefaults",
+      "target": "FINANCIAL_HEALTH_CHECK",
+      "trigger": "STRESS_SPIKE"
+    },
+    {
+      "id": "agnes-financial-friction-to-somatic-support",
+      "source": "SpineCascadeDefaults",
+      "target": "SOMATIC_SUPPORT_REQUESTED",
+      "trigger": "FINANCIAL_FRICTION_CHANGED"
+    },
+    {
+      "id": "atlas-morning-brief-session",
+      "source": "SpineCascadeDefaults",
+      "target": "MORNING_BRIEF_DUE",
+      "trigger": "SESSION_STARTED"
+    },
+    {
+      "id": "atlas-evening-checkin-session",
+      "source": "SpineCascadeDefaults",
+      "target": "EVENING_CHECKIN_DUE",
+      "trigger": "SESSION_STARTED"
+    },
+    {
+      "id": "atlas-journal-reflection-streak-milestone",
+      "source": "SpineCascadeDefaults",
+      "target": "HABIT_STREAK_MILESTONE",
+      "trigger": "JOURNAL_ENTRY_CREATED"
+    },
+    {
+      "id": "atlas-commitment-missed-to-routine-disrupted",
+      "source": "SpineCascadeDefaults",
+      "target": "ROUTINE_UPDATED",
+      "trigger": "COMMITMENT_MISSED"
+    },
+    {
+      "id": "atlas-habit-streak-broken-to-somatic-support",
+      "source": "SpineCascadeDefaults",
+      "target": "SOMATIC_SUPPORT_REQUESTED",
+      "trigger": "HABIT_STREAK_BROKEN"
+    },
+    {
+      "id": "atlas-goal-updated-to-state-changed",
+      "source": "SpineCascadeDefaults",
+      "target": "ATLAS_STATE_CHANGED",
+      "trigger": "ATLAS_GOAL_UPDATED"
+    },
+    {
+      "id": "atlas-goal-completed-to-milestone",
+      "source": "SpineCascadeDefaults",
+      "target": "ATLAS_GOAL_MILESTONE",
+      "trigger": "ATLAS_GOAL_UPDATED"
+    },
+    {
+      "id": "atlas-deadline-pressure-high-to-crunch",
+      "source": "SpineCascadeDefaults",
+      "target": "DEADLINE_CRUNCH",
+      "trigger": "DEADLINE_PRESSURE_CHANGED"
+    },
+    {
+      "id": "atlas-planning-state-updated-to-vital",
+      "source": "SpineCascadeDefaults",
+      "target": "VITAL_UPDATED",
+      "trigger": "PLANNING_STATE_UPDATED"
+    },
+    {
+      "id": "circular-manual-action-bandwidth",
+      "source": "SpineCascadeDefaults",
+      "target": "ACHIEVEMENT_LOGGED",
+      "trigger": "MANUAL_ACTION_COMPLETED"
+    },
+    {
+      "id": "circular-biosync-vitality-titan",
+      "source": "SpineCascadeDefaults",
+      "target": "TITAN_UI_MODE_RECOVERY",
+      "trigger": "BIO_SYNC"
+    },
+    {
+      "id": "circular-biosync-vitality-atlas",
+      "source": "SpineCascadeDefaults",
+      "target": "ATLAS_PUSH_DEADLINES",
+      "trigger": "BIO_SYNC"
+    },
+    {
+      "id": "circular-blabber-agnes-session",
+      "source": "SpineCascadeDefaults",
+      "target": "AGNES_SESSION_INVITATION",
+      "trigger": "BLABBER_INGESTED"
+    },
+    {
+      "id": "circular-blabber-ledger-runway",
+      "source": "SpineCascadeDefaults",
+      "target": "LEDGER_RUNWAY_PING",
+      "trigger": "BLABBER_INGESTED"
+    },
+    {
+      "id": "agnes-victory-infer-task-complete",
+      "source": "SpineCascadeDefaults",
+      "target": "INFER_TASK_COMPLETE",
+      "trigger": "AGNES_SESSION_END"
+    },
+    {
+      "id": "soma-vitality-critical-atlas-lock",
+      "source": "SpineCascadeDefaults",
+      "target": "ATLAS_BLUEPRINT_LOCKED",
+      "trigger": "VITALITY_CRITICAL"
+    },
+    {
+      "id": "ledger-friction-material-review",
+      "source": "SpineCascadeDefaults",
+      "target": "ATLAS_INSERT_PRIORITY_TASK",
+      "trigger": "FINANCIAL_STRESS"
+    },
+    {
+      "id": "circular-clinical-upload-user-titan",
+      "source": "SpineCascadeDefaults",
+      "target": "TITAN_RECOVERY_SUGGESTED",
+      "trigger": "CLINICAL_UPLOAD_PROCESSED"
+    },
+    {
+      "id": "circular-clinical-upload-user-atlas",
+      "source": "SpineCascadeDefaults",
+      "target": "ATLAS_LOWER_CAPACITY",
+      "trigger": "CLINICAL_UPLOAD_PROCESSED"
+    },
+    {
+      "id": "circular-collision-agnes-wins",
+      "source": "SpineCascadeDefaults",
+      "target": "ATLAS_WORK_BLOCK_TO_REST",
+      "trigger": "CONFLICT_DETECTED"
+    },
+    {
+      "id": "crying-override-veto",
+      "source": "SpineCascadeDefaults",
+      "target": "VETO_PRIORITY_1",
+      "trigger": "SOUL_MUTATION_APPLIED"
+    },
+    {
+      "id": "crying-override-atlas-hide",
+      "source": "SpineCascadeDefaults",
+      "target": "ATLAS_HIDE_BLUEPRINT",
+      "trigger": "VETO_PRIORITY_1"
+    },
+    {
+      "id": "crying-override-titan-hide",
+      "source": "SpineCascadeDefaults",
+      "target": "TITAN_HIDE_PERFORMANCE",
+      "trigger": "VETO_PRIORITY_1"
+    },
+    {
+      "id": "crying-override-nexus-morph",
+      "source": "SpineCascadeDefaults",
+      "target": "NEXUS_MORPH_AGNES_ONLY",
+      "trigger": "VETO_PRIORITY_1"
+    },
+    {
+      "id": "titan-post-pump-soma-delayed-fatigue",
+      "source": "SpineCascadeDefaults",
+      "target": "SOMA_DELAYED_FATIGUE_FLAG",
+      "trigger": "WORKOUT_COMPLETED"
+    },
+    {
+      "id": "titan-post-pump-soma-to-atlas-defer",
+      "source": "SpineCascadeDefaults",
+      "target": "ATLAS_DEFER_TASKS_24H",
+      "trigger": "SOMA_DELAYED_FATIGUE_FLAG"
+    },
+    {
+      "id": "titan-session-missed-agnes-lazy-bum-probe",
+      "source": "SpineCascadeDefaults",
+      "target": "AGNES_SELF_SABOTAGE_PROBE",
+      "trigger": "SESSION_MISSED"
+    },
+    {
+      "id": "titan-post-pump-ledger-supplement-check",
+      "source": "SpineCascadeDefaults",
+      "target": "LEDGER_SUPPLEMENT_INVENTORY_CHECK",
+      "trigger": "WORKOUT_COMPLETED"
+    },
+    {
+      "id": "titan-ledger-supplement-low-propose-purchase",
+      "source": "SpineCascadeDefaults",
+      "target": "LEDGER_PROPOSE_PURCHASE",
+      "trigger": "LEDGER_SUPPLEMENT_INVENTORY_CHECK"
+    }
+  ],
+  "events": [
+    {
+      "source": "cascade",
+      "type": "ACHIEVEMENT_LOGGED"
+    },
+    {
+      "source": "cascade",
+      "type": "AGNES_DOPAMINE_ANCHOR"
+    },
+    {
+      "source": "cascade",
+      "type": "AGNES_SCARCITY_NODE_PING"
+    },
+    {
+      "source": "cascade",
+      "type": "AGNES_SELF_SABOTAGE_PROBE"
+    },
+    {
+      "source": "cascade",
+      "type": "AGNES_SESSION_END"
+    },
+    {
+      "source": "cascade",
+      "type": "AGNES_SESSION_INVITATION"
+    },
+    {
+      "source": "cascade",
+      "type": "ATLAS_AUDIT_REQUEST_RUNWAY"
+    },
+    {
+      "source": "cascade",
+      "type": "ATLAS_BLUEPRINT_LOCKED"
+    },
+    {
+      "source": "cascade",
+      "type": "ATLAS_DEFER_TASKS_24H"
+    },
+    {
+      "source": "cascade",
+      "type": "ATLAS_GOAL_MILESTONE"
+    },
+    {
+      "source": "cascade",
+      "type": "ATLAS_GOAL_UPDATED"
+    },
+    {
+      "source": "cascade",
+      "type": "ATLAS_HIDE_BLUEPRINT"
+    },
+    {
+      "source": "cascade",
+      "type": "ATLAS_INSERT_PRIORITY_TASK"
+    },
+    {
+      "source": "cascade",
+      "type": "ATLAS_LOWER_CAPACITY"
+    },
+    {
+      "source": "cascade",
+      "type": "ATLAS_PUSH_DEADLINES"
+    },
+    {
+      "source": "cascade",
+      "type": "ATLAS_STATE_CHANGED"
+    },
+    {
+      "source": "cascade",
+      "type": "ATLAS_WORK_BLOCK_TO_REST"
+    },
+    {
+      "source": "cascade",
+      "type": "BIO_SYNC"
+    },
+    {
+      "source": "cascade",
+      "type": "BLABBER_INGESTED"
+    },
+    {
+      "source": "cascade",
+      "type": "BUDGET_UPDATED"
+    },
+    {
+      "source": "cascade",
+      "type": "BURNOUT_WARNING"
+    },
+    {
+      "source": "cascade",
+      "type": "CLINICAL_UPLOAD_PROCESSED"
+    },
+    {
+      "source": "cascade",
+      "type": "COMMITMENT_MISSED"
+    },
+    {
+      "source": "cascade",
+      "type": "CONFLICT_DETECTED"
+    },
+    {
+      "source": "cascade",
+      "type": "DEADLINE_CRUNCH"
+    },
+    {
+      "source": "cascade",
+      "type": "DEADLINE_PRESSURE_CHANGED"
+    },
+    {
+      "source": "cascade",
+      "type": "EVENING_CHECKIN_DUE"
+    },
+    {
+      "source": "cascade",
+      "type": "FINANCIAL_FRICTION_CHANGED"
+    },
+    {
+      "source": "cascade",
+      "type": "FINANCIAL_HEALTH_CHECK"
+    },
+    {
+      "source": "cascade",
+      "type": "FINANCIAL_STRESS"
+    },
+    {
+      "source": "cascade",
+      "type": "FLATTEN_ENERGY_WAVE"
+    },
+    {
+      "source": "cascade",
+      "type": "FRICTION_THRESHOLD_EXCEEDED"
+    },
+    {
+      "source": "cascade",
+      "type": "GOAL_PROGRESS"
+    },
+    {
+      "source": "cascade",
+      "type": "HABIT_STREAK_BROKEN"
+    },
+    {
+      "source": "cascade",
+      "type": "HABIT_STREAK_MILESTONE"
+    },
+    {
+      "source": "cascade",
+      "type": "INFER_TASK_COMPLETE"
+    },
+    {
+      "source": "cascade",
+      "type": "JOURNAL_ENTRY_CREATED"
+    },
+    {
+      "source": "cascade",
+      "type": "LEDGER_PROPOSE_PURCHASE"
+    },
+    {
+      "source": "cascade",
+      "type": "LEDGER_RUNWAY_PING"
+    },
+    {
+      "source": "cascade",
+      "type": "LEDGER_SUPPLEMENT_INVENTORY_CHECK"
+    },
+    {
+      "source": "cascade",
+      "type": "MANUAL_ACTION_COMPLETED"
+    },
+    {
+      "source": "cascade",
+      "type": "MORNING_BRIEF_DUE"
+    },
+    {
+      "source": "cascade",
+      "type": "NEXUS_AUTOPILOT_LOCK"
+    },
+    {
+      "source": "cascade",
+      "type": "NEXUS_MORPH_AGNES_ONLY"
+    },
+    {
+      "source": "cascade",
+      "type": "OVERRIDE_VETO"
+    },
+    {
+      "source": "cascade",
+      "type": "PLANNING_STATE_UPDATED"
+    },
+    {
+      "source": "cascade",
+      "type": "RESONANCE_FRICTION_UPDATED"
+    },
+    {
+      "source": "cascade",
+      "type": "RISK_DETECTED"
+    },
+    {
+      "source": "cascade",
+      "type": "ROUTINE_UPDATED"
+    },
+    {
+      "source": "cascade",
+      "type": "RUNWAY_UPDATED"
+    },
+    {
+      "source": "cascade",
+      "type": "SESSION_MISSED"
+    },
+    {
+      "source": "cascade",
+      "type": "SESSION_STARTED"
+    },
+    {
+      "source": "cascade",
+      "type": "SOMATIC_SUPPORT_REQUESTED"
+    },
+    {
+      "source": "cascade",
+      "type": "SOMA_DELAYED_FATIGUE_FLAG"
+    },
+    {
+      "source": "cascade",
+      "type": "SOUL_MUTATION_APPLIED"
+    },
+    {
+      "source": "cascade",
+      "type": "STRESS_SPIKE"
+    },
+    {
+      "source": "cascade",
+      "type": "TITAN_CACHE_ROUTINE_TO_HORIZON"
+    },
+    {
+      "source": "cascade",
+      "type": "TITAN_CLEARANCE_VETOED"
+    },
+    {
+      "source": "cascade",
+      "type": "TITAN_HIDE_PERFORMANCE"
+    },
+    {
+      "source": "cascade",
+      "type": "TITAN_RECOVERY_NEEDED"
+    },
+    {
+      "source": "cascade",
+      "type": "TITAN_RECOVERY_SUGGESTED"
+    },
+    {
+      "source": "cascade",
+      "type": "TITAN_UI_MODE_RECOVERY"
+    },
+    {
+      "source": "cascade",
+      "type": "TO_THE_DOT_SUCCESS"
+    },
+    {
+      "source": "cascade",
+      "type": "TRANSACTION_CREATED"
+    },
+    {
+      "source": "cascade",
+      "type": "VETO_PRIORITY_1"
+    },
+    {
+      "source": "cascade",
+      "type": "VITALITY_CRITICAL"
+    },
+    {
+      "source": "cascade",
+      "type": "VITAL_UPDATED"
+    },
+    {
+      "source": "cascade",
+      "type": "WEEKLY_REVIEW_DUE"
+    },
+    {
+      "source": "cascade",
+      "type": "WEEKLY_REVIEW_FLAG"
+    },
+    {
+      "source": "cascade",
+      "type": "WORKOUT_COMPLETED"
+    }
+  ],
+  "generatedAt": "2026-03-25T21:11:17.121037Z"
+}

@@ -138,7 +138,7 @@ class DefaultPersonaFactory : PersonaFactory {
             [OUTPUT FORMAT]
             - Use <thought>...</thought> for internal reasoning.
             - Use <action type="...">JSON_PAYLOAD</action> for system side-effects.
-            - Provide your public response outside these tags.
+            - Everything outside these tags is shown directly to the user. Do NOT prefix it with labels like "Public response:".
         """.trimIndent()
 
         return listOf(

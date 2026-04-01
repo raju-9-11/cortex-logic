@@ -27,6 +27,18 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Run common tests (Android target)
+        run: ./gradlew testDebugUnitTest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+
+      - name: Run JS tests
+        run: ./gradlew jsBrowserTest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+
       - name: Publish to GitHub Packages
         run: ./gradlew publish
         env:

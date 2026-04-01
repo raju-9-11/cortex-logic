@@ -7,7 +7,11 @@ import io.ktor.http.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 /**
  * KMP-compatible LLM transport using Ktor client.
@@ -101,50 +105,6 @@ class KtorLlmTransport(
     } catch (_: Exception) {
         // Malformed JSON chunk — skip silently; the stream remains open
         null
-    }
-
-    /**
-     * Serialize [LlmRequest] to an OpenAI-compatible [JsonObject] without requiring
-     * `@Serializable` on the domain model (which uses a sealed interface for content).
-     *
-     * Supports both text-only and multimodal message content:
-     *   - [LlmContent.Text]              → `"content": "<string>"`
-     *   - [LlmContent.List] with parts   → `"content": [{ "type": "text"|"image_url", ... }]`
-     */
-    private fun LlmRequest.toJsonBody(): JsonObject = buildJsonObject {
-        put("model", model)
-        put("temperature", temperature)
-        put("max_tokens", maxTokens)
-        put("stream", stream)
-        put("top_p", topP)
-        putJsonArray("messages") {
-            messages.forEach { msg ->
-                addJsonObject {
-                    put("role", msg.role)
-                    when (val content = msg.content) {
-                        is LlmContent.Text -> put("content", content.value)
-                        is LlmContent.List -> putJsonArray("content") {
-                            content.parts.forEach { part ->
-                                addJsonObject {
-                                    when (part) {
-                                        is LlmContent.List.Part.Text -> {
-                                            put("type", "text")
-                                            put("text", part.text)
-                                        }
-                                        is LlmContent.List.Part.Image -> {
-                                            put("type", "image_url")
-                                            putJsonObject("image_url") {
-                                                put("url", part.imageUrl)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 

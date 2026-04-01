@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Clock
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -207,7 +208,7 @@ class NexusSynthesisServiceTest {
             affectedModules = listOf("test"),
             severity = NexusSynthesisService.ConflictSeverity.BLOCK,
             suggestedResolution = "Test resolution",
-            detectedAt = System.currentTimeMillis()
+            detectedAt = Clock.System.now().toEpochMilliseconds()
         )
         
         // BLOCK severity should always surface
@@ -233,7 +234,7 @@ class NexusSynthesisServiceTest {
             affectedModules = listOf("test"),
             severity = NexusSynthesisService.ConflictSeverity.WARN,
             suggestedResolution = "Test resolution",
-            detectedAt = System.currentTimeMillis()
+            detectedAt = Clock.System.now().toEpochMilliseconds()
         )
         
         // First check should return true (never surfaced before)
@@ -258,7 +259,7 @@ class NexusSynthesisServiceTest {
             affectedModules = listOf("test"),
             severity = NexusSynthesisService.ConflictSeverity.WARN,
             suggestedResolution = "Test resolution",
-            detectedAt = System.currentTimeMillis()
+            detectedAt = Clock.System.now().toEpochMilliseconds()
         )
         
         val warnConflict2 = NexusSynthesisService.ConflictResult(
@@ -267,7 +268,7 @@ class NexusSynthesisServiceTest {
             affectedModules = listOf("test"),
             severity = NexusSynthesisService.ConflictSeverity.WARN,
             suggestedResolution = "Test resolution",
-            detectedAt = System.currentTimeMillis()
+            detectedAt = Clock.System.now().toEpochMilliseconds()
         )
         
         // Mark first conflict as surfaced
@@ -473,7 +474,7 @@ class NexusSynthesisServiceTest {
             affectedModules = listOf("titan", "agnes"),
             severity = NexusSynthesisService.ConflictSeverity.BLOCK,
             suggestedResolution = "Test resolution",
-            detectedAt = System.currentTimeMillis()
+            detectedAt = Clock.System.now().toEpochMilliseconds()
         )
         
         service.markSurfaced(conflict)
@@ -499,7 +500,7 @@ class NexusSynthesisServiceTest {
             affectedModules = listOf("test"),
             severity = NexusSynthesisService.ConflictSeverity.WARN,
             suggestedResolution = "Test resolution",
-            detectedAt = System.currentTimeMillis()
+            detectedAt = Clock.System.now().toEpochMilliseconds()
         )
         
         service.markSurfaced(conflict)

@@ -1,5 +1,5 @@
 group = "com.agnes.nexus"
-version = "1.0.0"
+version = "1.4.0"
 
 plugins {
     alias(libs.plugins.android.library)
@@ -10,6 +10,8 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(21)
+
     androidTarget {
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
@@ -18,7 +20,15 @@ kotlin {
     }
 
     js(IR) {
-        browser()
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadlessNoSandbox()
+                }
+            }
+        }
+        nodejs()
+        binaries.library()
     }
 
     sourceSets {
