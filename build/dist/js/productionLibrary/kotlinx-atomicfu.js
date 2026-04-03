@@ -37,13 +37,13 @@
       tmp_1[tmp_0] = atomic$ref$1(null);
       tmp_0 = tmp_0 + 1 | 0;
     }
-    tmp.ao_1 = tmp_1;
+    tmp.eo_1 = tmp_1;
   }
-  protoOf(atomicfu$AtomicRefArray$ref).bo = function () {
-    return this.ao_1.length;
+  protoOf(atomicfu$AtomicRefArray$ref).fo = function () {
+    return this.eo_1.length;
   };
   protoOf(atomicfu$AtomicRefArray$ref).atomicfu$get = function (index) {
-    return this.ao_1[index];
+    return this.eo_1[index];
   };
   function atomicfu$AtomicRefArray$ofNulls(size) {
     return new atomicfu$AtomicRefArray$ref(size);
@@ -71,10 +71,10 @@
   function AtomicRef(value) {
     this.kotlinx$atomicfu$value = value;
   }
-  protoOf(AtomicRef).co = function (_set____db54di) {
+  protoOf(AtomicRef).go = function (_set____db54di) {
     this.kotlinx$atomicfu$value = _set____db54di;
   };
-  protoOf(AtomicRef).do = function () {
+  protoOf(AtomicRef).ho = function () {
     return this.kotlinx$atomicfu$value;
   };
   protoOf(AtomicRef).atomicfu$compareAndSet = function (expect, update) {
@@ -97,10 +97,10 @@
   function AtomicBoolean(value) {
     this.kotlinx$atomicfu$value = value;
   }
-  protoOf(AtomicBoolean).eo = function (_set____db54di) {
+  protoOf(AtomicBoolean).io = function (_set____db54di) {
     this.kotlinx$atomicfu$value = _set____db54di;
   };
-  protoOf(AtomicBoolean).do = function () {
+  protoOf(AtomicBoolean).ho = function () {
     return this.kotlinx$atomicfu$value;
   };
   protoOf(AtomicBoolean).atomicfu$compareAndSet = function (expect, update) {
@@ -123,10 +123,10 @@
   function AtomicLong(value) {
     this.kotlinx$atomicfu$value = value;
   }
-  protoOf(AtomicLong).fo = function (_set____db54di) {
+  protoOf(AtomicLong).jo = function (_set____db54di) {
     this.kotlinx$atomicfu$value = _set____db54di;
   };
-  protoOf(AtomicLong).do = function () {
+  protoOf(AtomicLong).ho = function () {
     return this.kotlinx$atomicfu$value;
   };
   protoOf(AtomicLong).atomicfu$compareAndSet = function (expect, update) {
@@ -142,29 +142,29 @@
   };
   protoOf(AtomicLong).atomicfu$getAndIncrement$long = function () {
     var _unary__edvuaz = this.kotlinx$atomicfu$value;
-    this.kotlinx$atomicfu$value = _unary__edvuaz.w2();
+    this.kotlinx$atomicfu$value = _unary__edvuaz.x2();
     return _unary__edvuaz;
   };
   protoOf(AtomicLong).atomicfu$getAndDecrement$long = function () {
     var _unary__edvuaz = this.kotlinx$atomicfu$value;
-    this.kotlinx$atomicfu$value = _unary__edvuaz.x2();
+    this.kotlinx$atomicfu$value = _unary__edvuaz.y2();
     return _unary__edvuaz;
   };
   protoOf(AtomicLong).atomicfu$getAndAdd$long = function (delta) {
     var oldValue = this.kotlinx$atomicfu$value;
-    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.r2(delta);
+    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.s2(delta);
     return oldValue;
   };
   protoOf(AtomicLong).atomicfu$addAndGet$long = function (delta) {
-    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.r2(delta);
+    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.s2(delta);
     return this.kotlinx$atomicfu$value;
   };
   protoOf(AtomicLong).atomicfu$incrementAndGet$long = function () {
-    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.w2();
+    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.x2();
     return this.kotlinx$atomicfu$value;
   };
   protoOf(AtomicLong).atomicfu$decrementAndGet$long = function () {
-    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.x2();
+    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.y2();
     return this.kotlinx$atomicfu$value;
   };
   protoOf(AtomicLong).toString = function () {
@@ -176,10 +176,10 @@
   function AtomicInt(value) {
     this.kotlinx$atomicfu$value = value;
   }
-  protoOf(AtomicInt).go = function (_set____db54di) {
+  protoOf(AtomicInt).ko = function (_set____db54di) {
     this.kotlinx$atomicfu$value = _set____db54di;
   };
-  protoOf(AtomicInt).do = function () {
+  protoOf(AtomicInt).ho = function () {
     return this.kotlinx$atomicfu$value;
   };
   protoOf(AtomicInt).atomicfu$compareAndSet = function (expect, update) {
@@ -243,7 +243,7 @@
     return new AtomicInt(initial);
   }
   //region block: post-declaration
-  defineProp(protoOf(atomicfu$AtomicRefArray$ref), 'atomicfu$size', protoOf(atomicfu$AtomicRefArray$ref).bo);
+  defineProp(protoOf(atomicfu$AtomicRefArray$ref), 'atomicfu$size', protoOf(atomicfu$AtomicRefArray$ref).fo);
   //endregion
   //region block: exports
   _.$_$ = _.$_$ || {};
