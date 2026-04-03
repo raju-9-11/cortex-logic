@@ -1,0 +1,15 @@
+# Gradle build artifacts — keep build/dist/ for npm packaging
+.gradle/
+.kotlin/
+local.properties
+kotlin-js-store/
+build/classes/
+build/generated/
+build/intermediates/
+build/kotlin/
+build/outputs/
+build/reports/
+build/tmp/
+build/js/
+build/libs/
+build/publications/
