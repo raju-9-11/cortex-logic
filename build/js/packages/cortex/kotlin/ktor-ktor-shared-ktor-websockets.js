@@ -21,22 +21,22 @@
   var imul = Math.imul;
   var collectionSizeOrDefault = kotlin_kotlin.$_$.b6;
   var mapCapacity = kotlin_kotlin.$_$.r7;
-  var coerceAtLeast = kotlin_kotlin.$_$.hc;
+  var coerceAtLeast = kotlin_kotlin.$_$.lc;
   var LinkedHashMap_init_$Create$ = kotlin_kotlin.$_$.x;
   var Unit_instance = kotlin_kotlin.$_$.f5;
-  var protoOf = kotlin_kotlin.$_$.xb;
-  var initMetadataForCompanion = kotlin_kotlin.$_$.ua;
-  var enumEntries = kotlin_kotlin.$_$.y9;
-  var Enum = kotlin_kotlin.$_$.sf;
-  var initMetadataForClass = kotlin_kotlin.$_$.ta;
+  var protoOf = kotlin_kotlin.$_$.bc;
+  var initMetadataForCompanion = kotlin_kotlin.$_$.ya;
+  var enumEntries = kotlin_kotlin.$_$.ca;
+  var Enum = kotlin_kotlin.$_$.yf;
+  var initMetadataForClass = kotlin_kotlin.$_$.xa;
   var VOID = kotlin_kotlin.$_$.h;
-  var toString = kotlin_kotlin.$_$.bc;
-  var getStringHashCode = kotlin_kotlin.$_$.ra;
-  var THROW_CCE = kotlin_kotlin.$_$.cg;
-  var initMetadataForObject = kotlin_kotlin.$_$.za;
-  var compareTo = kotlin_kotlin.$_$.ka;
-  var ensureNotNull = kotlin_kotlin.$_$.ug;
-  var objectCreate = kotlin_kotlin.$_$.wb;
+  var toString = kotlin_kotlin.$_$.fc;
+  var getStringHashCode = kotlin_kotlin.$_$.va;
+  var THROW_CCE = kotlin_kotlin.$_$.ig;
+  var initMetadataForObject = kotlin_kotlin.$_$.db;
+  var compareTo = kotlin_kotlin.$_$.oa;
+  var ensureNotNull = kotlin_kotlin.$_$.ah;
+  var objectCreate = kotlin_kotlin.$_$.ac;
   var toByteArray = kotlin_io_ktor_ktor_io.$_$.u;
   var Buffer = kotlin_org_jetbrains_kotlinx_kotlinx_io_core.$_$.e;
   var writeText = kotlin_io_ktor_ktor_io.$_$.x;
@@ -75,17 +75,17 @@
     var capacity = coerceAtLeast(mapCapacity(collectionSizeOrDefault(this_0, 10)), 16);
     // Inline function 'kotlin.collections.associateByTo' call
     var destination = LinkedHashMap_init_$Create$(capacity);
-    var _iterator__ex2g4s = this_0.g();
-    while (_iterator__ex2g4s.h()) {
-      var element = _iterator__ex2g4s.i();
-      var tmp$ret$0 = element.d2n_1;
-      destination.h2(tmp$ret$0, element);
+    var _iterator__ex2g4s = this_0.j();
+    while (_iterator__ex2g4s.k()) {
+      var element = _iterator__ex2g4s.l();
+      var tmp$ret$0 = element.t2n_1;
+      destination.k2(tmp$ret$0, element);
     }
-    tmp.e2n_1 = destination;
-    this.f2n_1 = Codes_INTERNAL_ERROR_getInstance();
+    tmp.u2n_1 = destination;
+    this.v2n_1 = Codes_INTERNAL_ERROR_getInstance();
   }
-  protoOf(Companion).g2n = function (code) {
-    return this.e2n_1.e2(code);
+  protoOf(Companion).w2n = function (code) {
+    return this.u2n_1.h2(code);
   };
   var Companion_instance;
   function Companion_getInstance() {
@@ -124,7 +124,7 @@
   var $ENTRIES;
   function Codes(name, ordinal, code) {
     Enum.call(this, name, ordinal);
-    this.d2n_1 = code;
+    this.t2n_1 = code;
   }
   function Codes_NORMAL_getInstance() {
     Codes_initEntries();
@@ -175,19 +175,19 @@
     return Codes_TRY_AGAIN_LATER_instance;
   }
   function CloseReason(code, message) {
-    this.h2n_1 = code;
-    this.i2n_1 = message;
+    this.x2n_1 = code;
+    this.y2n_1 = message;
   }
-  protoOf(CloseReason).j2n = function () {
-    return Companion_getInstance().g2n(this.h2n_1);
+  protoOf(CloseReason).z2n = function () {
+    return Companion_getInstance().w2n(this.x2n_1);
   };
   protoOf(CloseReason).toString = function () {
-    var tmp0_elvis_lhs = this.j2n();
-    return 'CloseReason(reason=' + toString(tmp0_elvis_lhs == null ? this.h2n_1 : tmp0_elvis_lhs) + ', message=' + this.i2n_1 + ')';
+    var tmp0_elvis_lhs = this.z2n();
+    return 'CloseReason(reason=' + toString(tmp0_elvis_lhs == null ? this.x2n_1 : tmp0_elvis_lhs) + ', message=' + this.y2n_1 + ')';
   };
   protoOf(CloseReason).hashCode = function () {
-    var result = this.h2n_1;
-    result = imul(result, 31) + getStringHashCode(this.i2n_1) | 0;
+    var result = this.x2n_1;
+    result = imul(result, 31) + getStringHashCode(this.y2n_1) | 0;
     return result;
   };
   protoOf(CloseReason).equals = function (other) {
@@ -196,15 +196,15 @@
     if (!(other instanceof CloseReason))
       return false;
     var tmp0_other_with_cast = other instanceof CloseReason ? other : THROW_CCE();
-    if (!(this.h2n_1 === tmp0_other_with_cast.h2n_1))
+    if (!(this.x2n_1 === tmp0_other_with_cast.x2n_1))
       return false;
-    if (!(this.i2n_1 === tmp0_other_with_cast.i2n_1))
+    if (!(this.y2n_1 === tmp0_other_with_cast.y2n_1))
       return false;
     return true;
   };
   function NonDisposableHandle() {
   }
-  protoOf(NonDisposableHandle).ur = function () {
+  protoOf(NonDisposableHandle).bs = function () {
     return Unit_instance;
   };
   protoOf(NonDisposableHandle).toString = function () {
@@ -237,32 +237,32 @@
     var tmp$ret$0;
     $l$block_0: {
       // Inline function 'kotlin.collections.maxByOrNull' call
-      var iterator = tmp0.g();
-      if (!iterator.h()) {
+      var iterator = tmp0.j();
+      if (!iterator.k()) {
         tmp$ret$0 = null;
         break $l$block_0;
       }
-      var maxElem = iterator.i();
-      if (!iterator.h()) {
+      var maxElem = iterator.l();
+      if (!iterator.k()) {
         tmp$ret$0 = maxElem;
         break $l$block_0;
       }
-      var maxValue = maxElem.n2n_1;
+      var maxValue = maxElem.d2o_1;
       do {
-        var e = iterator.i();
-        var v = e.n2n_1;
+        var e = iterator.l();
+        var v = e.d2o_1;
         if (compareTo(maxValue, v) < 0) {
           maxElem = e;
           maxValue = v;
         }
       }
-       while (iterator.h());
+       while (iterator.k());
       tmp$ret$0 = maxElem;
     }
-    tmp.o2n_1 = ensureNotNull(tmp$ret$0).n2n_1;
+    tmp.e2o_1 = ensureNotNull(tmp$ret$0).d2o_1;
     var tmp_0 = this;
     var tmp_1 = 0;
-    var tmp_2 = this.o2n_1 + 1 | 0;
+    var tmp_2 = this.e2o_1 + 1 | 0;
     // Inline function 'kotlin.arrayOfNulls' call
     var tmp_3 = Array(tmp_2);
     while (tmp_1 < tmp_2) {
@@ -273,10 +273,10 @@
         // Inline function 'kotlin.collections.singleOrNull' call
         var single = null;
         var found = false;
-        var _iterator__ex2g4s = tmp1.g();
-        while (_iterator__ex2g4s.h()) {
-          var element = _iterator__ex2g4s.i();
-          if (element.n2n_1 === tmp_4) {
+        var _iterator__ex2g4s = tmp1.j();
+        while (_iterator__ex2g4s.k()) {
+          var element = _iterator__ex2g4s.l();
+          if (element.d2o_1 === tmp_4) {
             if (found) {
               tmp$ret$5 = null;
               break $l$block_2;
@@ -294,7 +294,7 @@
       tmp_3[tmp_4] = tmp$ret$5;
       tmp_1 = tmp_1 + 1 | 0;
     }
-    tmp_0.p2n_1 = tmp_3;
+    tmp_0.f2o_1 = tmp_3;
   }
   var Companion_instance_0;
   function Companion_getInstance_0() {
@@ -326,8 +326,8 @@
   var $ENTRIES_0;
   function FrameType(name, ordinal, controlFrame, opcode) {
     Enum.call(this, name, ordinal);
-    this.m2n_1 = controlFrame;
-    this.n2n_1 = opcode;
+    this.c2o_1 = controlFrame;
+    this.d2o_1 = opcode;
   }
   function FrameType_TEXT_getInstance() {
     FrameType_initEntries();
@@ -370,8 +370,8 @@
   function Close_init_$Init$(reason, $this) {
     // Inline function 'io.ktor.utils.io.core.buildPacket' call
     var builder = new Buffer();
-    builder.y19(reason.h2n_1);
-    writeText(builder, reason.i2n_1);
+    builder.f1a(reason.x2n_1);
+    writeText(builder, reason.y2n_1);
     Close_init_$Init$_0(builder, $this);
     return $this;
   }
@@ -383,7 +383,7 @@
     return $this;
   }
   function Close_init_$Init$_1($this) {
-    Close.call($this, Companion_getInstance_1().q2n_1);
+    Close.call($this, Companion_getInstance_1().g2o_1);
     return $this;
   }
   function Close_init_$Create$_0() {
@@ -406,7 +406,7 @@
   }
   function Companion_1() {
     Companion_instance_1 = this;
-    this.q2n_1 = new Int8Array(0);
+    this.g2o_1 = new Int8Array(0);
   }
   var Companion_instance_1;
   function Companion_getInstance_1() {
@@ -420,16 +420,16 @@
     rsv1 = rsv1 === VOID ? false : rsv1;
     rsv2 = rsv2 === VOID ? false : rsv2;
     rsv3 = rsv3 === VOID ? false : rsv3;
-    this.r2n_1 = fin;
-    this.s2n_1 = frameType;
-    this.t2n_1 = data;
-    this.u2n_1 = disposableHandle;
-    this.v2n_1 = rsv1;
-    this.w2n_1 = rsv2;
-    this.x2n_1 = rsv3;
+    this.h2o_1 = fin;
+    this.i2o_1 = frameType;
+    this.j2o_1 = data;
+    this.k2o_1 = disposableHandle;
+    this.l2o_1 = rsv1;
+    this.m2o_1 = rsv2;
+    this.n2o_1 = rsv3;
   }
   protoOf(Frame).toString = function () {
-    return 'Frame ' + this.s2n_1.toString() + ' (fin=' + this.r2n_1 + ', buffer len = ' + this.t2n_1.length + ')';
+    return 'Frame ' + this.i2o_1.toString() + ' (fin=' + this.h2o_1 + ', buffer len = ' + this.j2o_1.length + ')';
   };
   //region block: init
   NonDisposableHandle_instance = new NonDisposableHandle();

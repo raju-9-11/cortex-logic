@@ -29,7 +29,7 @@
 </td>
 <td>
 <div class="infoBox" id="failures">
-<div class="counter">10</div>
+<div class="counter">1</div>
 <p>failures</p>
 </div>
 </td>
@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.012s</div>
+<div class="counter">0.054s</div>
 <p>duration</p>
 </div>
 </td>
@@ -51,7 +51,7 @@
 </td>
 <td>
 <div class="infoBox failures" id="successRate">
-<div class="percent">72%</div>
+<div class="percent">97%</div>
 <p>successful</p>
 </div>
 </td>
@@ -69,150 +69,6 @@
 </ul>
 <div class="tab">
 <h2>Failed tests</h2>
-<div class="test">
-<a name="decideRoute_customFallback_usesCustomFallback"></a>
-<h3 class="failures">decideRoute_customFallback_usesCustomFallback[js, node]</h3>
-<span class="code">
-<pre>AssertionError: Should use custom fallback when no match. Expected &lt;agnes&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_customFallback_usesCustomFallback_uyx7vn(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:172)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17727)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</pre>
-</span>
-</div>
-<div class="test">
-<a name="decideRoute_emotionKeyword_routesToAgnes"></a>
-<h3 class="failures">decideRoute_emotionKeyword_routesToAgnes[js, node]</h3>
-<span class="code">
-<pre>AssertionError: Emotion keyword should route to agnes. Expected &lt;agnes&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_emotionKeyword_routesToAgnes_f3jqvi(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:71)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17677)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</pre>
-</span>
-</div>
-<div class="test">
-<a name="decideRoute_energyPlanCompound_routesToAtlas"></a>
-<h3 class="failures">decideRoute_energyPlanCompound_routesToAtlas[js, node]</h3>
-<span class="code">
-<pre>AssertionError: Energy plan compound should route to atlas. Expected &lt;atlas&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_energyPlanCompound_routesToAtlas_qupgen(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:308)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17787)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</pre>
-</span>
-</div>
-<div class="test">
-<a name="decideRoute_expenseKeyword_routesToLedger"></a>
-<h3 class="failures">decideRoute_expenseKeyword_routesToLedger[js, node]</h3>
-<span class="code">
-<pre>AssertionError: Expense keyword should route to ledger. Expected &lt;ledger&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_expenseKeyword_routesToLedger_4nla0e(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:112)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17697)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</pre>
-</span>
-</div>
-<div class="test">
-<a name="decideRoute_heartRateCompound_routesToSoma"></a>
-<h3 class="failures">decideRoute_heartRateCompound_routesToSoma[js, node]</h3>
-<span class="code">
-<pre>AssertionError: Compound phrase 'heart rate variability' should route to soma. Expected &lt;soma&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_heartRateCompound_routesToSoma_fh1oof(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:259)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17762)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</pre>
-</span>
-</div>
-<div class="test">
-<a name="decideRoute_mentalHealthCompound_routesToAgnes"></a>
-<h3 class="failures">decideRoute_mentalHealthCompound_routesToAgnes[js, node]</h3>
-<span class="code">
-<pre>AssertionError: Compound phrase 'mental health' should route to agnes. Expected &lt;agnes&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_mentalHealthCompound_routesToAgnes_dyskls(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:239)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17752)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</pre>
-</span>
-</div>
-<div class="test">
-<a name="decideRoute_noMatch_routesToOrchestrator"></a>
-<h3 class="failures">decideRoute_noMatch_routesToOrchestrator[js, node]</h3>
-<span class="code">
-<pre>AssertionError: Rationale should indicate default fallback. Expected &lt;default_nexus&gt;, actual &lt;command:fallback general intent&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_noMatch_routesToOrchestrator_n0riag(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:145)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17712)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</pre>
-</span>
-</div>
-<div class="test">
-<a name="decideRoute_scheduleKeyword_routesToAtlas"></a>
-<h3 class="failures">decideRoute_scheduleKeyword_routesToAtlas[js, node]</h3>
-<span class="code">
-<pre>AssertionError: Schedule keyword should route to atlas. Expected &lt;atlas&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_scheduleKeyword_routesToAtlas_7gynkl(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:290)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17777)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</pre>
-</span>
-</div>
-<div class="test">
-<a name="decideRoute_weekPlanCompound_routesToAtlas"></a>
-<h3 class="failures">decideRoute_weekPlanCompound_routesToAtlas[js, node]</h3>
-<span class="code">
-<pre>AssertionError: Compound phrase 'week plan' should route to atlas. Expected &lt;atlas&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_weekPlanCompound_routesToAtlas_n6yw0t(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:249)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17757)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</pre>
-</span>
-</div>
 <div class="test">
 <a name="decideRoute_workoutKeyword_routesToTitan"></a>
 <h3 class="failures">decideRoute_workoutKeyword_routesToTitan[js, node]</h3>
@@ -267,7 +123,7 @@
 <tr>
 <td class="success">decideRoute_codeKeyword_routesToForge[js, node]</td>
 <td class="success">decideRoute_codeKeyword_routesToForge</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -285,7 +141,7 @@
 <tr>
 <td class="success">decideRoute_confidenceCappedAt92[js, node]</td>
 <td class="success">decideRoute_confidenceCappedAt92</td>
-<td class="success">0.001s</td>
+<td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -297,14 +153,14 @@
 <tr>
 <td class="success">decideRoute_consultativeMentionStaysWithNexus[js, node]</td>
 <td class="success">decideRoute_consultativeMentionStaysWithNexus</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
-<td class="failures">decideRoute_customFallback_usesCustomFallback[js, node]</td>
-<td class="failures">decideRoute_customFallback_usesCustomFallback</td>
-<td class="failures">0.001s</td>
-<td class="failures">failed</td>
+<td class="success">decideRoute_customFallback_usesCustomFallback[js, node]</td>
+<td class="success">decideRoute_customFallback_usesCustomFallback</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">decideRoute_debtKeyword_routesToLedger[js, node]</td>
@@ -315,7 +171,7 @@
 <tr>
 <td class="success">decideRoute_defaultFallbackHasLowConfidence[js, node]</td>
 <td class="success">decideRoute_defaultFallbackHasLowConfidence</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
@@ -325,46 +181,46 @@
 <td class="success">passed</td>
 </tr>
 <tr>
-<td class="failures">decideRoute_emotionKeyword_routesToAgnes[js, node]</td>
-<td class="failures">decideRoute_emotionKeyword_routesToAgnes</td>
-<td class="failures">0.001s</td>
-<td class="failures">failed</td>
+<td class="success">decideRoute_emotionKeyword_routesToAgnes[js, node]</td>
+<td class="success">decideRoute_emotionKeyword_routesToAgnes</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">decideRoute_emptyString_routesToOrchestrator[js, node]</td>
 <td class="success">decideRoute_emptyString_routesToOrchestrator</td>
-<td class="success">0.001s</td>
-<td class="success">passed</td>
-</tr>
-<tr>
-<td class="failures">decideRoute_energyPlanCompound_routesToAtlas[js, node]</td>
-<td class="failures">decideRoute_energyPlanCompound_routesToAtlas</td>
-<td class="failures">0s</td>
-<td class="failures">failed</td>
-</tr>
-<tr>
-<td class="failures">decideRoute_expenseKeyword_routesToLedger[js, node]</td>
-<td class="failures">decideRoute_expenseKeyword_routesToLedger</td>
-<td class="failures">0s</td>
-<td class="failures">failed</td>
-</tr>
-<tr>
-<td class="success">decideRoute_gymKeyword_routesToTitan[js, node]</td>
-<td class="success">decideRoute_gymKeyword_routesToTitan</td>
 <td class="success">0s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
-<td class="failures">decideRoute_heartRateCompound_routesToSoma[js, node]</td>
-<td class="failures">decideRoute_heartRateCompound_routesToSoma</td>
-<td class="failures">0s</td>
-<td class="failures">failed</td>
+<td class="success">decideRoute_energyPlanCompound_routesToAtlas[js, node]</td>
+<td class="success">decideRoute_energyPlanCompound_routesToAtlas</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
 </tr>
 <tr>
-<td class="failures">decideRoute_mentalHealthCompound_routesToAgnes[js, node]</td>
-<td class="failures">decideRoute_mentalHealthCompound_routesToAgnes</td>
-<td class="failures">0.001s</td>
-<td class="failures">failed</td>
+<td class="success">decideRoute_expenseKeyword_routesToLedger[js, node]</td>
+<td class="success">decideRoute_expenseKeyword_routesToLedger</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">decideRoute_gymKeyword_routesToTitan[js, node]</td>
+<td class="success">decideRoute_gymKeyword_routesToTitan</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">decideRoute_heartRateCompound_routesToSoma[js, node]</td>
+<td class="success">decideRoute_heartRateCompound_routesToSoma</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">decideRoute_mentalHealthCompound_routesToAgnes[js, node]</td>
+<td class="success">decideRoute_mentalHealthCompound_routesToAgnes</td>
+<td class="success">0.001s</td>
+<td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">decideRoute_multipleKeywordsSameModule_accumulatesScore[js, node]</td>
@@ -375,14 +231,14 @@
 <tr>
 <td class="success">decideRoute_multipleMatches_highestScoreWins[js, node]</td>
 <td class="success">decideRoute_multipleMatches_highestScoreWins</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
-<td class="failures">decideRoute_noMatch_routesToOrchestrator[js, node]</td>
-<td class="failures">decideRoute_noMatch_routesToOrchestrator</td>
-<td class="failures">0.001s</td>
-<td class="failures">failed</td>
+<td class="success">decideRoute_noMatch_routesToOrchestrator[js, node]</td>
+<td class="success">decideRoute_noMatch_routesToOrchestrator</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">decideRoute_ownershipMentionDelegatesToMentionedModule[js, node]</td>
@@ -405,14 +261,14 @@
 <tr>
 <td class="success">decideRoute_savingsKeyword_routesToLedger[js, node]</td>
 <td class="success">decideRoute_savingsKeyword_routesToLedger</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
-<td class="failures">decideRoute_scheduleKeyword_routesToAtlas[js, node]</td>
-<td class="failures">decideRoute_scheduleKeyword_routesToAtlas</td>
-<td class="failures">0.001s</td>
-<td class="failures">failed</td>
+<td class="success">decideRoute_scheduleKeyword_routesToAtlas[js, node]</td>
+<td class="success">decideRoute_scheduleKeyword_routesToAtlas</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">decideRoute_sleepScoreCompound_routesToSoma[js, node]</td>
@@ -423,25 +279,25 @@
 <tr>
 <td class="success">decideRoute_therapyKeyword_routesToAgnes[js, node]</td>
 <td class="success">decideRoute_therapyKeyword_routesToAgnes</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">decideRoute_trainingKeyword_routesToTitan[js, node]</td>
 <td class="success">decideRoute_trainingKeyword_routesToTitan</td>
-<td class="success">0.001s</td>
+<td class="success">0.003s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
-<td class="failures">decideRoute_weekPlanCompound_routesToAtlas[js, node]</td>
-<td class="failures">decideRoute_weekPlanCompound_routesToAtlas</td>
-<td class="failures">0s</td>
-<td class="failures">failed</td>
+<td class="success">decideRoute_weekPlanCompound_routesToAtlas[js, node]</td>
+<td class="success">decideRoute_weekPlanCompound_routesToAtlas</td>
+<td class="success">0s</td>
+<td class="success">passed</td>
 </tr>
 <tr>
 <td class="failures">decideRoute_workoutKeyword_routesToTitan[js, node]</td>
 <td class="failures">decideRoute_workoutKeyword_routesToTitan</td>
-<td class="failures">0.003s</td>
+<td class="failures">0.033s</td>
 <td class="failures">failed</td>
 </tr>
 <tr>
@@ -453,13 +309,13 @@
 <tr>
 <td class="success">getRoute_validModuleId_returnsRoute[js, node]</td>
 <td class="success">getRoute_validModuleId_returnsRoute</td>
-<td class="success">0s</td>
+<td class="success">0.001s</td>
 <td class="success">passed</td>
 </tr>
 <tr>
 <td class="success">parseCommand_extractsStructuredScheduleIntent[js, node]</td>
 <td class="success">parseCommand_extractsStructuredScheduleIntent</td>
-<td class="success">0s</td>
+<td class="success">0.002s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -472,7 +328,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="https://www.gradle.org">Gradle 8.14.3</a> at 31-Mar-2026, 7:15:01 pm</p>
+<a href="https://www.gradle.org">Gradle 8.14.3</a> at 03-Apr-2026, 5:47:25 pm</p>
 </div>
 </div>
 </body>

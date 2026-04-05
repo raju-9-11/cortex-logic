@@ -1,5 +1,8 @@
 package com.agnes.nexus.core.domain.service.orchestration
 
+import com.agnes.nexus.core.domain.model.orchestration.HistoryMode
+import com.agnes.nexus.core.domain.service.NsvOwnershipService
+import com.agnes.nexus.core.engine.orchestrator.RuntimeSemanticsBuilder
 import com.agnes.nexus.core.platform.generateUuid
 import kotlinx.serialization.json.*
 import kotlin.math.max
@@ -21,11 +24,28 @@ object OrchestrationActionGateService {
         "generate_summary", "detect_data_hint", "navigate_to_module",
         "delegate_to_module", "create_module_handoff", "apply_program_template",
         "suggest_progression",
+        // Merged from Agnes TS NON_MUTATING_ACTIONS
+        "create_emotional_support_session", "create_workout_plan",
+        "create_medical_review", "create_financial_plan_request",
+        "create_research_request", "create_technical_task", "create_general_request",
     )
 
     private val NON_MUTATING_PREFIXES = listOf(
-        "analyze_", "compare_", "identify_", "generate_", "query_",
-        "suggest_", "explain_", "validate_", "propose_",
+        "analyze_", "compare_", "detect_", "identify_", "generate_", "query_",
+        "suggest_", "explain_", "validate_", "propose_", "navigate_",
+    )
+
+    /**
+     * Whether a module has no NSV write permissions.
+     * Derived from [NsvOwnershipService.WRITE_PERMISSIONS] — single source of truth.
+     */
+    private fun isNsvReadOnly(moduleId: String): Boolean =
+        NsvOwnershipService.getWritableMetrics(moduleId).isEmpty()
+
+    /** Action types that constitute a direct NSV/soul write. */
+    private val NSV_WRITE_ACTION_TYPES = setOf(
+        "update_soul", "write_soul", "patch_nsv", "update_nsv", "commit_nsv",
+        "soul_write", "nsv_write",
     )
 
     private val MUTATING_PREFIXES = listOf(
@@ -45,6 +65,14 @@ object OrchestrationActionGateService {
         if (MUTATING_PREFIXES.any { actionType.startsWith(it) }) return true
         return true
     }
+
+    /** Whether [moduleId] is NSV read-only (empty write permissions). */
+    fun isNsvReadOnlyModule(moduleId: String): Boolean =
+        isNsvReadOnly(moduleId)
+
+    /** Whether [actionType] is a direct NSV/soul write action (case-insensitive). */
+    fun isNsvWriteActionType(actionType: String): Boolean =
+        NSV_WRITE_ACTION_TYPES.contains(actionType.lowercase())
 
     fun inferHighRisk(actionType: String): Boolean {
         val normalized = actionType.lowercase()
@@ -241,35 +269,14 @@ object OrchestrationActionGateService {
                 put("highRisk", highRisk)
                 put("dispatchStatus", dispatchStatus)
                 putJsonObject("runtime") {
-                    put("autopilotLevel", autopilotLevel)
-                    // Derive autonomy, disposition, etc. inline (matching RuntimeSemanticsBuilder)
-                    val autonomy = when {
-                        autopilotLevel >= 5 -> "ghost"
-                        autopilotLevel >= 4 -> "supervised_autonomy"
-                        autopilotLevel == 3 -> "conditional_autonomy"
-                        autopilotLevel == 2 -> "guided_assist"
-                        autopilotLevel == 1 -> "proposal_first"
-                        else -> "manual_lock"
-                    }
-                    put("autonomy", autonomy)
-                    val disposition = when {
-                        highRisk && dispatchStatus != "approved" && dispatchStatus != "ephemeral" -> "high_risk_review"
-                        dispatchStatus == "awaiting_approval" -> "proposal_review"
-                        dispatchStatus == "blocked" -> "manual_review"
-                        dispatchStatus == "analysis_only" -> "analysis_only"
-                        dispatchStatus == "ephemeral" -> "ephemeral_preview"
-                        effectiveHistoryMode == "silent" -> "silent_execution"
-                        else -> "visible_execution"
-                    }
-                    put("disposition", disposition)
-                    val historyDest = when {
-                        effectiveHistoryMode == "silent" && dispatchStatus == "approved" -> "silent_audit"
-                        dispatchStatus == "ephemeral" -> "none"
-                        else -> "standard"
-                    }
-                    put("historyDestination", historyDest)
-                    put("willPersistHistory", historyDest != "none")
-                    put("shouldNotifyUser", dispatchStatus == "awaiting_approval" || highRisk || disposition == "incident_review")
+                    val histMode = if (effectiveHistoryMode == "silent") HistoryMode.SILENT else HistoryMode.STANDARD
+                    val semantics = RuntimeSemanticsBuilder.build(autopilotLevel, histMode, dispatchStatus, highRisk)
+                    put("autopilotLevel", semantics.autopilotLevel)
+                    put("autonomy", semantics.autonomy.name.lowercase())
+                    put("disposition", semantics.disposition.name.lowercase())
+                    put("historyDestination", semantics.historyDestination)
+                    put("willPersistHistory", semantics.willPersistHistory)
+                    put("shouldNotifyUser", semantics.shouldNotifyUser)
                 }
             }
         }.toString()

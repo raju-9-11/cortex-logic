@@ -14,7 +14,7 @@ class ActionCapabilityResolverJs {
 
 @JsExport
 class AgentRegistryJs {
-    private val registry = AgentRegistry()
+    private val registry = AgentRegistry
     private val json = Json { ignoreUnknownKeys = true }
 
     fun listProviders(): String = registry.listProvidersJson()

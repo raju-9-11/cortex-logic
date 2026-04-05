@@ -31,4 +31,8 @@ class NsvServiceJs {
      */
     fun formatForAtlasPlanner(nsvJson: String): String =
         NsvService.formatForAtlasPlanner(nsvJson)
+
+    /** Merge two NSV patch objects — shallow spread + domain deep merge. */
+    fun mergePatches(baseJson: String, updatesJson: String): String =
+        NsvService.mergePatches(baseJson, updatesJson)
 }

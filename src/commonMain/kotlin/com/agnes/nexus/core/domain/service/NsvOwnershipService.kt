@@ -156,6 +156,85 @@ object NsvOwnershipService {
         return coOwned
     }
 
+    /** Metrics that are computed/derived rather than directly user-reported. */
+    val DERIVED_METRICS: List<String> = listOf(
+        "cognitive.activeLoad", "cognitive.researchLoad", "cognitive.planningLoad",
+        "cognitive.taskCompletionRate", "cognitive.interestDiversity",
+        "planning.streakHealth", "planning.deadlinePressure",
+    )
+
+    /** Per-metric calibration prompt templates for user-facing data collection. */
+    val CALIBRATION_PROMPTS: Map<String, String> = mapOf(
+        "biological.cnsFatigue" to "On a 0-10 scale, how fatigued does your CNS feel right now?",
+        "biological.sleepQuality" to "How would you rate your last sleep quality from 0-10?",
+        "biological.recoveryScore" to "What is your current recovery score (0-10) if you have one?",
+        "biological.hormonalContext" to "Any notable hormonal context or cycle phase to note right now?",
+        "emotional.emotionalResilience" to "On a 0-10 scale, how resilient do you feel today?",
+        "emotional.stressLoad" to "On a 0-10 scale, how elevated is your stress load?",
+        "emotional.moodTrend" to "What is your current mood trend (e.g., stable, improving, declining)?",
+        "emotional.traumaMarkers" to "Any trauma markers or triggers to log, or should I mark none for now?",
+        "cognitive.energyBudget" to "What is your current energy budget (0-10)?",
+        "cognitive.focusScore" to "How would you rate your focus today (0-10)?",
+        "cognitive.activeLoad" to "How heavy is your task load right now (0-10)?",
+        "cognitive.researchLoad" to "How intense is your research load right now (0-10)?",
+        "cognitive.planningLoad" to "How many open, uncommitted tasks or plans do you have in your head right now (0-10)?",
+        "cognitive.taskCompletionRate" to "Roughly what fraction of tasks you planned this week did you complete (0.0-1.0)?",
+        "cognitive.interestDiversity" to "How broad are your active research interests right now (0-10, low = hyperfocused on one thing)?",
+        "planning.streakHealth" to "How well are you maintaining your daily habits and streaks (0-10)?",
+        "planning.deadlinePressure" to "How much deadline pressure do you feel right now (0-10)?",
+        "planning.reflectionStreak" to "How many consecutive days have you journaled recently?",
+        "planning.goalAlignment" to "What fraction of your active goals have linked tasks (0-1)?",
+        "planning.habitMomentum" to "What fraction of your active habits have live streaks (0-1)?",
+        "resource.financialFriction" to "How much financial friction do you feel right now (0-10)?",
+        "resource.resonanceROI" to "What is your current resonance ROI (0-1 or percentage)?",
+    )
+
+    /** Build a calibration prompt for a module based on its owned metrics. */
+    fun buildCalibrationPrompt(moduleId: String): String {
+        val owned = WRITE_PERMISSIONS[moduleId] ?: return "Calibration required. Share any missing vital metrics for this domain."
+        if (owned.isEmpty()) return "Calibration required. Share any missing vital metrics for this domain."
+        val lines = owned.map { metric -> "- ${CALIBRATION_PROMPTS[metric] ?: metric}" }
+        return (listOf("Calibration required. Please provide:") + lines).joinToString("\n")
+    }
+
+    /**
+     * Filter an NSV write patch to only include metrics [moduleId] is allowed to write.
+     * KMP equivalent of Agnes `filterReadOnlyModuleNSVUpdate`.
+     *
+     * Supports both flat dotted keys (e.g. {"biological.cnsFatigue": 5})
+     * and nested JSON (e.g. {"biological": {"cnsFatigue": 5}}).
+     *
+     * @param moduleId Module performing the write.
+     * @param patchJson JSON object in either format.
+     * @return Filtered JSON (flat dotted format) with only writable paths, or `null` if nothing remains.
+     */
+    fun filterWritePatch(moduleId: String, patchJson: String): String? {
+        val allowed = WRITE_PERMISSIONS[moduleId] ?: return null
+        if (allowed.isEmpty()) return null
+        val allowedSet = allowed.toSet()
+
+        val patch = try {
+            Json.parseToJsonElement(patchJson) as? JsonObject ?: return null
+        } catch (_: Exception) { return null }
+
+        // Flatten nested format to dotted keys, pass flat keys through
+        val flatPatch = mutableMapOf<String, JsonElement>()
+        for ((key, value) in patch) {
+            if (value is JsonObject && !key.contains('.')) {
+                // Nested: { "biological": { "cnsFatigue": 5 } } → "biological.cnsFatigue": 5
+                for ((field, fieldValue) in value) {
+                    flatPatch["$key.$field"] = fieldValue
+                }
+            } else {
+                flatPatch[key] = value
+            }
+        }
+
+        val filtered = flatPatch.filterKeys { it in allowedSet }
+        if (filtered.isEmpty()) return null
+        return Json.encodeToString(JsonObject.serializer(), JsonObject(filtered))
+    }
+
     // ── Private helpers ──────────────────────────────────────────────────────
 
     /**

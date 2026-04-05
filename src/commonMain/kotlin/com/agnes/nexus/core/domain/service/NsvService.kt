@@ -143,6 +143,35 @@ object NsvService {
     }
 
     /**
+     * Merge two NSV patch objects (shallow spread at top level + deep merge per domain).
+     * Mirrors Agnes's mergeNSVPatch(). Used when assembling partial NSV updates.
+     */
+    fun mergePatches(baseJson: String, updatesJson: String): String {
+        val base = try { json.parseToJsonElement(baseJson).jsonObject } catch (_: Exception) { JsonObject(emptyMap()) }
+        val updates = try { json.parseToJsonElement(updatesJson).jsonObject } catch (_: Exception) { JsonObject(emptyMap()) }
+
+        val result = mutableMapOf<String, JsonElement>()
+
+        // Top-level non-domain keys: updates override base
+        for ((k, v) in base) { if (k !in DOMAINS) result[k] = v }
+        for ((k, v) in updates) { if (k !in DOMAINS) result[k] = v }
+
+        // Domain keys: shallow merge within each domain
+        for (domain in DOMAINS) {
+            val baseDomain = base[domain]?.jsonObjectOrNull ?: JsonObject(emptyMap())
+            val updatesDomain = updates[domain]?.jsonObjectOrNull ?: JsonObject(emptyMap())
+            if (baseDomain.isNotEmpty() || updatesDomain.isNotEmpty()) {
+                result[domain] = buildJsonObject {
+                    for ((k, v) in baseDomain) put(k, v)
+                    for ((k, v) in updatesDomain) put(k, v)
+                }
+            }
+        }
+
+        return json.encodeToString(JsonObject.serializer(), JsonObject(result))
+    }
+
+    /**
      * Format full NSV for prompt injection with [GLOBAL NEURAL STATE] header.
      * (Agnes-compatible format.)
      */

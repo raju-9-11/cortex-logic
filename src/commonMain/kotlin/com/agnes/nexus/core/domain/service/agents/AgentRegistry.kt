@@ -18,8 +18,10 @@ data class AgentProviderDescriptor(
 /**
  * Agent registry — manages provider descriptors and resolves capabilities.
  * Pure computation, no I/O. Payload adapters stay in platform code (they use Date/constructors).
+ *
+ * Singleton to ensure all callers share the same registry state (e.g. custom provider registrations).
  */
-class AgentRegistry {
+object AgentRegistry {
 
     private val providers = mutableMapOf<String, AgentProviderDescriptor>()
     private var bootstrapped = false
@@ -113,19 +115,18 @@ class AgentRegistry {
         bootstrapped = false
     }
 
-    companion object {
-        private fun sortProviders(
-            providers: List<AgentProviderDescriptor>,
-            preferredModuleIds: List<String>,
-        ): List<AgentProviderDescriptor> {
-            val preferenceIndex = preferredModuleIds.withIndex().associate { (i, id) -> id to i }
-            return providers.sortedWith(compareBy(
-                { preferenceIndex[it.moduleId] ?: Int.MAX_VALUE },
-                { it.precedence },
-            ))
-        }
+    private fun sortProviders(
+        providers: List<AgentProviderDescriptor>,
+        preferredModuleIds: List<String>,
+    ): List<AgentProviderDescriptor> {
+        val preferenceIndex = preferredModuleIds.withIndex().associate { (i, id) -> id to i }
+        return providers.sortedWith(compareBy(
+            { preferenceIndex[it.moduleId] ?: Int.MAX_VALUE },
+            { it.precedence },
+        ))
+    }
 
-        val DEFAULT_AGENT_PROVIDERS = listOf(
+    val DEFAULT_AGENT_PROVIDERS = listOf(
             AgentProviderDescriptor(
                 id = "nexus-orchestrator", moduleId = "nexus", title = "Nexus",
                 capabilities = listOf("general-orchestration", "reminder-management"),
@@ -168,5 +169,5 @@ class AgentRegistry {
                 precedence = 70, latencyTier = "heavy",
             ),
         )
-    }
 }
+

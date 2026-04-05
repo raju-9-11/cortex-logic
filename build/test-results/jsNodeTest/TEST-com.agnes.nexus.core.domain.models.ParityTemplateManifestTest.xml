@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.agnes.nexus.core.domain.models.ParityTemplateManifestTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-03-31T13:45:01.112Z" hostname="raj-13766" time="0.001">
-  <properties/>
-  <testcase name="manifest includes expected module template ids and notification presets[js, node]" classname="com.agnes.nexus.core.domain.models.ParityTemplateManifestTest" time="0.001"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

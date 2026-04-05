@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.agnes.nexus.core.domain.models.NotificationPresetRegistryTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-03-31T13:45:01.111Z" hostname="raj-13766" time="0.001">
-  <properties/>
-  <testcase name="preset ids match web truth source[js, node]" classname="com.agnes.nexus.core.domain.models.NotificationPresetRegistryTest" time="0.001"/>
-  <testcase name="all presets include recurrence and message templates[js, node]" classname="com.agnes.nexus.core.domain.models.NotificationPresetRegistryTest" time="0.0"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

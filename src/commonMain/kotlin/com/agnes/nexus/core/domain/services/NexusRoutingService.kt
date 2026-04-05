@@ -2,12 +2,16 @@ package com.agnes.nexus.core.domain.services
 
 import com.agnes.nexus.core.domain.models.ModuleIds
 import com.agnes.nexus.core.domain.models.ModuleManifest
+import com.agnes.nexus.core.domain.service.agents.AgentRegistry
 import com.agnes.nexus.core.engine.LlmSanitizer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+
+/** Minimum confidence for a non-nexus routing decision. */
+private const val MIN_ROUTE_CONFIDENCE = 0.55
 
 data class RouteDecision(
     val moduleId: String,
@@ -27,7 +31,7 @@ private data class Keyword(
 
 class NexusRoutingService(
     private val llmSanitizer: LlmSanitizer = LlmSanitizer(),
-    private val commandIntelligenceService: CommandIntelligenceService = CommandIntelligenceService
+    private val commandIntelligenceService: CommandIntelligenceService = CommandIntelligenceService,
 ) {
     fun decideRoute(
         prompt: String,
@@ -83,12 +87,34 @@ class NexusRoutingService(
 
         classifyMentionIntent(parsedCommand)?.let { return it }
 
-        val topHint = parsedCommand.sharedRouteHints.firstOrNull() ?: return null
-        return RouteDecision(
-            moduleId = ModuleIds.normalize(topHint.moduleId) ?: ModuleIds.NEXUS,
-            confidence = topHint.confidence.coerceIn(0.0, 1.0),
-            rationale = "command:${topHint.reason}"
-        )
+        val topHint = parsedCommand.sharedRouteHints.firstOrNull()
+        if (topHint != null) {
+            if (topHint.confidence < MIN_ROUTE_CONFIDENCE) return null
+            return RouteDecision(
+                moduleId = ModuleIds.normalize(topHint.moduleId) ?: ModuleIds.NEXUS,
+                confidence = topHint.confidence.coerceIn(0.0, 1.0),
+                rationale = "command:${topHint.reason} scored:${topHint.confidence}"
+            )
+        }
+
+        // Capability-based fallback: resolve primary provider from intent capabilities
+        val capabilities = parsedCommand.intents.flatMap { it.capabilities }
+        val candidateModules = parsedCommand.intents.flatMap { it.candidateModules }
+        if (capabilities.isNotEmpty()) {
+            val provider = AgentRegistry.resolvePrimaryProvider(capabilities, candidateModules)
+            if (provider != null && provider.moduleId != ModuleIds.NEXUS) {
+                val confidence = parsedCommand.confidence
+                if (confidence >= MIN_ROUTE_CONFIDENCE) {
+                    return RouteDecision(
+                        moduleId = provider.moduleId,
+                        confidence = confidence,
+                        rationale = "capability:${provider.id}"
+                    )
+                }
+            }
+        }
+
+        return null
     }
 
     fun parseCommand(
@@ -174,7 +200,13 @@ class NexusRoutingService(
         }
     }
 
-    private fun buildRouterPrompt(): String {
+    @Deprecated("Use buildRouterPrompt() directly — method is now internal", replaceWith = ReplaceWith("buildRouterPrompt()"))
+    fun buildRouterPromptPublic(): String = buildRouterPrompt()
+
+    @Deprecated("Use parseRoutingResponse() directly — method is now internal", replaceWith = ReplaceWith("parseRoutingResponse(raw)"))
+    fun parseRoutingResponsePublic(raw: String): RouteDecision? = parseRoutingResponse(raw)
+
+    internal fun buildRouterPrompt(): String {
         val moduleLines = ModuleManifest.entries.joinToString("\n") { entry ->
             "- ${entry.id}: ${entry.title} (${entry.description})"
         }
@@ -194,7 +226,7 @@ class NexusRoutingService(
         """.trimIndent()
     }
 
-    private fun parseRoutingResponse(raw: String): RouteDecision? {
+    internal fun parseRoutingResponse(raw: String): RouteDecision? {
         return try {
             val sanitized = llmSanitizer.sanitizeJsonPayload(raw)
             val element = Json.parseToJsonElement(sanitized).jsonObject
@@ -257,6 +289,9 @@ class NexusRoutingService(
                     Keyword("training plan", 3),
                     Keyword("fitness plan", 3),
                     Keyword("exercise plan", 3),
+                    Keyword("workout schedule", 3),
+                    Keyword("schedule workout", 3),
+                    Keyword("training calendar", 3),
                     Keyword("personal record", 2),
                     Keyword("titan", 2),
                     Keyword("workout", 2),
@@ -265,7 +300,8 @@ class NexusRoutingService(
                     Keyword("fitness", 2),
                     Keyword("strength", 1),
                     Keyword("routine", 1),
-                    Keyword("fatigue", 1)
+                    Keyword("fatigue", 1),
+                    Keyword("schedule", 1)
                 )
             ),
             KeywordRoute(
@@ -308,6 +344,14 @@ class NexusRoutingService(
             KeywordRoute(
                 moduleId = "scout",
                 keywords = listOf(
+                    Keyword("what does research say", 3),
+                    Keyword("scientific consensus", 3),
+                    Keyword("evidence-based", 3),
+                    Keyword("studies show", 3),
+                    Keyword("meta-analysis", 2),
+                    Keyword("peer reviewed", 2),
+                    Keyword("clinical trial", 2),
+                    Keyword("systematic review", 2),
                     Keyword("topic map", 2),
                     Keyword("fact-check", 2),
                     Keyword("scout", 2),
@@ -319,7 +363,12 @@ class NexusRoutingService(
                     Keyword("trend", 1),
                     Keyword("news", 1),
                     Keyword("interest", 1),
-                    Keyword("discover", 1)
+                    Keyword("discover", 1),
+                    Keyword("literature", 1),
+                    Keyword("cite", 1),
+                    Keyword("citation", 1),
+                    Keyword("findings", 1),
+                    Keyword("study", 1)
                 )
             ),
             KeywordRoute(

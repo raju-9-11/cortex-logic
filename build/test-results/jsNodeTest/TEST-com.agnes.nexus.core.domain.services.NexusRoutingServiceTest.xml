@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" tests="37" skipped="0" failures="10" errors="0" timestamp="2026-03-31T13:45:01.131Z" hostname="raj-13766" time="0.015">
+<testsuite name="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" tests="37" skipped="0" failures="1" errors="0" timestamp="2026-04-03T12:17:25.360Z" hostname="raj-13766" time="0.058">
   <properties/>
-  <testcase name="decideRoute_workoutKeyword_routesToTitan[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.003">
+  <testcase name="decideRoute_workoutKeyword_routesToTitan[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.033">
     <failure message="AssertionError: Rationale should indicate workout match" type="AssertionError">AssertionError: Rationale should indicate workout match
 	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
 	at DefaultJsAsserter.protoOf.assertTrue_dqb114(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:67)
@@ -12,140 +12,41 @@
 	at &lt;global&gt;.processImmediate(node:internal/timers:478)
 </failure>
   </testcase>
-  <testcase name="decideRoute_trainingKeyword_routesToTitan[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
-  <testcase name="decideRoute_gymKeyword_routesToTitan[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
+  <testcase name="decideRoute_trainingKeyword_routesToTitan[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.003"/>
+  <testcase name="decideRoute_gymKeyword_routesToTitan[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
   <testcase name="decideRoute_anxietyKeyword_routesToAgnes[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
-  <testcase name="decideRoute_emotionKeyword_routesToAgnes[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001">
-    <failure message="AssertionError: Emotion keyword should route to agnes. Expected &lt;agnes&gt;, actual &lt;nexus&gt;." type="AssertionError">AssertionError: Emotion keyword should route to agnes. Expected &lt;agnes&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_emotionKeyword_routesToAgnes_f3jqvi(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:71)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17677)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</failure>
-  </testcase>
-  <testcase name="decideRoute_therapyKeyword_routesToAgnes[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
+  <testcase name="decideRoute_emotionKeyword_routesToAgnes[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.003"/>
+  <testcase name="decideRoute_therapyKeyword_routesToAgnes[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
   <testcase name="decideRoute_depressionKeyword_routesToAgnes[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
   <testcase name="decideRoute_budgetKeyword_routesToLedger[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
-  <testcase name="decideRoute_expenseKeyword_routesToLedger[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0">
-    <failure message="AssertionError: Expense keyword should route to ledger. Expected &lt;ledger&gt;, actual &lt;nexus&gt;." type="AssertionError">AssertionError: Expense keyword should route to ledger. Expected &lt;ledger&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_expenseKeyword_routesToLedger_4nla0e(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:112)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17697)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</failure>
-  </testcase>
-  <testcase name="decideRoute_savingsKeyword_routesToLedger[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
+  <testcase name="decideRoute_expenseKeyword_routesToLedger[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.002"/>
+  <testcase name="decideRoute_savingsKeyword_routesToLedger[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
   <testcase name="decideRoute_debtKeyword_routesToLedger[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
-  <testcase name="decideRoute_noMatch_routesToOrchestrator[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001">
-    <failure message="AssertionError: Rationale should indicate default fallback. Expected &lt;default_nexus&gt;, actual &lt;command:fallback general intent&gt;." type="AssertionError">AssertionError: Rationale should indicate default fallback. Expected &lt;default_nexus&gt;, actual &lt;command:fallback general intent&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_noMatch_routesToOrchestrator_n0riag(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:145)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17712)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</failure>
-  </testcase>
+  <testcase name="decideRoute_noMatch_routesToOrchestrator[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
   <testcase name="decideRoute_randomText_routesToOrchestrator[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
-  <testcase name="decideRoute_emptyString_routesToOrchestrator[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
-  <testcase name="decideRoute_customFallback_usesCustomFallback[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001">
-    <failure message="AssertionError: Should use custom fallback when no match. Expected &lt;agnes&gt;, actual &lt;nexus&gt;." type="AssertionError">AssertionError: Should use custom fallback when no match. Expected &lt;agnes&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_customFallback_usesCustomFallback_uyx7vn(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:172)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17727)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</failure>
-  </testcase>
-  <testcase name="decideRoute_multipleMatches_highestScoreWins[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
+  <testcase name="decideRoute_emptyString_routesToOrchestrator[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
+  <testcase name="decideRoute_customFallback_usesCustomFallback[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
+  <testcase name="decideRoute_multipleMatches_highestScoreWins[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
   <testcase name="decideRoute_multipleKeywordsSameModule_accumulatesScore[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
   <testcase name="decideRoute_competingModules_higherWeightWins[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
   <testcase name="decideRoute_compoundPhrase_higherWeight[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
-  <testcase name="decideRoute_mentalHealthCompound_routesToAgnes[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001">
-    <failure message="AssertionError: Compound phrase 'mental health' should route to agnes. Expected &lt;agnes&gt;, actual &lt;nexus&gt;." type="AssertionError">AssertionError: Compound phrase 'mental health' should route to agnes. Expected &lt;agnes&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_mentalHealthCompound_routesToAgnes_dyskls(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:239)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17752)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</failure>
-  </testcase>
-  <testcase name="decideRoute_weekPlanCompound_routesToAtlas[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0">
-    <failure message="AssertionError: Compound phrase 'week plan' should route to atlas. Expected &lt;atlas&gt;, actual &lt;nexus&gt;." type="AssertionError">AssertionError: Compound phrase 'week plan' should route to atlas. Expected &lt;atlas&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_weekPlanCompound_routesToAtlas_n6yw0t(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:249)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17757)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</failure>
-  </testcase>
-  <testcase name="decideRoute_heartRateCompound_routesToSoma[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0">
-    <failure message="AssertionError: Compound phrase 'heart rate variability' should route to soma. Expected &lt;soma&gt;, actual &lt;nexus&gt;." type="AssertionError">AssertionError: Compound phrase 'heart rate variability' should route to soma. Expected &lt;soma&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_heartRateCompound_routesToSoma_fh1oof(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:259)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17762)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</failure>
-  </testcase>
+  <testcase name="decideRoute_mentalHealthCompound_routesToAgnes[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
+  <testcase name="decideRoute_weekPlanCompound_routesToAtlas[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
+  <testcase name="decideRoute_heartRateCompound_routesToSoma[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
   <testcase name="decideRoute_researchKeyword_routesToScout[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
-  <testcase name="decideRoute_codeKeyword_routesToForge[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
-  <testcase name="decideRoute_scheduleKeyword_routesToAtlas[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001">
-    <failure message="AssertionError: Schedule keyword should route to atlas. Expected &lt;atlas&gt;, actual &lt;nexus&gt;." type="AssertionError">AssertionError: Schedule keyword should route to atlas. Expected &lt;atlas&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_scheduleKeyword_routesToAtlas_7gynkl(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:290)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17777)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</failure>
-  </testcase>
+  <testcase name="decideRoute_codeKeyword_routesToForge[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
+  <testcase name="decideRoute_scheduleKeyword_routesToAtlas[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
   <testcase name="decideRoute_sleepScoreCompound_routesToSoma[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
-  <testcase name="decideRoute_energyPlanCompound_routesToAtlas[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0">
-    <failure message="AssertionError: Energy plan compound should route to atlas. Expected &lt;atlas&gt;, actual &lt;nexus&gt;." type="AssertionError">AssertionError: Energy plan compound should route to atlas. Expected &lt;atlas&gt;, actual &lt;nexus&gt;.
-	at DefaultJsAsserter.protoOf.assertTrue_rpw5fg(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/JsImpl.kt:23)
-	at DefaultJsAsserter.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:713)
-	at DefaultJsAsserter.protoOf.assertEquals_ldumo(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/js/src/main/kotlin/kotlin/test/DefaultJsAsserter.kt:27)
-	at &lt;global&gt;.assertEquals(/Users/raj-13766/Desktop/nexus/cortex-logic/build/compileSync/js/test/testDevelopmentExecutable/kotlin/common/src/main/kotlin/kotlin/test/Assertions.kt:63)
-	at NexusRoutingServiceTest.protoOf.decideRoute_energyPlanCompound_routesToAtlas_qupgen(/Users/raj-13766/Desktop/nexus/cortex-logic/src/commonTest/kotlin/com/agnes/nexus/core/domain/services/NexusRoutingServiceTest.kt:308)
-	at &lt;global&gt;.fn(kotlin/cortex-test.js:17787)
-	at Context.&lt;anonymous&gt;(/Users/raj-13766/Desktop/nexus/cortex-logic/build/js/node_modules/kotlin-web-helpers/src/KotlinTestTeamCityConsoleAdapter.ts:72)
-	at &lt;global&gt;.processImmediate(node:internal/timers:478)
-</failure>
-  </testcase>
+  <testcase name="decideRoute_energyPlanCompound_routesToAtlas[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
   <testcase name="decideRoute_caseInsensitive_workout[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
   <testcase name="decideRoute_caseInsensitive_anxiety[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
-  <testcase name="getRoute_validModuleId_returnsRoute[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
+  <testcase name="getRoute_validModuleId_returnsRoute[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
   <testcase name="getRoute_invalidModuleId_returnsInput[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
   <testcase name="decideRoute_confidenceIncreasesWithScore[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
-  <testcase name="decideRoute_confidenceCappedAt92[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
-  <testcase name="decideRoute_defaultFallbackHasLowConfidence[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
-  <testcase name="parseCommand_extractsStructuredScheduleIntent[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
-  <testcase name="decideRoute_consultativeMentionStaysWithNexus[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
+  <testcase name="decideRoute_confidenceCappedAt92[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
+  <testcase name="decideRoute_defaultFallbackHasLowConfidence[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
+  <testcase name="parseCommand_extractsStructuredScheduleIntent[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.002"/>
+  <testcase name="decideRoute_consultativeMentionStaysWithNexus[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.001"/>
   <testcase name="decideRoute_ownershipMentionDelegatesToMentionedModule[js, node]" classname="com.agnes.nexus.core.domain.services.NexusRoutingServiceTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
