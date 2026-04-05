@@ -17,7 +17,7 @@
   var initMetadataForClass = kotlin_kotlin.$_$.xa;
   var initMetadataForObject = kotlin_kotlin.$_$.db;
   var VOID = kotlin_kotlin.$_$.h;
-  var toString = kotlin_kotlin.$_$.lh;
+  var toString = kotlin_kotlin.$_$.mh;
   //endregion
   //region block: pre-declaration
   initMetadataForClass(atomicfu$AtomicRefArray$ref, 'AtomicArray');

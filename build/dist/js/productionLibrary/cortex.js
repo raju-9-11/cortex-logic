@@ -42,7 +42,7 @@
   var mapCapacity = kotlin_kotlin.$_$.r7;
   var coerceAtLeast = kotlin_kotlin.$_$.lc;
   var LinkedHashMap_init_$Create$ = kotlin_kotlin.$_$.x;
-  var to = kotlin_kotlin.$_$.mh;
+  var to = kotlin_kotlin.$_$.nh;
   var toString = kotlin_kotlin.$_$.fc;
   var ArrayList_init_$Create$ = kotlin_kotlin.$_$.o;
   var JsonArray = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.g;
@@ -53,13 +53,13 @@
   var JsonPrimitive = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.o;
   var System_instance = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.b;
   var get_jsonPrimitive = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.a1;
-  var THROW_CCE = kotlin_kotlin.$_$.ig;
+  var THROW_CCE = kotlin_kotlin.$_$.jg;
   var isCharSequence = kotlin_kotlin.$_$.ib;
-  var trim = kotlin_kotlin.$_$.of;
+  var trim = kotlin_kotlin.$_$.pf;
   var Regex_init_$Create$ = kotlin_kotlin.$_$.f1;
   var _Char___init__impl__6a9atx = kotlin_kotlin.$_$.o2;
   var charArrayOf = kotlin_kotlin.$_$.ja;
-  var trim_0 = kotlin_kotlin.$_$.nf;
+  var trim_0 = kotlin_kotlin.$_$.of;
   var numberToInt = kotlin_kotlin.$_$.yb;
   var coerceIn = kotlin_kotlin.$_$.qc;
   var VOID = kotlin_kotlin.$_$.h;
@@ -73,18 +73,18 @@
   var get_contentOrNull = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.t;
   var isBlank = kotlin_kotlin.$_$.td;
   var emptyMap = kotlin_kotlin.$_$.u6;
-  var ensureNotNull = kotlin_kotlin.$_$.ah;
+  var ensureNotNull = kotlin_kotlin.$_$.bh;
   var get_floatOrNull = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.w;
   var coerceIn_0 = kotlin_kotlin.$_$.pc;
   var mapOf = kotlin_kotlin.$_$.t7;
   var Companion_instance = kotlin_kotlin.$_$.a5;
   var Companion_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_datetime.$_$.d;
   var numberToLong = kotlin_kotlin.$_$.zb;
-  var Long = kotlin_kotlin.$_$.dg;
+  var Long = kotlin_kotlin.$_$.eg;
   var Collection = kotlin_kotlin.$_$.h5;
   var isInterface = kotlin_kotlin.$_$.mb;
   var _Result___init__impl__xyqfz8 = kotlin_kotlin.$_$.w2;
-  var createFailure = kotlin_kotlin.$_$.zg;
+  var createFailure = kotlin_kotlin.$_$.ah;
   var _Result___get_isFailure__impl__jpiriv = kotlin_kotlin.$_$.y2;
   var _Result___get_value__impl__bjfvqg = kotlin_kotlin.$_$.z2;
   var JsonObjectBuilder = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.j;
@@ -146,10 +146,10 @@
   var LinkedHashSet_init_$Create$ = kotlin_kotlin.$_$.a1;
   var createSimpleEnumSerializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.d2;
   var LazyThreadSafetyMode_PUBLICATION_getInstance = kotlin_kotlin.$_$.l;
-  var lazy = kotlin_kotlin.$_$.fh;
+  var lazy = kotlin_kotlin.$_$.gh;
   var SerializerFactory = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.b2;
   var initMetadataForCompanion = kotlin_kotlin.$_$.ya;
-  var Enum = kotlin_kotlin.$_$.yf;
+  var Enum = kotlin_kotlin.$_$.zf;
   var createAnnotatedEnumSerializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.c2;
   var StringSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.r;
   var ArrayListSerializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.s1;
@@ -167,9 +167,9 @@
   var IntSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.p;
   var DoubleSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.n;
   var getNumberHashCode = kotlin_kotlin.$_$.ta;
-  var THROW_IAE = kotlin_kotlin.$_$.jg;
+  var THROW_IAE = kotlin_kotlin.$_$.kg;
   var JsonElementSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.b;
-  var toString_0 = kotlin_kotlin.$_$.lh;
+  var toString_0 = kotlin_kotlin.$_$.mh;
   var LinkedHashMapSerializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.x1;
   var LongSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.q;
   var FloatSerializer_getInstance = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.o;
@@ -182,7 +182,7 @@
   var put = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.f1;
   var getOrNull = kotlin_kotlin.$_$.b7;
   var lineSequence = kotlin_kotlin.$_$.be;
-  var Exception = kotlin_kotlin.$_$.ag;
+  var Exception = kotlin_kotlin.$_$.bg;
   var replace_0 = kotlin_kotlin.$_$.je;
   var split = kotlin_kotlin.$_$.me;
   var toInt = kotlin_kotlin.$_$.ye;
@@ -192,10 +192,10 @@
   var substringBefore = kotlin_kotlin.$_$.se;
   var substringAfter = kotlin_kotlin.$_$.re;
   var JsonNull = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.i;
-  var isNaN_0 = kotlin_kotlin.$_$.eh;
+  var isNaN_0 = kotlin_kotlin.$_$.fh;
   var getKClass = kotlin_kotlin.$_$.f;
   var PrimitiveClasses_getInstance = kotlin_kotlin.$_$.u4;
-  var arrayOf = kotlin_kotlin.$_$.wg;
+  var arrayOf = kotlin_kotlin.$_$.xg;
   var createKType = kotlin_kotlin.$_$.c;
   var createInvariantKTypeProjection = kotlin_kotlin.$_$.a;
   var serializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.t2;
@@ -211,7 +211,7 @@
   var compareBy = kotlin_kotlin.$_$.h9;
   var sortedWith = kotlin_kotlin.$_$.p8;
   var FunctionAdapter = kotlin_kotlin.$_$.ea;
-  var Comparator = kotlin_kotlin.$_$.vf;
+  var Comparator = kotlin_kotlin.$_$.wf;
   var compareValues = kotlin_kotlin.$_$.i9;
   var addAll = kotlin_kotlin.$_$.t5;
   var listOfNotNull = kotlin_kotlin.$_$.o7;
@@ -220,15 +220,15 @@
   var removeSuffix = kotlin_kotlin.$_$.fe;
   var toDouble = kotlin_kotlin.$_$.we;
   var ListSerializer = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.s;
-  var Pair = kotlin_kotlin.$_$.fg;
+  var Pair = kotlin_kotlin.$_$.gg;
   var get_double = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.u;
   var first = kotlin_kotlin.$_$.y6;
   var compareTo = kotlin_kotlin.$_$.oa;
   var padStart = kotlin_kotlin.$_$.de;
-  var Triple = kotlin_kotlin.$_$.kg;
+  var Triple = kotlin_kotlin.$_$.lg;
   var abs = kotlin_kotlin.$_$.gc;
   var roundToLong = kotlin_kotlin.$_$.ic;
-  var trimEnd = kotlin_kotlin.$_$.jf;
+  var trimEnd = kotlin_kotlin.$_$.kf;
   var downTo = kotlin_kotlin.$_$.sc;
   var dropLast = kotlin_kotlin.$_$.r6;
   var emptySet = kotlin_kotlin.$_$.v6;
@@ -237,7 +237,7 @@
   var add = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.r;
   var putJsonArray = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.c1;
   var putJsonObject = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.d1;
-  var isFinite = kotlin_kotlin.$_$.ch;
+  var isFinite = kotlin_kotlin.$_$.dh;
   var get_longOrNull = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_json.$_$.b1;
   var longArrayOf = kotlin_kotlin.$_$.sb;
   var sortWith = kotlin_kotlin.$_$.n8;
@@ -262,11 +262,11 @@
   var HashSet_init_$Create$ = kotlin_kotlin.$_$.v;
   var plus_3 = kotlin_kotlin.$_$.a8;
   var plus_4 = kotlin_kotlin.$_$.z7;
-  var noWhenBranchMatchedException = kotlin_kotlin.$_$.hh;
-  var uppercaseChar = kotlin_kotlin.$_$.pf;
+  var noWhenBranchMatchedException = kotlin_kotlin.$_$.ih;
+  var uppercaseChar = kotlin_kotlin.$_$.qf;
   var toString_2 = kotlin_kotlin.$_$.v2;
   var println = kotlin_kotlin.$_$.da;
-  var trimIndent = kotlin_kotlin.$_$.kf;
+  var trimIndent = kotlin_kotlin.$_$.lf;
   var CoroutineScope = kotlin_org_jetbrains_kotlinx_kotlinx_coroutines_core.$_$.u;
   var launch = kotlin_org_jetbrains_kotlinx_kotlinx_coroutines_core.$_$.d1;
   var SupervisorJob = kotlin_org_jetbrains_kotlinx_kotlinx_coroutines_core.$_$.w;
@@ -286,7 +286,7 @@
   var reversed = kotlin_kotlin.$_$.i8;
   var average_0 = kotlin_kotlin.$_$.w5;
   var drop_0 = kotlin_kotlin.$_$.s6;
-  var trimStart = kotlin_kotlin.$_$.mf;
+  var trimStart = kotlin_kotlin.$_$.nf;
   var FlowCollector = kotlin_org_jetbrains_kotlinx_kotlinx_coroutines_core.$_$.j;
   var flow = kotlin_org_jetbrains_kotlinx_kotlinx_coroutines_core.$_$.k;
   var HttpResponse = kotlin_io_ktor_ktor_client_core.$_$.f;
@@ -312,7 +312,8 @@
   var mapNotNull = kotlin_kotlin.$_$.bd;
   var toList_0 = kotlin_kotlin.$_$.cd;
   var firstOrNull_0 = kotlin_kotlin.$_$.od;
-  var Char = kotlin_kotlin.$_$.tf;
+  var Char = kotlin_kotlin.$_$.uf;
+  var trimEnd_0 = kotlin_kotlin.$_$.jf;
   var listOfNotNull_0 = kotlin_kotlin.$_$.n7;
   var reversed_0 = kotlin_kotlin.$_$.ke;
   var chunked = kotlin_kotlin.$_$.ed;
@@ -104558,7 +104559,52 @@
       tmp_43 = '';
     }
     var summaryBlock = tmp_43;
-    var outputFormat = '[OUTPUT FORMAT]\n- Use <thought>...<\/thought> for internal reasoning.\n- Use <action type="...">JSON_PAYLOAD<\/action> for system side-effects.\n- Everything outside these tags is shown directly to the user. Do NOT prefix it with labels like "Public response:".';
+    // Inline function 'kotlin.text.buildString' call
+    // Inline function 'kotlin.apply' call
+    var this_1 = StringBuilder_init_$Create$();
+    // Inline function 'kotlin.text.appendLine' call
+    var value = '[OUTPUT FORMAT]';
+    // Inline function 'kotlin.text.appendLine' call
+    this_1.e8(value).f8(_Char___init__impl__6a9atx(10));
+    // Inline function 'kotlin.text.appendLine' call
+    var value_0 = '- Use <thought>...<\/thought> for internal reasoning.';
+    // Inline function 'kotlin.text.appendLine' call
+    this_1.e8(value_0).f8(_Char___init__impl__6a9atx(10));
+    // Inline function 'kotlin.text.appendLine' call
+    var value_1 = '- Use <action type="...">JSON_PAYLOAD<\/action> for system side-effects.';
+    // Inline function 'kotlin.text.appendLine' call
+    this_1.e8(value_1).f8(_Char___init__impl__6a9atx(10));
+    // Inline function 'kotlin.text.appendLine' call
+    var value_2 = '- Everything outside these tags is shown directly to the user. Do NOT prefix it with labels like "Public response:".';
+    // Inline function 'kotlin.text.appendLine' call
+    this_1.e8(value_2).f8(_Char___init__impl__6a9atx(10));
+    if (moduleId === 'nexus' || moduleId === 'orchestrator') {
+      // Inline function 'kotlin.text.appendLine' call
+      this_1.f8(_Char___init__impl__6a9atx(10));
+      // Inline function 'kotlin.text.appendLine' call
+      var value_3 = '[CRITICAL \u2014 DATA RETRIEVAL PROTOCOL]';
+      // Inline function 'kotlin.text.appendLine' call
+      this_1.e8(value_3).f8(_Char___init__impl__6a9atx(10));
+      // Inline function 'kotlin.text.appendLine' call
+      var value_4 = 'When the user asks about domain-specific data (tasks, workouts, spending, habits, schedules, journals, health records, etc.), you MUST emit a query_module_data action. Do NOT answer with a text-only response. Do NOT say "Data." or similar placeholders. Instead, emit exactly:';
+      // Inline function 'kotlin.text.appendLine' call
+      this_1.e8(value_4).f8(_Char___init__impl__6a9atx(10));
+      // Inline function 'kotlin.text.appendLine' call
+      var value_5 = '<action type="query_module_data">{"moduleId":"TARGET_MODULE","question":"DETAILED_QUESTION"}<\/action>';
+      // Inline function 'kotlin.text.appendLine' call
+      this_1.e8(value_5).f8(_Char___init__impl__6a9atx(10));
+      // Inline function 'kotlin.text.appendLine' call
+      var value_6 = 'Where TARGET_MODULE is one of: atlas (tasks/goals/habits/projects), titan (workouts/training/recovery), ledger (transactions/budgets/spending), agnes (emotional/therapy), soma (health/labs/biomarkers), scout (research).';
+      // Inline function 'kotlin.text.appendLine' call
+      this_1.e8(value_6).f8(_Char___init__impl__6a9atx(10));
+      // Inline function 'kotlin.text.appendLine' call
+      var value_7 = 'For internal data retrieval actions (query_module, query_module_data, search_memory), do NOT output any user-facing text \u2014 emit the action tag silently.';
+      // Inline function 'kotlin.text.appendLine' call
+      this_1.e8(value_7).f8(_Char___init__impl__6a9atx(10));
+    }
+    // Inline function 'kotlin.text.trimEnd' call
+    var this_2 = this_1.toString();
+    var outputFormat = toString(trimEnd_0(isCharSequence(this_2) ? this_2 : THROW_CCE()));
     // Inline function 'kotlin.collections.filter' call
     var tmp0_1 = listOf_0([base, identityContext, biologicalContext, overlayBlock, identityBlock, nsvBlock, stateAwarenessBlock, summaryBlock, moduleSpecificContext, behaviorBlock, outputFormat]);
     // Inline function 'kotlin.collections.filterTo' call
