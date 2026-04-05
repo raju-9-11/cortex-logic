@@ -57,12 +57,6 @@ if (typeof Math.clz32 === 'undefined') {
     };
   }(Math.log, Math.LN2);
 }
-if (typeof String.prototype.startsWith === 'undefined') {
-  Object.defineProperty(String.prototype, 'startsWith', {value: function (searchString, position) {
-    position = position || 0;
-    return this.lastIndexOf(searchString, position) === position;
-  }});
-}
 if (typeof String.prototype.endsWith === 'undefined') {
   Object.defineProperty(String.prototype, 'endsWith', {value: function (searchString, position) {
     var subjectString = this.toString();
@@ -72,6 +66,12 @@ if (typeof String.prototype.endsWith === 'undefined') {
     position -= searchString.length;
     var lastIndex = subjectString.indexOf(searchString, position);
     return lastIndex !== -1 && lastIndex === position;
+  }});
+}
+if (typeof String.prototype.startsWith === 'undefined') {
+  Object.defineProperty(String.prototype, 'startsWith', {value: function (searchString, position) {
+    position = position || 0;
+    return this.lastIndexOf(searchString, position) === position;
   }});
 }
 //endregion
@@ -12348,6 +12348,26 @@ if (typeof String.prototype.endsWith === 'undefined') {
     }
     return tmp$ret$1;
   }
+  function trimEnd_0(_this__u8e3s4) {
+    var tmp$ret$1;
+    $l$block: {
+      // Inline function 'kotlin.text.trimEnd' call
+      var inductionVariable = charSequenceLength(_this__u8e3s4) - 1 | 0;
+      if (0 <= inductionVariable)
+        do {
+          var index = inductionVariable;
+          inductionVariable = inductionVariable + -1 | 0;
+          var p0 = charSequenceGet(_this__u8e3s4, index);
+          if (!isWhitespace(p0)) {
+            tmp$ret$1 = charSequenceSubSequence(_this__u8e3s4, 0, index + 1 | 0);
+            break $l$block;
+          }
+        }
+         while (0 <= inductionVariable);
+      tmp$ret$1 = '';
+    }
+    return tmp$ret$1;
+  }
   function removeSurrounding_0(_this__u8e3s4, prefix, suffix) {
     if (_this__u8e3s4.length >= (charSequenceLength(prefix) + charSequenceLength(suffix) | 0) && startsWith_2(_this__u8e3s4, prefix) && endsWith_0(_this__u8e3s4, suffix)) {
       var tmp1 = charSequenceLength(prefix);
@@ -15209,62 +15229,63 @@ if (typeof String.prototype.endsWith === 'undefined') {
   _.$_$.gf = toULongOrNull;
   _.$_$.hf = toULong;
   _.$_$.if = toUShort;
-  _.$_$.jf = trimEnd;
-  _.$_$.kf = trimIndent;
-  _.$_$.lf = trimMargin;
-  _.$_$.mf = trimStart;
-  _.$_$.nf = trim_0;
-  _.$_$.of = trim;
-  _.$_$.pf = uppercaseChar;
-  _.$_$.qf = Duration;
-  _.$_$.rf = Uuid;
-  _.$_$.sf = ArithmeticException;
-  _.$_$.tf = Char;
-  _.$_$.uf = Comparable;
-  _.$_$.vf = Comparator;
-  _.$_$.wf = DeepRecursiveFunction;
-  _.$_$.xf = DeepRecursiveScope;
-  _.$_$.yf = Enum;
-  _.$_$.zf = Error_0;
-  _.$_$.ag = Exception;
-  _.$_$.bg = IllegalArgumentException;
-  _.$_$.cg = IllegalStateException;
-  _.$_$.dg = Long;
-  _.$_$.eg = NoSuchElementException;
-  _.$_$.fg = Pair;
-  _.$_$.gg = Result;
-  _.$_$.hg = RuntimeException;
-  _.$_$.ig = THROW_CCE;
-  _.$_$.jg = THROW_IAE;
-  _.$_$.kg = Triple;
-  _.$_$.lg = UByteArray;
-  _.$_$.mg = UByte;
-  _.$_$.ng = UIntArray;
-  _.$_$.og = UInt;
-  _.$_$.pg = ULongArray;
-  _.$_$.qg = ULong;
-  _.$_$.rg = UShortArray;
-  _.$_$.sg = UShort;
-  _.$_$.tg = Unit;
-  _.$_$.ug = UnsupportedOperationException;
-  _.$_$.vg = addSuppressed;
-  _.$_$.wg = arrayOf;
-  _.$_$.xg = closeFinally;
-  _.$_$.yg = countTrailingZeroBits;
-  _.$_$.zg = createFailure;
-  _.$_$.ah = ensureNotNull;
-  _.$_$.bh = invoke;
-  _.$_$.ch = isFinite;
-  _.$_$.dh = isFinite_0;
-  _.$_$.eh = isNaN_0;
-  _.$_$.fh = lazy_0;
-  _.$_$.gh = lazy;
-  _.$_$.hh = noWhenBranchMatchedException;
-  _.$_$.ih = plus_5;
-  _.$_$.jh = stackTraceToString;
-  _.$_$.kh = throwUninitializedPropertyAccessException;
-  _.$_$.lh = toString_0;
-  _.$_$.mh = to;
+  _.$_$.jf = trimEnd_0;
+  _.$_$.kf = trimEnd;
+  _.$_$.lf = trimIndent;
+  _.$_$.mf = trimMargin;
+  _.$_$.nf = trimStart;
+  _.$_$.of = trim_0;
+  _.$_$.pf = trim;
+  _.$_$.qf = uppercaseChar;
+  _.$_$.rf = Duration;
+  _.$_$.sf = Uuid;
+  _.$_$.tf = ArithmeticException;
+  _.$_$.uf = Char;
+  _.$_$.vf = Comparable;
+  _.$_$.wf = Comparator;
+  _.$_$.xf = DeepRecursiveFunction;
+  _.$_$.yf = DeepRecursiveScope;
+  _.$_$.zf = Enum;
+  _.$_$.ag = Error_0;
+  _.$_$.bg = Exception;
+  _.$_$.cg = IllegalArgumentException;
+  _.$_$.dg = IllegalStateException;
+  _.$_$.eg = Long;
+  _.$_$.fg = NoSuchElementException;
+  _.$_$.gg = Pair;
+  _.$_$.hg = Result;
+  _.$_$.ig = RuntimeException;
+  _.$_$.jg = THROW_CCE;
+  _.$_$.kg = THROW_IAE;
+  _.$_$.lg = Triple;
+  _.$_$.mg = UByteArray;
+  _.$_$.ng = UByte;
+  _.$_$.og = UIntArray;
+  _.$_$.pg = UInt;
+  _.$_$.qg = ULongArray;
+  _.$_$.rg = ULong;
+  _.$_$.sg = UShortArray;
+  _.$_$.tg = UShort;
+  _.$_$.ug = Unit;
+  _.$_$.vg = UnsupportedOperationException;
+  _.$_$.wg = addSuppressed;
+  _.$_$.xg = arrayOf;
+  _.$_$.yg = closeFinally;
+  _.$_$.zg = countTrailingZeroBits;
+  _.$_$.ah = createFailure;
+  _.$_$.bh = ensureNotNull;
+  _.$_$.ch = invoke;
+  _.$_$.dh = isFinite;
+  _.$_$.eh = isFinite_0;
+  _.$_$.fh = isNaN_0;
+  _.$_$.gh = lazy_0;
+  _.$_$.hh = lazy;
+  _.$_$.ih = noWhenBranchMatchedException;
+  _.$_$.jh = plus_5;
+  _.$_$.kh = stackTraceToString;
+  _.$_$.lh = throwUninitializedPropertyAccessException;
+  _.$_$.mh = toString_0;
+  _.$_$.nh = to;
   //endregion
   return _;
 }));

@@ -266,12 +266,20 @@ class DefaultPersonaFactory : PersonaFactory {
             "\n[LONG-TERM SUMMARY]\n$longTermSummary"
         } else ""
 
-        val outputFormat = """
-            [OUTPUT FORMAT]
-            - Use <thought>...</thought> for internal reasoning.
-            - Use <action type="...">JSON_PAYLOAD</action> for system side-effects.
-            - Everything outside these tags is shown directly to the user. Do NOT prefix it with labels like "Public response:".
-        """.trimIndent()
+        val outputFormat = buildString {
+            appendLine("[OUTPUT FORMAT]")
+            appendLine("- Use <thought>...</thought> for internal reasoning.")
+            appendLine("- Use <action type=\"...\">JSON_PAYLOAD</action> for system side-effects.")
+            appendLine("- Everything outside these tags is shown directly to the user. Do NOT prefix it with labels like \"Public response:\".")
+            if (moduleId == "nexus" || moduleId == "orchestrator") {
+                appendLine()
+                appendLine("[CRITICAL — DATA RETRIEVAL PROTOCOL]")
+                appendLine("When the user asks about domain-specific data (tasks, workouts, spending, habits, schedules, journals, health records, etc.), you MUST emit a query_module_data action. Do NOT answer with a text-only response. Do NOT say \"Data.\" or similar placeholders. Instead, emit exactly:")
+                appendLine("<action type=\"query_module_data\">{\"moduleId\":\"TARGET_MODULE\",\"question\":\"DETAILED_QUESTION\"}</action>")
+                appendLine("Where TARGET_MODULE is one of: atlas (tasks/goals/habits/projects), titan (workouts/training/recovery), ledger (transactions/budgets/spending), agnes (emotional/therapy), soma (health/labs/biomarkers), scout (research).")
+                appendLine("For internal data retrieval actions (query_module, query_module_data, search_memory), do NOT output any user-facing text — emit the action tag silently.")
+            }
+        }.trimEnd()
 
         return listOf(
             base,
