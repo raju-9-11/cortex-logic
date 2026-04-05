@@ -16,14 +16,15 @@ import com.agnes.nexus.core.domain.services.SpineEventFilter
 import com.agnes.nexus.core.domain.services.SpineEventPayload
 import com.agnes.nexus.core.domain.services.SpinePriority
 import com.agnes.nexus.core.domain.services.VaultBoundary
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.*
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -46,7 +47,6 @@ import kotlin.coroutines.resumeWithException
  *   (err) => console.error(err))
  * ```
  */
-@OptIn(DelicateCoroutinesApi::class)
 @Suppress("WRONG_EXPORTED_DECLARATION")
 @JsExport
 class ActionHubJs(
@@ -59,9 +59,11 @@ class ActionHubJs(
     private val jsEmitSpineEvent: (eventJson: String) -> Unit,
     private val jsVaultEncrypt: ((plaintext: String, keyIgnored: String, onComplete: (String) -> Unit, onError: (String) -> Unit) -> Unit)? = null,
     private val jsVaultDecrypt: ((cipherJson: String, keyIgnored: String, onComplete: (String) -> Unit, onError: (String) -> Unit) -> Unit)? = null,
+    private val debug: Boolean = false,
 ) {
     private val actionHub: ActionHub
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
+    private val scope = CoroutineScope(SupervisorJob())
 
     init {
         val vaultBoundary: VaultBoundary? =
@@ -86,9 +88,10 @@ class ActionHubJs(
         userId: String?,
         onComplete: (Boolean) -> Unit,
         onError: (String) -> Unit,
-    ) {
-        GlobalScope.launch {
+    ): CancellableTask {
+        val job = scope.launch {
             try {
+                if (debug) console.log("ActionHubJs.execute: moduleId=$moduleId, actionType=$actionType, userId=$userId")
                 val call = ActionCall(
                     type = actionType,
                     payload = Json.parseToJsonElement(payloadJson).jsonObject,
@@ -96,14 +99,23 @@ class ActionHubJs(
                     moduleId = moduleId,
                 )
                 val handled = actionHub.isRegistered(moduleId, actionType)
+                if (debug) console.log("ActionHubJs.execute: isRegistered=$handled for $moduleId.$actionType")
                 if (handled) {
+                    if (debug) console.log("ActionHubJs.execute: calling actionHub.execute for $moduleId.$actionType")
                     actionHub.execute(call)
+                    if (debug) console.log("ActionHubJs.execute: actionHub.execute completed for $moduleId.$actionType")
+                } else {
+                    if (debug) console.warn("ActionHubJs.execute: no handler registered for $moduleId.$actionType")
                 }
                 onComplete(handled)
+            } catch (_: CancellationException) {
+                // Cancelled from TypeScript — don't call onError.
             } catch (e: Throwable) {
+                if (debug) console.error("ActionHubJs.execute: exception ${e.message}")
                 onError(e.message ?: "ActionHub execution failed")
             }
         }
+        return CancellableTask(job)
     }
 
     // ── Private JSON helpers ──────────────────────────────────────────────────
@@ -140,18 +152,18 @@ class ActionHubJs(
                             } else {
                                 try { cont.resume(serializer(jsonStr)) }
                                 catch (e: Exception) {
-                                    console.warn("JsNexusDataLayer.getDocument serializer error: ${e.message}")
+                                    if (debug) console.warn("JsNexusDataLayer.getDocument serializer error: ${e.message}")
                                     cont.resumeWithException(e)
                                 }
                             }
                         },
                         { err ->
-                            console.warn("JsNexusDataLayer.getDocument callback error: $err")
+                            if (debug) console.warn("JsNexusDataLayer.getDocument callback error: $err")
                             cont.resumeWithException(RuntimeException(err))
                         },
                     )
                 } catch (e: Exception) {
-                    console.warn("JsNexusDataLayer.getDocument invoke error: ${e.message}")
+                    if (debug) console.warn("JsNexusDataLayer.getDocument invoke error: ${e.message}")
                     cont.resumeWithException(e)
                 }
             }
@@ -173,19 +185,19 @@ class ActionHubJs(
             suspendCancellableCoroutine<Unit> { cont ->
                 try {
                     val json = mapToJson(data)
-                    console.log("JsNexusDataLayer.setDocument: collection=$collection, id=$id, data keys=${data.keys.toList()}")
+                    if (debug) console.log("JsNexusDataLayer.setDocument: collection=$collection, id=$id, data keys=${data.keys.toList()}")
                     jsSetDocument(collection, id, json,
                         {
-                            console.log("JsNexusDataLayer.setDocument success: collection=$collection, id=$id")
+                            if (debug) console.log("JsNexusDataLayer.setDocument success: collection=$collection, id=$id")
                             cont.resume(Unit)
                         },
                         { err ->
-                            console.error("JsNexusDataLayer.setDocument callback error: $err")
+                            if (debug) console.error("JsNexusDataLayer.setDocument callback error: $err")
                             cont.resumeWithException(RuntimeException(err))
                         },
                     )
                 } catch (e: Exception) {
-                    console.error("JsNexusDataLayer.setDocument invoke error: ${e.message}")
+                    if (debug) console.error("JsNexusDataLayer.setDocument invoke error: ${e.message}")
                     cont.resumeWithException(e)
                 }
             }
@@ -195,19 +207,19 @@ class ActionHubJs(
             suspendCancellableCoroutine<Unit> { cont ->
                 try {
                     val json = mapToJson(updates)
-                    console.log("JsNexusDataLayer.updateDocument: collection=$collection, id=$id, update keys=${updates.keys.toList()}")
+                    if (debug) console.log("JsNexusDataLayer.updateDocument: collection=$collection, id=$id, update keys=${updates.keys.toList()}")
                     jsUpdateDocument(collection, id, json,
                         {
-                            console.log("JsNexusDataLayer.updateDocument success: collection=$collection, id=$id")
+                            if (debug) console.log("JsNexusDataLayer.updateDocument success: collection=$collection, id=$id")
                             cont.resume(Unit)
                         },
                         { err ->
-                            console.error("JsNexusDataLayer.updateDocument callback error: $err")
+                            if (debug) console.error("JsNexusDataLayer.updateDocument callback error: $err")
                             cont.resumeWithException(RuntimeException(err))
                         },
                     )
                 } catch (e: Exception) {
-                    console.error("JsNexusDataLayer.updateDocument invoke error: ${e.message}")
+                    if (debug) console.error("JsNexusDataLayer.updateDocument invoke error: ${e.message}")
                     cont.resumeWithException(e)
                 }
             }

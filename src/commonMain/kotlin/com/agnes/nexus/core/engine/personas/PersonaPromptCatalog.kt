@@ -6,6 +6,8 @@ import com.agnes.nexus.core.engine.personas.forge.ForgePersonaPrompts
 import com.agnes.nexus.core.engine.personas.ledger.LedgerPersonaPrompts
 import com.agnes.nexus.core.engine.personas.orchestrator.OrchestratorPersonaPrompts
 import com.agnes.nexus.core.engine.personas.titan.TitanPersonaPrompts
+import com.agnes.nexus.core.engine.personas.notifications.NotificationsPersonaPrompts
+import com.agnes.nexus.core.engine.personas.scout.ScoutPersonaPrompts
 import com.agnes.nexus.core.engine.personas.soma.SomaPersonaPrompts
 
 /**
@@ -20,6 +22,9 @@ object PersonaPromptCatalog {
         "atlas" to AtlasPersonaPrompts.base,
         "soma" to SomaPersonaPrompts.base,
         "forge" to ForgePersonaPrompts.base,
+        "scout" to ScoutPersonaPrompts.base,
+        "scout_master" to ScoutPersonaPrompts.masterChat,
+        "notifications" to NotificationsPersonaPrompts.base,
         "orchestrator" to OrchestratorPersonaPrompts.base,
         "orchestrator_onboarding" to OrchestratorPersonaPrompts.onboarding
     )

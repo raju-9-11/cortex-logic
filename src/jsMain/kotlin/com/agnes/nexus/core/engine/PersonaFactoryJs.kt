@@ -1,5 +1,19 @@
 package com.agnes.nexus.core.engine
 
+import com.agnes.nexus.core.domain.models.AtlasProfile
+import com.agnes.nexus.core.domain.models.LedgerProfile
+import com.agnes.nexus.core.domain.models.SomaProfile
+import com.agnes.nexus.core.domain.models.TrainerProfile
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.longOrNull
+
 /**
  * JS-export facade for DefaultPersonaFactory.
  *
@@ -18,6 +32,70 @@ package com.agnes.nexus.core.engine
 @JsExport
 class PersonaFactoryJs {
     private val inner = DefaultPersonaFactory()
+
+    private companion object {
+        /** Lenient parser: ignores unknown keys so TS can pass superset data freely. */
+        private val lenientJson = Json { ignoreUnknownKeys = true; coerceInputValues = true }
+
+        /**
+         * Known profile keys that should be deserialized into typed Kotlin classes
+         * rather than kept as raw strings. Maps the JSON key to a deserializer function.
+         */
+        private val profileDeserializers: Map<String, (JsonObject) -> Any?> = mapOf(
+            "titan_profile" to { obj -> lenientJson.decodeFromJsonElement(TrainerProfile.serializer(), obj) },
+            "atlas_profile" to { obj -> lenientJson.decodeFromJsonElement(AtlasProfile.serializer(), obj) },
+            "ledger_profile" to { obj -> lenientJson.decodeFromJsonElement(LedgerProfile.serializer(), obj) },
+            "soma_profile" to { obj -> lenientJson.decodeFromJsonElement(SomaProfile.serializer(), obj) },
+        )
+
+        /**
+         * Convert a [kotlinx.serialization.json.JsonElement] to a native Kotlin value:
+         * - JsonPrimitive strings → String
+         * - JsonPrimitive booleans → Boolean
+         * - JsonPrimitive ints → Int
+         * - JsonPrimitive longs → Long
+         * - JsonPrimitive doubles → Double
+         * - JsonNull → null
+         * - JsonArray → List<Any?>
+         * - JsonObject → Map<String, Any?> (recursive)
+         *
+         * For known profile keys, the JsonObject is deserialized into the typed
+         * Kotlin data class instead.
+         */
+        fun jsonElementToAny(key: String, element: kotlinx.serialization.json.JsonElement): Any? {
+            return when (element) {
+                is JsonNull -> null
+                is JsonPrimitive -> {
+                    if (element.isString) {
+                        element.content
+                    } else {
+                        element.booleanOrNull
+                            ?: element.intOrNull
+                            ?: element.longOrNull
+                            ?: element.doubleOrNull
+                            ?: element.content
+                    }
+                }
+                is JsonObject -> {
+                    // Try typed deserialization for known profile keys
+                    val deserializer = profileDeserializers[key]
+                    if (deserializer != null) {
+                        try {
+                            deserializer(element)
+                        } catch (_: Exception) {
+                            // Fall back to raw map if deserialization fails
+                            element.entries.associate { (k, v) -> k to jsonElementToAny(k, v) }
+                        }
+                    } else {
+                        element.entries.associate { (k, v) -> k to jsonElementToAny(k, v) }
+                    }
+                }
+                is JsonArray -> {
+                    element.map { jsonElementToAny("", it) }
+                }
+            }
+        }
+    }
 
     /**
      * Assembles a full system prompt for the given module with no module context.
@@ -40,9 +118,13 @@ class PersonaFactoryJs {
     /**
      * Assembles with module context supplied as a JSON string.
      * Avoids the Map<String, Any?> restriction at the JS boundary by parsing
-     * the JSON on the Kotlin side and converting primitives to Any?.
+     * the JSON on the Kotlin side and converting values to properly typed Any?.
      *
-     * @param moduleContextJson A JSON object string, e.g. '{"backgroundSummary":"..."}'
+     * Typed profile keys (`titan_profile`, `atlas_profile`, `ledger_profile`,
+     * `soma_profile`) are deserialized into their Kotlin data classes so that
+     * DefaultPersonaFactory.assemble() can cast them correctly.
+     *
+     * @param moduleContextJson A JSON object string, e.g. '{"baseRole":"...", "titan_profile":{...}}'
      */
     fun assembleWithContext(
         moduleId: String,
@@ -53,8 +135,8 @@ class PersonaFactoryJs {
     ): String {
         if (nsv == null) return identity.name
         val context = try {
-            kotlinx.serialization.json.Json.decodeFromString<kotlinx.serialization.json.JsonObject>(moduleContextJson)
-                .entries.associate { (k, v) -> k to v.toString().removeSurrounding("\"") as Any? }
+            val jsonObject = lenientJson.decodeFromString<JsonObject>(moduleContextJson)
+            jsonObject.entries.associate { (k, v) -> k to jsonElementToAny(k, v) }
         } catch (_: Exception) {
             emptyMap()
         }

@@ -44,4 +44,24 @@ class NsvOwnershipServiceJs {
      */
     fun getCoOwnedMetricsInPatch(moduleId: String, patchJson: String): Array<String> =
         NsvOwnershipService.getCoOwnedMetricsInPatch(moduleId, patchJson).toTypedArray()
+
+    /**
+     * Filter an NSV write patch to only include metrics [moduleId] is allowed to write.
+     * Supports both flat dotted keys (e.g. {"biological.cnsFatigue": 5})
+     * and nested JSON (e.g. {"biological": {"cnsFatigue": 5}}).
+     * @param moduleId Module performing the write.
+     * @param patchJson JSON in either format.
+     * @return Filtered JSON (flat dotted format) or empty string if nothing remains.
+     */
+    fun filterWritePatch(moduleId: String, patchJson: String): String =
+        NsvOwnershipService.filterWritePatch(moduleId, patchJson) ?: ""
+
+    fun getDerivedMetrics(): Array<String> =
+        NsvOwnershipService.DERIVED_METRICS.toTypedArray()
+
+    fun getCalibrationPrompt(metric: String): String =
+        NsvOwnershipService.CALIBRATION_PROMPTS[metric] ?: metric
+
+    fun buildCalibrationPrompt(moduleId: String): String =
+        NsvOwnershipService.buildCalibrationPrompt(moduleId)
 }

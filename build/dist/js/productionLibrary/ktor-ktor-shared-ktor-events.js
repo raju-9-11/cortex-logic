@@ -15,14 +15,14 @@
 }(function (_, kotlin_kotlin, kotlin_io_ktor_ktor_utils) {
   'use strict';
   //region block: imports
-  var protoOf = kotlin_kotlin.$_$.xb;
-  var initMetadataForClass = kotlin_kotlin.$_$.ta;
+  var protoOf = kotlin_kotlin.$_$.bc;
+  var initMetadataForClass = kotlin_kotlin.$_$.xa;
   var LockFreeLinkedListNode = kotlin_io_ktor_ktor_utils.$_$.d;
   var VOID = kotlin_kotlin.$_$.h;
   var CopyOnWriteHashMap = kotlin_io_ktor_ktor_utils.$_$.b;
-  var THROW_CCE = kotlin_kotlin.$_$.cg;
-  var equals = kotlin_kotlin.$_$.ma;
-  var addSuppressed = kotlin_kotlin.$_$.pg;
+  var THROW_CCE = kotlin_kotlin.$_$.ig;
+  var equals = kotlin_kotlin.$_$.qa;
+  var addSuppressed = kotlin_kotlin.$_$.vg;
   var Unit_instance = kotlin_kotlin.$_$.f5;
   //endregion
   //region block: pre-declaration
@@ -35,22 +35,22 @@
   function HandlerRegistration() {
   }
   function Events() {
-    this.c2n_1 = new CopyOnWriteHashMap();
+    this.n2n_1 = new CopyOnWriteHashMap();
   }
-  protoOf(Events).d2n = function (definition, value) {
+  protoOf(Events).o2n = function (definition, value) {
     var exception = null;
-    var tmp0_safe_receiver = this.c2n_1.u27(definition);
+    var tmp0_safe_receiver = this.n2n_1.f28(definition);
     if (tmp0_safe_receiver == null)
       null;
     else {
       // Inline function 'io.ktor.util.internal.LockFreeLinkedListHead.forEach' call
-      var tmp = tmp0_safe_receiver.q10();
+      var tmp = tmp0_safe_receiver.t10();
       var cur = tmp instanceof LockFreeLinkedListNode ? tmp : THROW_CCE();
       while (!equals(cur, tmp0_safe_receiver)) {
         if (cur instanceof HandlerRegistration) {
           var registration = cur;
           try {
-            var tmp_0 = registration.f2n_1;
+            var tmp_0 = registration.q2n_1;
             (typeof tmp_0 === 'function' ? tmp_0 : THROW_CCE())(value);
           } catch ($p) {
             if ($p instanceof Error) {
@@ -72,7 +72,7 @@
             }
           }
         }
-        cur = cur.t28();
+        cur = cur.e29();
       }
     }
     var tmp1_safe_receiver = exception;

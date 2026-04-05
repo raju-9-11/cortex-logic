@@ -1,8 +1,8 @@
 package com.agnes.nexus.core.domain.services
 
 import com.agnes.nexus.core.domain.models.NeuralStateVector
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
@@ -18,7 +18,6 @@ import kotlinx.serialization.json.*
  * @param onEvent  Called on every emitted Spine event: (type, dataJson) → Unit.
  *                 Agnes wires this to `Spine.emit()` on the TypeScript side.
  */
-@OptIn(DelicateCoroutinesApi::class)
 @JsExport
 class NexusSynthesisServiceJs(
     private val onEvent: (type: String, dataJson: String) -> Unit
@@ -55,9 +54,11 @@ class NexusSynthesisServiceJs(
         override fun getRecentEvents(filter: SpineEventFilter?): List<SpineEvent> = emptyList()
     }
 
+    private val scope = CoroutineScope(SupervisorJob())
+
     private val inner = NexusSynthesisService(
         eventBus = callbackBus,
-        scope = GlobalScope
+        scope = scope
     )
 
     // ── Public API ────────────────────────────────────────────────────────────
@@ -104,7 +105,7 @@ class NexusSynthesisServiceJs(
      */
     fun markSurfaced(conflictJson: String) {
         val conflict = parseConflictJson(conflictJson) ?: return
-        GlobalScope.launch { inner.markSurfaced(conflict) }
+        scope.launch { inner.markSurfaced(conflict) }
     }
 
     /**

@@ -66,4 +66,16 @@ class RuntimeSemanticsBuilderJs {
     /** Derive just the runtime autonomy label for a given autopilot level. */
     fun deriveAutonomy(autopilotLevel: Int): String =
         RuntimeSemanticsBuilder.deriveAutonomy(autopilotLevel).name.lowercase()
+
+    /** Maps dispatchStatus → executionStatus string. */
+    fun deriveExecutionStatus(dispatchStatus: String): String =
+        RuntimeSemanticsBuilder.deriveExecutionStatus(dispatchStatus)
+
+    /** Returns ApprovalRequirement JSON for a given dispatchStatus. */
+    fun defaultApprovalRequirement(dispatchStatus: String): String =
+        RuntimeSemanticsBuilder.defaultApprovalRequirementJson(dispatchStatus)
+
+    /** Returns notice prefix for the given runtime disposition, or null. */
+    fun getNoticePrefix(disposition: String): String? =
+        RuntimeSemanticsBuilder.getNoticePrefix(disposition)
 }

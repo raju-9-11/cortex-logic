@@ -1,13 +1,15 @@
 package com.agnes.nexus.core.domain.services
 
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import com.agnes.nexus.core.engine.CancellableTask
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.*
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * JS-facing bridge that exposes the KMP [CommandIntelligenceService] to
@@ -29,9 +31,10 @@ import kotlinx.serialization.json.*
  * [parse] is fully synchronous — no coroutines, no IO.  It is safe to call on
  * the JS event loop without a callback wrapper.
  */
-@OptIn(DelicateCoroutinesApi::class)
 @JsExport
 class CommandIntelligenceServiceJs {
+
+    private val scope = CoroutineScope(SupervisorJob())
 
     /**
      * Parse a raw input string (phase 1 — fully deterministic, synchronous).
@@ -71,7 +74,7 @@ class CommandIntelligenceServiceJs {
         generateJson: ((prompt: String, systemPrompt: String, onComplete: (String) -> Unit, onError: (String) -> Unit) -> Unit)?,
         onComplete: (String) -> Unit,
         onError: (String) -> Unit
-    ) {
+    ): CancellableTask {
         val nowInstant: Instant = if (nowIso.isBlank()) {
             Clock.System.now()
         } else {
@@ -92,7 +95,7 @@ class CommandIntelligenceServiceJs {
             }
         } else null
 
-        GlobalScope.launch {
+        val job = scope.launch {
             try {
                 val envelope = CommandIntelligenceService.parseWithLlm(
                     rawInput = rawInput,
@@ -102,10 +105,13 @@ class CommandIntelligenceServiceJs {
                     generateJson = generateJsonSuspend
                 )
                 onComplete(serializeEnvelope(envelope))
+            } catch (_: CancellationException) {
+                // Cancelled from TypeScript — don't call onError.
             } catch (e: Throwable) {
                 onError(e.message ?: "Command parse failed")
             }
         }
+        return CancellableTask(job)
     }
 }
 

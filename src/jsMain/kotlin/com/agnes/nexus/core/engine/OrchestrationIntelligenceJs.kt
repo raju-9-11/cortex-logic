@@ -131,9 +131,47 @@ class OrchestrationCommandCenterServiceJs {
 }
 
 @JsExport
+class NexusActionDispatchServiceJs {
+    fun canDispatchDeterministically(moduleId: String, actionType: String): Boolean =
+        NexusActionDispatchService.canDispatchDeterministically(moduleId, actionType)
+    fun getDeterministicActions(moduleId: String): Array<String> =
+        NexusActionDispatchService.getDeterministicActions(moduleId).toTypedArray()
+}
+
+@JsExport
+class NexusDispatchExecutionServiceJs {
+    fun detectDependencyCycles(dispatchPlanJson: String): Array<String> =
+        NexusDispatchExecutionService.detectDependencyCycles(dispatchPlanJson).toTypedArray()
+
+    fun buildExecutionSummary(packetJson: String, resultsJson: String): String =
+        NexusDispatchExecutionService.buildExecutionSummary(packetJson, resultsJson)
+
+    fun buildRetryPacket(packetJson: String, resultsJson: String): String? =
+        NexusDispatchExecutionService.buildRetryPacket(packetJson, resultsJson)
+
+    fun buildExecutionId(planId: String, nodeId: String): String =
+        NexusDispatchExecutionService.buildExecutionId(planId, nodeId)
+
+    fun getRetryParentPlanId(packetJson: String): String? =
+        NexusDispatchExecutionService.getRetryParentPlanId(packetJson)
+
+    fun buildExecutionArtifacts(
+        packetJson: String,
+        resultsJson: String,
+        timestamp: String,
+        retryPacketJson: String?,
+        retryPrompt: String?,
+    ): String = NexusDispatchExecutionService.buildExecutionArtifacts(
+        packetJson, resultsJson, timestamp, retryPacketJson, retryPrompt,
+    )
+}
+
+@JsExport
 class OrchestrationActionGateServiceJs {
     fun inferMutatesState(actionType: String): Boolean = OrchestrationActionGateService.inferMutatesState(actionType)
     fun inferHighRisk(actionType: String): Boolean = OrchestrationActionGateService.inferHighRisk(actionType)
+    fun isNsvReadOnlyModule(moduleId: String): Boolean = OrchestrationActionGateService.isNsvReadOnlyModule(moduleId)
+    fun isNsvWriteActionType(actionType: String): Boolean = OrchestrationActionGateService.isNsvWriteActionType(actionType)
     fun clampConfidence(value: Double): Double = OrchestrationActionGateService.clampConfidence(value)
     fun buildProposalCardStatus(dispatchStatus: String): String = OrchestrationActionGateService.buildProposalCardStatus(dispatchStatus)
     fun buildExecutionStatus(dispatchStatus: String): String = OrchestrationActionGateService.buildExecutionStatus(dispatchStatus)

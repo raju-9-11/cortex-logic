@@ -5,11 +5,13 @@ import com.agnes.nexus.core.domain.models.MessageRole
 import com.agnes.nexus.core.domain.models.NeuralStateVector
 import io.ktor.client.*
 import io.ktor.client.engine.js.*
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * JS-facing bridge that exposes the KMP cognitive engine stack to TypeScript/React.
@@ -19,11 +21,13 @@ import kotlinx.serialization.json.*
  * engine stack.  All subsequent [chat] and [generateText] calls share the same
  * [LlmClient] and [CognitiveEngine] instances.
  *
- * ## Threading model
- * Kotlin/JS is single-threaded. [GlobalScope.launch] schedules coroutines on the
- * JS event loop; no synchronisation primitives are required. The [@DelicateCoroutinesApi]
- * opt-in is acceptable here because the JS runtime has no daemon/thread-lifecycle
- * concerns that make GlobalScope dangerous on JVM/Native.
+ * ## Structured concurrency
+ * All async methods launch coroutines on an instance-scoped [CoroutineScope]
+ * backed by a [SupervisorJob], ensuring that:
+ * - A failure in one coroutine does not cancel siblings.
+ * - TypeScript callers can cancel individual operations via the returned
+ *   [CancellableTask] handle.
+ * - [clearCredentials] cancels all in-flight coroutines and resets the scope.
  *
  * ## Mock mode
  * Pass `isMockMode = true` (or supply no API keys) to receive canned responses.
@@ -35,7 +39,6 @@ import kotlinx.serialization.json.*
  * - Callbacks use plain Kotlin function types, which Kotlin/JS IR compiles to
  *   callable JS objects.
  */
-@OptIn(DelicateCoroutinesApi::class)
 @JsExport
 class CognitiveEngineJs {
 
@@ -48,6 +51,17 @@ class CognitiveEngineJs {
     private var llmProvider: LlmProvider? = null
 
     private var isMock: Boolean = false
+
+    private var credentialStore: CredentialStoreJs? = null
+
+    /**
+     * Coroutine scope for all async operations. Uses [SupervisorJob] so that a
+     * failure in one coroutine (e.g. a cancelled chat) does not tear down
+     * siblings (e.g. another in-flight generateText call).
+     *
+     * Recreated in [clearCredentials] to ensure a clean slate after logout.
+     */
+    private var scope = CoroutineScope(SupervisorJob())
 
     // ── Public API ────────────────────────────────────────────────────────────
 
@@ -105,6 +119,112 @@ class CognitiveEngineJs {
     }
 
     /**
+     * Initializes the engine using a [CredentialStoreJs] for secure key resolution.
+     *
+     * Unlike [init] which receives raw API key strings, this method lets KMP
+     * resolve keys on demand from the host's encrypted storage. Keys are fetched
+     * asynchronously the first time an LLM call is made (or eagerly via [onReady]).
+     *
+     * @param store          A [CredentialStoreJs] wired to the host's encrypted storage.
+     * @param preferredModel Model ID override. Defaults to internal default when blank.
+     * @param isMockMode     When true, all requests return canned responses.
+     * @param onReady        Called once the engine is ready (keys resolved).
+     * @param onError        Called if key resolution fails.
+     */
+    fun initWithCredentialStore(
+        store: CredentialStoreJs,
+        preferredModel: String = "",
+        isMockMode: Boolean = false,
+        onReady: () -> Unit,
+        onError: (String) -> Unit
+    ): CancellableTask {
+        credentialStore = store
+        isMock = isMockMode
+
+        // Eagerly resolve keys so the engine is ready for the first chat call.
+        val job = scope.launch {
+            try {
+                val keys = store.resolveKeys()
+                if (!keys.hasAnyKey() && !isMockMode) {
+                    isMock = true
+                }
+
+                val keyProvider = store.toApiKeyProvider()
+                val httpClient = HttpClient(Js)
+                val transport = KtorLlmTransport(httpClient)
+
+                val client = if (preferredModel.isNotBlank()) {
+                    LlmClient(
+                        apiKeyProvider = keyProvider,
+                        transport = transport,
+                        defaultModel = preferredModel
+                    )
+                } else {
+                    LlmClient(
+                        apiKeyProvider = keyProvider,
+                        transport = transport
+                    )
+                }
+
+                llmProvider = client
+                engine = CognitiveEngine(
+                    llmProvider = client,
+                    personaFactory = DefaultPersonaFactory(),
+                    sanitizer = LlmSanitizer()
+                )
+
+                onReady()
+            } catch (_: CancellationException) {
+                // Cancelled from TypeScript — don't call onError.
+            } catch (e: Throwable) {
+                onError(e.message ?: "Credential store initialization failed")
+            }
+        }
+        return CancellableTask(job)
+    }
+
+    /**
+     * Re-initializes the engine after a key change (e.g. user updated API key in settings).
+     *
+     * Only works if [initWithCredentialStore] was used. Re-fetches keys from the
+     * credential store (cache is invalidated) and rebuilds the engine.
+     *
+     * @param preferredModel Model ID override. Pass empty to keep current default.
+     * @param onReady        Called once re-init completes.
+     * @param onError        Called if re-init fails.
+     */
+    fun reinitFromCredentialStore(
+        preferredModel: String = "",
+        onReady: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val store = credentialStore
+        if (store == null) {
+            onError("No credential store configured. Call initWithCredentialStore first.")
+            return
+        }
+        // Invalidate the store's cache so it re-fetches from encrypted storage.
+        store.clearCredentials()
+        initWithCredentialStore(store, preferredModel, isMock, onReady, onError)
+    }
+
+    /**
+     * Clears all in-memory credentials and tears down the engine.
+     *
+     * Call this on logout to ensure API keys are not retained in KMP memory.
+     * The engine enters mock mode after this call.
+     */
+    fun clearCredentials() {
+        scope.cancel()
+        scope = CoroutineScope(SupervisorJob())
+        credentialStore?.clearCredentials()
+        credentialStore = null
+        engine = null
+        llmProvider = null
+        isMock = true
+    }
+
+    /**
      * Streams a single chat turn through the cognitive engine.
      *
      * The flow is:
@@ -141,18 +261,18 @@ class CognitiveEngineJs {
         onChunk: (StreamChunkJs) -> Unit,
         onComplete: (FinalResponseJs) -> Unit,
         onError: (String) -> Unit
-    ) {
+    ): CancellableTask {
         val currentEngine = engine
         if (isMock || currentEngine == null) {
             onComplete(MOCK_FINAL_RESPONSE)
-            return
+            return CancellableTask(SupervisorJob().apply { complete() })
         }
 
         val history = parseHistoryJson(historyJson)
         val nsv = NeuralStateVectorJs(nsvJson).nsv
         val userIdentity = identity.toUserIdentity()
 
-        GlobalScope.launch {
+        val job = scope.launch {
             try {
                 currentEngine.chat(
                     moduleId = moduleId,
@@ -181,10 +301,13 @@ class CognitiveEngineJs {
                         )
                     }
                 }
+            } catch (_: CancellationException) {
+                // Cancelled from TypeScript — don't call onError.
             } catch (e: Throwable) {
                 onError(e.message ?: "Chat failed with an unknown error")
             }
         }
+        return CancellableTask(job)
     }
 
     /**
@@ -206,14 +329,14 @@ class CognitiveEngineJs {
         systemPrompt: String? = null,
         onComplete: (String) -> Unit,
         onError: (String) -> Unit
-    ) {
+    ): CancellableTask {
         val provider = llmProvider
         if (isMock || provider == null) {
             onComplete("{}")
-            return
+            return CancellableTask(SupervisorJob().apply { complete() })
         }
 
-        GlobalScope.launch {
+        val job = scope.launch {
             try {
                 val resolvedSystem = systemPrompt ?: "You are a helpful assistant."
                 val tokens = provider.stream(
@@ -222,10 +345,13 @@ class CognitiveEngineJs {
                     userMessage = prompt
                 ).toList()
                 onComplete(tokens.joinToString(""))
+            } catch (_: CancellationException) {
+                // Cancelled from TypeScript — don't call onError.
             } catch (e: Throwable) {
                 onError(e.message ?: "Text generation failed with an unknown error")
             }
         }
+        return CancellableTask(job)
     }
 
     /**
@@ -249,14 +375,14 @@ class CognitiveEngineJs {
         systemPrompt: String = "You are a helpful visual assistant.",
         onComplete: (String) -> Unit,
         onError: (String) -> Unit
-    ) {
+    ): CancellableTask {
         val provider = llmProvider
         if (isMock || provider == null) {
             onComplete("")
-            return
+            return CancellableTask(SupervisorJob().apply { complete() })
         }
 
-        GlobalScope.launch {
+        val job = scope.launch {
             try {
                 val tokens = provider.stream(
                     systemPrompt = systemPrompt,
@@ -265,10 +391,13 @@ class CognitiveEngineJs {
                     imageContent = imageDataUrl
                 ).toList()
                 onComplete(tokens.joinToString(""))
+            } catch (_: CancellationException) {
+                // Cancelled from TypeScript — don't call onError.
             } catch (e: Throwable) {
                 onError(e.message ?: "Image analysis failed with an unknown error")
             }
         }
+        return CancellableTask(job)
     }
 
     /**
@@ -298,11 +427,11 @@ class CognitiveEngineJs {
         onChunk: (StreamChunkJs) -> Unit,
         onComplete: (FinalResponseJs) -> Unit,
         onError: (String) -> Unit
-    ) {
+    ): CancellableTask {
         val provider = llmProvider
         if (isMock || provider == null) {
             onComplete(MOCK_FINAL_RESPONSE)
-            return
+            return CancellableTask(SupervisorJob().apply { complete() })
         }
 
         val history = parseHistoryJson(historyJson)
@@ -315,7 +444,7 @@ class CognitiveEngineJs {
             sanitizer = LlmSanitizer()
         )
 
-        GlobalScope.launch {
+        val job = scope.launch {
             try {
                 engine.chat(
                     moduleId = moduleId,
@@ -346,10 +475,13 @@ class CognitiveEngineJs {
                         )
                     }
                 }
+            } catch (_: CancellationException) {
+                // Cancelled from TypeScript — don't call onError.
             } catch (e: Throwable) {
                 onError(e.message ?: "Chat failed with an unknown error")
             }
         }
+        return CancellableTask(job)
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────

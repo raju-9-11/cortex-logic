@@ -60,4 +60,30 @@ object RuntimeSemanticsBuilder {
             shouldNotifyUser = disposition != RuntimeDisposition.SILENT_EXECUTION,
         )
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Action dispatch status helpers
+    // ─────────────────────────────────────────────────────────────────────────
+
+    fun deriveExecutionStatus(dispatchStatus: String): String = when (dispatchStatus) {
+        "approved" -> "executed"
+        "awaiting_approval" -> "deferred"
+        "analysis_only", "ephemeral" -> "analysis_only"
+        else -> "blocked"
+    }
+
+    fun defaultApprovalRequirementJson(dispatchStatus: String): String =
+        if (dispatchStatus == "awaiting_approval")
+            """{"required":true,"reason":"manual_level"}"""
+        else
+            """{"required":false,"reason":"none"}"""
+
+    fun getNoticePrefix(disposition: String): String? = when (disposition) {
+        "manual_review" -> "Manual review required before execution"
+        "proposal_review" -> "Pending approval before execution"
+        "high_risk_review" -> "High-risk action requires approval"
+        "analysis_only", "ephemeral_preview" -> "Not executed in this session"
+        "incident_review" -> "Execution failed and requires incident review"
+        else -> null
+    }
 }
