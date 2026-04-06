@@ -57,6 +57,12 @@ if (typeof Math.clz32 === 'undefined') {
     };
   }(Math.log, Math.LN2);
 }
+if (typeof String.prototype.startsWith === 'undefined') {
+  Object.defineProperty(String.prototype, 'startsWith', {value: function (searchString, position) {
+    position = position || 0;
+    return this.lastIndexOf(searchString, position) === position;
+  }});
+}
 if (typeof String.prototype.endsWith === 'undefined') {
   Object.defineProperty(String.prototype, 'endsWith', {value: function (searchString, position) {
     var subjectString = this.toString();
@@ -66,12 +72,6 @@ if (typeof String.prototype.endsWith === 'undefined') {
     position -= searchString.length;
     var lastIndex = subjectString.indexOf(searchString, position);
     return lastIndex !== -1 && lastIndex === position;
-  }});
-}
-if (typeof String.prototype.startsWith === 'undefined') {
-  Object.defineProperty(String.prototype, 'startsWith', {value: function (searchString, position) {
-    position = position || 0;
-    return this.lastIndexOf(searchString, position) === position;
   }});
 }
 //endregion
@@ -102,8 +102,8 @@ if (typeof String.prototype.startsWith === 'undefined') {
   initMetadataForInterface(KtList, 'List', VOID, VOID, [Collection]);
   initMetadataForInterface(KtSet, 'Set', VOID, VOID, [Collection]);
   initMetadataForInterface(MutableIterable, 'MutableIterable');
-  initMetadataForInterface(KtMutableSet, 'MutableSet', VOID, VOID, [KtSet, Collection, MutableIterable]);
-  initMetadataForInterface(KtMutableList, 'MutableList', VOID, VOID, [KtList, Collection, MutableIterable]);
+  initMetadataForInterface(KtMutableSet, 'MutableSet', VOID, VOID, [KtSet, MutableIterable, Collection]);
+  initMetadataForInterface(KtMutableList, 'MutableList', VOID, VOID, [KtList, MutableIterable, Collection]);
   initMetadataForInterface(Entry, 'Entry');
   initMetadataForInterface(KtMap, 'Map');
   initMetadataForInterface(KtMutableMap, 'MutableMap', VOID, VOID, [KtMap]);
@@ -125,7 +125,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
   initMetadataForInterface(Comparator, 'Comparator');
   initMetadataForObject(Unit, 'Unit');
   initMetadataForClass(AbstractCollection, 'AbstractCollection', VOID, VOID, [Collection]);
-  initMetadataForClass(AbstractMutableCollection, 'AbstractMutableCollection', VOID, AbstractCollection, [AbstractCollection, Collection, MutableIterable]);
+  initMetadataForClass(AbstractMutableCollection, 'AbstractMutableCollection', VOID, AbstractCollection, [AbstractCollection, MutableIterable, Collection]);
   initMetadataForClass(IteratorImpl, 'IteratorImpl');
   initMetadataForClass(ListIteratorImpl, 'ListIteratorImpl', VOID, IteratorImpl);
   initMetadataForClass(AbstractMutableList, 'AbstractMutableList', VOID, AbstractMutableCollection, [AbstractMutableCollection, KtMutableList]);
@@ -138,7 +138,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
   initMetadataForClass(ArrayList, 'ArrayList', ArrayList_init_$Create$, AbstractMutableList, [AbstractMutableList, KtMutableList, RandomAccess]);
   initMetadataForClass(HashMap, 'HashMap', HashMap_init_$Create$, AbstractMutableMap, [AbstractMutableMap, KtMutableMap]);
   initMetadataForClass(HashMapKeys, 'HashMapKeys', VOID, AbstractMutableSet, [KtMutableSet, AbstractMutableSet]);
-  initMetadataForClass(HashMapValues, 'HashMapValues', VOID, AbstractMutableCollection, [Collection, MutableIterable, AbstractMutableCollection]);
+  initMetadataForClass(HashMapValues, 'HashMapValues', VOID, AbstractMutableCollection, [MutableIterable, Collection, AbstractMutableCollection]);
   initMetadataForClass(HashMapEntrySetBase, 'HashMapEntrySetBase', VOID, AbstractMutableSet, [KtMutableSet, AbstractMutableSet]);
   initMetadataForClass(HashMapEntrySet, 'HashMapEntrySet', VOID, HashMapEntrySetBase);
   initMetadataForClass(HashMapKeysDefault$iterator$1);
@@ -283,6 +283,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
   initMetadataForObject(EmptySequence, 'EmptySequence', VOID, VOID, [Sequence, DropTakeSequence]);
   initMetadataForObject(EmptySet, 'EmptySet', VOID, VOID, [KtSet]);
   initMetadataForObject(ReverseOrderComparator, 'ReverseOrderComparator', VOID, VOID, [Comparator]);
+  initMetadataForObject(NaturalOrderComparator, 'NaturalOrderComparator', VOID, VOID, [Comparator]);
   initMetadataForClass(sam$kotlin_Comparator$0_0, 'sam$kotlin_Comparator$0', VOID, VOID, [Comparator, FunctionAdapter]);
   initMetadataForObject(Key, 'Key');
   function plus(context) {
@@ -1061,6 +1062,22 @@ if (typeof String.prototype.startsWith === 'undefined') {
       checkCountOverflow(count);
     }
     return count === 0 ? NaN : sum / count;
+  }
+  function sorted(_this__u8e3s4) {
+    if (isInterface(_this__u8e3s4, Collection)) {
+      if (_this__u8e3s4.m() <= 1)
+        return toList_0(_this__u8e3s4);
+      // Inline function 'kotlin.collections.toTypedArray' call
+      var tmp = copyToArray(_this__u8e3s4);
+      // Inline function 'kotlin.apply' call
+      var this_0 = isArray(tmp) ? tmp : THROW_CCE();
+      sort(this_0);
+      return asList(this_0);
+    }
+    // Inline function 'kotlin.apply' call
+    var this_1 = toMutableList_1(_this__u8e3s4);
+    sort_0(this_1);
+    return this_1;
   }
   function toCollection_0(_this__u8e3s4, destination) {
     var _iterator__ex2g4s = _this__u8e3s4.j();
@@ -3238,6 +3255,11 @@ if (typeof String.prototype.startsWith === 'undefined') {
       sortArrayWith(_this__u8e3s4, comparator);
     }
   }
+  function sort(_this__u8e3s4) {
+    if (_this__u8e3s4.length > 1) {
+      sortArray(_this__u8e3s4);
+    }
+  }
   function fill(_this__u8e3s4, element, fromIndex, toIndex) {
     fromIndex = fromIndex === VOID ? 0 : fromIndex;
     toIndex = toIndex === VOID ? _this__u8e3s4.length : toIndex;
@@ -3615,6 +3637,9 @@ if (typeof String.prototype.startsWith === 'undefined') {
       throwCountOverflow();
     }
     return count;
+  }
+  function sort_0(_this__u8e3s4) {
+    collectionsSort(_this__u8e3s4, naturalOrder());
   }
   function copyToArray(collection) {
     var tmp;
@@ -4147,6 +4172,17 @@ if (typeof String.prototype.startsWith === 'undefined') {
       mergeSort(array, 0, get_lastIndex(array), comparator);
     }
   }
+  function sortArray(array) {
+    if (getStableSortingIsSupported()) {
+      var comparison = sortArray$lambda;
+      // Inline function 'kotlin.js.asDynamic' call
+      array.sort(comparison);
+    } else {
+      // Inline function 'kotlin.js.unsafeCast' call
+      // Inline function 'kotlin.js.asDynamic' call
+      mergeSort(array, 0, get_lastIndex(array), naturalOrder());
+    }
+  }
   function getStableSortingIsSupported() {
     var tmp0_safe_receiver = _stableSortingIsSupported;
     if (tmp0_safe_receiver == null)
@@ -4243,6 +4279,9 @@ if (typeof String.prototype.startsWith === 'undefined') {
     return function (a, b) {
       return $comparator.compare(a, b);
     };
+  }
+  function sortArray$lambda(a, b) {
+    return compareTo(a, b);
   }
   function getStableSortingIsSupported$lambda(a, b) {
     return (a & 3) - (b & 3) | 0;
@@ -10096,6 +10135,10 @@ if (typeof String.prototype.startsWith === 'undefined') {
       return 1;
     return compareTo((!(a == null) ? isComparable(a) : false) ? a : THROW_CCE(), b);
   }
+  function naturalOrder() {
+    var tmp = NaturalOrderComparator_instance;
+    return isInterface(tmp, Comparator) ? tmp : THROW_CCE();
+  }
   function compareValuesByImpl(a, b, selectors) {
     var inductionVariable = 0;
     var last = selectors.length;
@@ -10122,6 +10165,19 @@ if (typeof String.prototype.startsWith === 'undefined') {
   var ReverseOrderComparator_instance;
   function ReverseOrderComparator_getInstance() {
     return ReverseOrderComparator_instance;
+  }
+  function NaturalOrderComparator() {
+  }
+  protoOf(NaturalOrderComparator).uh = function (a, b) {
+    return compareTo(a, b);
+  };
+  protoOf(NaturalOrderComparator).compare = function (a, b) {
+    var tmp = (!(a == null) ? isComparable(a) : false) ? a : THROW_CCE();
+    return this.uh(tmp, (!(b == null) ? isComparable(b) : false) ? b : THROW_CCE());
+  };
+  var NaturalOrderComparator_instance;
+  function NaturalOrderComparator_getInstance() {
+    return NaturalOrderComparator_instance;
   }
   function sam$kotlin_Comparator$0_0(function_0) {
     this.vh_1 = function_0;
@@ -14821,6 +14877,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
   EmptyIterator_instance = new EmptyIterator();
   EmptySequence_instance = new EmptySequence();
   ReverseOrderComparator_instance = new ReverseOrderComparator();
+  NaturalOrderComparator_instance = new NaturalOrderComparator();
   Key_instance = new Key();
   Companion_instance_12 = new Companion_12();
   Companion_instance_13 = new Companion_13();
@@ -15054,238 +15111,239 @@ if (typeof String.prototype.startsWith === 'undefined') {
   _.$_$.n8 = sortWith_0;
   _.$_$.o8 = sortedDescending;
   _.$_$.p8 = sortedWith;
-  _.$_$.q8 = sum;
-  _.$_$.r8 = takeLast;
-  _.$_$.s8 = take;
-  _.$_$.t8 = toBooleanArray;
-  _.$_$.u8 = toHashSet;
-  _.$_$.v8 = toList_1;
-  _.$_$.w8 = toList_0;
-  _.$_$.x8 = toList;
-  _.$_$.y8 = toMap_0;
-  _.$_$.z8 = toMap;
-  _.$_$.a9 = toMutableList_0;
-  _.$_$.b9 = toMutableMap;
-  _.$_$.c9 = toSet_0;
-  _.$_$.d9 = toTypedArray;
-  _.$_$.e9 = withIndex;
-  _.$_$.f9 = withIndex_0;
-  _.$_$.g9 = zip;
-  _.$_$.h9 = compareBy;
-  _.$_$.i9 = compareValues;
-  _.$_$.j9 = CancellationException;
-  _.$_$.k9 = get_COROUTINE_SUSPENDED;
-  _.$_$.l9 = createCoroutineUnintercepted_0;
-  _.$_$.m9 = createCoroutineUnintercepted;
-  _.$_$.n9 = intercepted;
-  _.$_$.o9 = startCoroutineUninterceptedOrReturnNonGeneratorVersion;
-  _.$_$.p9 = AbstractCoroutineContextElement;
-  _.$_$.q9 = AbstractCoroutineContextKey;
-  _.$_$.r9 = get_0;
-  _.$_$.s9 = minusKey_0;
-  _.$_$.t9 = ContinuationInterceptor;
-  _.$_$.u9 = Continuation;
-  _.$_$.v9 = fold;
-  _.$_$.w9 = get;
-  _.$_$.x9 = minusKey;
-  _.$_$.y9 = Element;
-  _.$_$.z9 = plus;
-  _.$_$.aa = CoroutineImpl;
-  _.$_$.ba = startCoroutine;
-  _.$_$.ca = enumEntries;
-  _.$_$.da = println;
-  _.$_$.ea = FunctionAdapter;
-  _.$_$.fa = anyToString;
-  _.$_$.ga = arrayIterator;
-  _.$_$.ha = booleanArray;
-  _.$_$.ia = captureStack;
-  _.$_$.ja = charArrayOf;
-  _.$_$.ka = charArray;
-  _.$_$.la = charSequenceGet;
-  _.$_$.ma = charSequenceLength;
-  _.$_$.na = charSequenceSubSequence;
-  _.$_$.oa = compareTo;
-  _.$_$.pa = defineProp;
-  _.$_$.qa = equals;
-  _.$_$.ra = extendThrowable;
-  _.$_$.sa = getBooleanHashCode;
-  _.$_$.ta = getNumberHashCode;
-  _.$_$.ua = getPropertyCallableRef;
-  _.$_$.va = getStringHashCode;
-  _.$_$.wa = hashCode;
-  _.$_$.xa = initMetadataForClass;
-  _.$_$.ya = initMetadataForCompanion;
-  _.$_$.za = initMetadataForCoroutine;
-  _.$_$.ab = initMetadataForFunctionReference;
-  _.$_$.bb = initMetadataForInterface;
-  _.$_$.cb = initMetadataForLambda;
-  _.$_$.db = initMetadataForObject;
-  _.$_$.eb = isArray;
-  _.$_$.fb = isBooleanArray;
-  _.$_$.gb = isByteArray;
-  _.$_$.hb = isCharArray;
-  _.$_$.ib = isCharSequence;
-  _.$_$.jb = isDoubleArray;
-  _.$_$.kb = isFloatArray;
-  _.$_$.lb = isIntArray;
-  _.$_$.mb = isInterface;
-  _.$_$.nb = isLongArray;
-  _.$_$.ob = isNumber;
-  _.$_$.pb = isShortArray;
-  _.$_$.qb = isSuspendFunction;
-  _.$_$.rb = get_js;
-  _.$_$.sb = longArrayOf;
-  _.$_$.tb = longArray;
-  _.$_$.ub = newThrowable;
-  _.$_$.vb = numberRangeToNumber;
-  _.$_$.wb = numberToChar;
-  _.$_$.xb = numberToDouble;
-  _.$_$.yb = numberToInt;
-  _.$_$.zb = numberToLong;
-  _.$_$.ac = objectCreate;
-  _.$_$.bc = protoOf;
-  _.$_$.cc = toByte;
-  _.$_$.dc = toLong;
-  _.$_$.ec = toShort;
-  _.$_$.fc = toString_1;
-  _.$_$.gc = abs;
-  _.$_$.hc = roundToInt;
-  _.$_$.ic = roundToLong;
-  _.$_$.jc = round;
-  _.$_$.kc = ClosedRange;
-  _.$_$.lc = coerceAtLeast;
-  _.$_$.mc = coerceAtMost;
-  _.$_$.nc = coerceAtMost_0;
-  _.$_$.oc = coerceIn_1;
-  _.$_$.pc = coerceIn_2;
-  _.$_$.qc = coerceIn_0;
-  _.$_$.rc = contains_7;
-  _.$_$.sc = downTo;
-  _.$_$.tc = step;
-  _.$_$.uc = until;
-  _.$_$.vc = KClass;
-  _.$_$.wc = KMutableProperty0;
-  _.$_$.xc = KMutableProperty1;
-  _.$_$.yc = KProperty0;
-  _.$_$.zc = KProperty1;
-  _.$_$.ad = KTypeParameter;
-  _.$_$.bd = mapNotNull;
-  _.$_$.cd = toList_2;
-  _.$_$.dd = Regex;
-  _.$_$.ed = chunked;
-  _.$_$.fd = concatToString;
-  _.$_$.gd = concatToString_0;
-  _.$_$.hd = contains_10;
-  _.$_$.id = contains_9;
-  _.$_$.jd = decodeToString;
-  _.$_$.kd = decodeToString_0;
-  _.$_$.ld = drop_0;
-  _.$_$.md = encodeToByteArray;
-  _.$_$.nd = equals_0;
-  _.$_$.od = firstOrNull_0;
-  _.$_$.pd = first_1;
-  _.$_$.qd = indexOfAny;
-  _.$_$.rd = indexOf_7;
-  _.$_$.sd = indexOf_6;
-  _.$_$.td = isBlank;
-  _.$_$.ud = isDigit;
-  _.$_$.vd = isSurrogate;
-  _.$_$.wd = isWhitespace;
-  _.$_$.xd = get_lastIndex_3;
-  _.$_$.yd = lastIndexOf;
-  _.$_$.zd = lastIndexOf_0;
-  _.$_$.ae = last_1;
-  _.$_$.be = lineSequence;
-  _.$_$.ce = lines;
-  _.$_$.de = padStart;
-  _.$_$.ee = removePrefix;
-  _.$_$.fe = removeSuffix;
-  _.$_$.ge = removeSurrounding;
-  _.$_$.he = repeat;
-  _.$_$.ie = replace;
-  _.$_$.je = replace_0;
-  _.$_$.ke = reversed_0;
-  _.$_$.le = single_2;
-  _.$_$.me = split_0;
-  _.$_$.ne = split;
-  _.$_$.oe = startsWith;
-  _.$_$.pe = startsWith_3;
-  _.$_$.qe = startsWith_1;
-  _.$_$.re = substringAfter;
-  _.$_$.se = substringBefore;
-  _.$_$.te = take_1;
-  _.$_$.ue = toBooleanStrictOrNull;
-  _.$_$.ve = toDoubleOrNull;
-  _.$_$.we = toDouble;
-  _.$_$.xe = toIntOrNull;
-  _.$_$.ye = toInt;
-  _.$_$.ze = toInt_0;
-  _.$_$.af = toLongOrNull;
-  _.$_$.bf = toLong_0;
-  _.$_$.cf = toString_3;
-  _.$_$.df = toString_2;
-  _.$_$.ef = toUByte;
-  _.$_$.ff = toUInt;
-  _.$_$.gf = toULongOrNull;
-  _.$_$.hf = toULong;
-  _.$_$.if = toUShort;
-  _.$_$.jf = trimEnd_0;
-  _.$_$.kf = trimEnd;
-  _.$_$.lf = trimIndent;
-  _.$_$.mf = trimMargin;
-  _.$_$.nf = trimStart;
-  _.$_$.of = trim_0;
-  _.$_$.pf = trim;
-  _.$_$.qf = uppercaseChar;
-  _.$_$.rf = Duration;
-  _.$_$.sf = Uuid;
-  _.$_$.tf = ArithmeticException;
-  _.$_$.uf = Char;
-  _.$_$.vf = Comparable;
-  _.$_$.wf = Comparator;
-  _.$_$.xf = DeepRecursiveFunction;
-  _.$_$.yf = DeepRecursiveScope;
-  _.$_$.zf = Enum;
-  _.$_$.ag = Error_0;
-  _.$_$.bg = Exception;
-  _.$_$.cg = IllegalArgumentException;
-  _.$_$.dg = IllegalStateException;
-  _.$_$.eg = Long;
-  _.$_$.fg = NoSuchElementException;
-  _.$_$.gg = Pair;
-  _.$_$.hg = Result;
-  _.$_$.ig = RuntimeException;
-  _.$_$.jg = THROW_CCE;
-  _.$_$.kg = THROW_IAE;
-  _.$_$.lg = Triple;
-  _.$_$.mg = UByteArray;
-  _.$_$.ng = UByte;
-  _.$_$.og = UIntArray;
-  _.$_$.pg = UInt;
-  _.$_$.qg = ULongArray;
-  _.$_$.rg = ULong;
-  _.$_$.sg = UShortArray;
-  _.$_$.tg = UShort;
-  _.$_$.ug = Unit;
-  _.$_$.vg = UnsupportedOperationException;
-  _.$_$.wg = addSuppressed;
-  _.$_$.xg = arrayOf;
-  _.$_$.yg = closeFinally;
-  _.$_$.zg = countTrailingZeroBits;
-  _.$_$.ah = createFailure;
-  _.$_$.bh = ensureNotNull;
-  _.$_$.ch = invoke;
-  _.$_$.dh = isFinite;
-  _.$_$.eh = isFinite_0;
-  _.$_$.fh = isNaN_0;
-  _.$_$.gh = lazy_0;
-  _.$_$.hh = lazy;
-  _.$_$.ih = noWhenBranchMatchedException;
-  _.$_$.jh = plus_5;
-  _.$_$.kh = stackTraceToString;
-  _.$_$.lh = throwUninitializedPropertyAccessException;
-  _.$_$.mh = toString_0;
-  _.$_$.nh = to;
+  _.$_$.q8 = sorted;
+  _.$_$.r8 = sum;
+  _.$_$.s8 = takeLast;
+  _.$_$.t8 = take;
+  _.$_$.u8 = toBooleanArray;
+  _.$_$.v8 = toHashSet;
+  _.$_$.w8 = toList_1;
+  _.$_$.x8 = toList_0;
+  _.$_$.y8 = toList;
+  _.$_$.z8 = toMap_0;
+  _.$_$.a9 = toMap;
+  _.$_$.b9 = toMutableList_0;
+  _.$_$.c9 = toMutableMap;
+  _.$_$.d9 = toSet_0;
+  _.$_$.e9 = toTypedArray;
+  _.$_$.f9 = withIndex;
+  _.$_$.g9 = withIndex_0;
+  _.$_$.h9 = zip;
+  _.$_$.i9 = compareBy;
+  _.$_$.j9 = compareValues;
+  _.$_$.k9 = CancellationException;
+  _.$_$.l9 = get_COROUTINE_SUSPENDED;
+  _.$_$.m9 = createCoroutineUnintercepted_0;
+  _.$_$.n9 = createCoroutineUnintercepted;
+  _.$_$.o9 = intercepted;
+  _.$_$.p9 = startCoroutineUninterceptedOrReturnNonGeneratorVersion;
+  _.$_$.q9 = AbstractCoroutineContextElement;
+  _.$_$.r9 = AbstractCoroutineContextKey;
+  _.$_$.s9 = get_0;
+  _.$_$.t9 = minusKey_0;
+  _.$_$.u9 = ContinuationInterceptor;
+  _.$_$.v9 = Continuation;
+  _.$_$.w9 = fold;
+  _.$_$.x9 = get;
+  _.$_$.y9 = minusKey;
+  _.$_$.z9 = Element;
+  _.$_$.aa = plus;
+  _.$_$.ba = CoroutineImpl;
+  _.$_$.ca = startCoroutine;
+  _.$_$.da = enumEntries;
+  _.$_$.ea = println;
+  _.$_$.fa = FunctionAdapter;
+  _.$_$.ga = anyToString;
+  _.$_$.ha = arrayIterator;
+  _.$_$.ia = booleanArray;
+  _.$_$.ja = captureStack;
+  _.$_$.ka = charArrayOf;
+  _.$_$.la = charArray;
+  _.$_$.ma = charSequenceGet;
+  _.$_$.na = charSequenceLength;
+  _.$_$.oa = charSequenceSubSequence;
+  _.$_$.pa = compareTo;
+  _.$_$.qa = defineProp;
+  _.$_$.ra = equals;
+  _.$_$.sa = extendThrowable;
+  _.$_$.ta = getBooleanHashCode;
+  _.$_$.ua = getNumberHashCode;
+  _.$_$.va = getPropertyCallableRef;
+  _.$_$.wa = getStringHashCode;
+  _.$_$.xa = hashCode;
+  _.$_$.ya = initMetadataForClass;
+  _.$_$.za = initMetadataForCompanion;
+  _.$_$.ab = initMetadataForCoroutine;
+  _.$_$.bb = initMetadataForFunctionReference;
+  _.$_$.cb = initMetadataForInterface;
+  _.$_$.db = initMetadataForLambda;
+  _.$_$.eb = initMetadataForObject;
+  _.$_$.fb = isArray;
+  _.$_$.gb = isBooleanArray;
+  _.$_$.hb = isByteArray;
+  _.$_$.ib = isCharArray;
+  _.$_$.jb = isCharSequence;
+  _.$_$.kb = isDoubleArray;
+  _.$_$.lb = isFloatArray;
+  _.$_$.mb = isIntArray;
+  _.$_$.nb = isInterface;
+  _.$_$.ob = isLongArray;
+  _.$_$.pb = isNumber;
+  _.$_$.qb = isShortArray;
+  _.$_$.rb = isSuspendFunction;
+  _.$_$.sb = get_js;
+  _.$_$.tb = longArrayOf;
+  _.$_$.ub = longArray;
+  _.$_$.vb = newThrowable;
+  _.$_$.wb = numberRangeToNumber;
+  _.$_$.xb = numberToChar;
+  _.$_$.yb = numberToDouble;
+  _.$_$.zb = numberToInt;
+  _.$_$.ac = numberToLong;
+  _.$_$.bc = objectCreate;
+  _.$_$.cc = protoOf;
+  _.$_$.dc = toByte;
+  _.$_$.ec = toLong;
+  _.$_$.fc = toShort;
+  _.$_$.gc = toString_1;
+  _.$_$.hc = abs;
+  _.$_$.ic = roundToInt;
+  _.$_$.jc = roundToLong;
+  _.$_$.kc = round;
+  _.$_$.lc = ClosedRange;
+  _.$_$.mc = coerceAtLeast;
+  _.$_$.nc = coerceAtMost;
+  _.$_$.oc = coerceAtMost_0;
+  _.$_$.pc = coerceIn_1;
+  _.$_$.qc = coerceIn_2;
+  _.$_$.rc = coerceIn_0;
+  _.$_$.sc = contains_7;
+  _.$_$.tc = downTo;
+  _.$_$.uc = step;
+  _.$_$.vc = until;
+  _.$_$.wc = KClass;
+  _.$_$.xc = KMutableProperty0;
+  _.$_$.yc = KMutableProperty1;
+  _.$_$.zc = KProperty0;
+  _.$_$.ad = KProperty1;
+  _.$_$.bd = KTypeParameter;
+  _.$_$.cd = mapNotNull;
+  _.$_$.dd = toList_2;
+  _.$_$.ed = Regex;
+  _.$_$.fd = chunked;
+  _.$_$.gd = concatToString;
+  _.$_$.hd = concatToString_0;
+  _.$_$.id = contains_10;
+  _.$_$.jd = contains_9;
+  _.$_$.kd = decodeToString;
+  _.$_$.ld = decodeToString_0;
+  _.$_$.md = drop_0;
+  _.$_$.nd = encodeToByteArray;
+  _.$_$.od = equals_0;
+  _.$_$.pd = firstOrNull_0;
+  _.$_$.qd = first_1;
+  _.$_$.rd = indexOfAny;
+  _.$_$.sd = indexOf_7;
+  _.$_$.td = indexOf_6;
+  _.$_$.ud = isBlank;
+  _.$_$.vd = isDigit;
+  _.$_$.wd = isSurrogate;
+  _.$_$.xd = isWhitespace;
+  _.$_$.yd = get_lastIndex_3;
+  _.$_$.zd = lastIndexOf;
+  _.$_$.ae = lastIndexOf_0;
+  _.$_$.be = last_1;
+  _.$_$.ce = lineSequence;
+  _.$_$.de = lines;
+  _.$_$.ee = padStart;
+  _.$_$.fe = removePrefix;
+  _.$_$.ge = removeSuffix;
+  _.$_$.he = removeSurrounding;
+  _.$_$.ie = repeat;
+  _.$_$.je = replace;
+  _.$_$.ke = replace_0;
+  _.$_$.le = reversed_0;
+  _.$_$.me = single_2;
+  _.$_$.ne = split_0;
+  _.$_$.oe = split;
+  _.$_$.pe = startsWith;
+  _.$_$.qe = startsWith_3;
+  _.$_$.re = startsWith_1;
+  _.$_$.se = substringAfter;
+  _.$_$.te = substringBefore;
+  _.$_$.ue = take_1;
+  _.$_$.ve = toBooleanStrictOrNull;
+  _.$_$.we = toDoubleOrNull;
+  _.$_$.xe = toDouble;
+  _.$_$.ye = toIntOrNull;
+  _.$_$.ze = toInt;
+  _.$_$.af = toInt_0;
+  _.$_$.bf = toLongOrNull;
+  _.$_$.cf = toLong_0;
+  _.$_$.df = toString_3;
+  _.$_$.ef = toString_2;
+  _.$_$.ff = toUByte;
+  _.$_$.gf = toUInt;
+  _.$_$.hf = toULongOrNull;
+  _.$_$.if = toULong;
+  _.$_$.jf = toUShort;
+  _.$_$.kf = trimEnd_0;
+  _.$_$.lf = trimEnd;
+  _.$_$.mf = trimIndent;
+  _.$_$.nf = trimMargin;
+  _.$_$.of = trimStart;
+  _.$_$.pf = trim_0;
+  _.$_$.qf = trim;
+  _.$_$.rf = uppercaseChar;
+  _.$_$.sf = Duration;
+  _.$_$.tf = Uuid;
+  _.$_$.uf = ArithmeticException;
+  _.$_$.vf = Char;
+  _.$_$.wf = Comparable;
+  _.$_$.xf = Comparator;
+  _.$_$.yf = DeepRecursiveFunction;
+  _.$_$.zf = DeepRecursiveScope;
+  _.$_$.ag = Enum;
+  _.$_$.bg = Error_0;
+  _.$_$.cg = Exception;
+  _.$_$.dg = IllegalArgumentException;
+  _.$_$.eg = IllegalStateException;
+  _.$_$.fg = Long;
+  _.$_$.gg = NoSuchElementException;
+  _.$_$.hg = Pair;
+  _.$_$.ig = Result;
+  _.$_$.jg = RuntimeException;
+  _.$_$.kg = THROW_CCE;
+  _.$_$.lg = THROW_IAE;
+  _.$_$.mg = Triple;
+  _.$_$.ng = UByteArray;
+  _.$_$.og = UByte;
+  _.$_$.pg = UIntArray;
+  _.$_$.qg = UInt;
+  _.$_$.rg = ULongArray;
+  _.$_$.sg = ULong;
+  _.$_$.tg = UShortArray;
+  _.$_$.ug = UShort;
+  _.$_$.vg = Unit;
+  _.$_$.wg = UnsupportedOperationException;
+  _.$_$.xg = addSuppressed;
+  _.$_$.yg = arrayOf;
+  _.$_$.zg = closeFinally;
+  _.$_$.ah = countTrailingZeroBits;
+  _.$_$.bh = createFailure;
+  _.$_$.ch = ensureNotNull;
+  _.$_$.dh = invoke;
+  _.$_$.eh = isFinite;
+  _.$_$.fh = isFinite_0;
+  _.$_$.gh = isNaN_0;
+  _.$_$.hh = lazy_0;
+  _.$_$.ih = lazy;
+  _.$_$.jh = noWhenBranchMatchedException;
+  _.$_$.kh = plus_5;
+  _.$_$.lh = stackTraceToString;
+  _.$_$.mh = throwUninitializedPropertyAccessException;
+  _.$_$.nh = toString_0;
+  _.$_$.oh = to;
   //endregion
   return _;
 }));
