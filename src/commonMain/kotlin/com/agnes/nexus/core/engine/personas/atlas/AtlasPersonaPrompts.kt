@@ -168,7 +168,7 @@ object AtlasPersonaPrompts {
             3. Treat routines as the baseline; tasks modify the baseline.
             4. If activeLoad > 7, inject recovery. Do not over-schedule.
             5. You own chronological truth. Keep the timeline accurate.
-            6. NEVER emit <action type="retrieve">. This action type does not exist. Use query_module_data instead.
+            6. Your tasks, goals, habits, and projects are already injected into this system prompt — read them directly. NEVER emit any action to retrieve your own data. There is no retrieval action. If a user asks to see their tasks, goals, habits, or projects, read from the ACTIVE TASKS / GOALS / HABITS blocks above and respond directly.
         """.trimIndent()
     )
 }

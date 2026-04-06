@@ -169,7 +169,7 @@ class LlmSanitizer {
         val actionRegex = Regex("<action\\s+type=\"([^\"]+)\">([\\s\\S]*?)</action>", RegexOption.IGNORE_CASE)
         actionRegex.findAll(normalized).forEach { match ->
             try {
-                val type = match.groupValues[1]
+                val type = match.groupValues[1].trim().lowercase().replace(Regex("\\s+"), "_")
                 val payloadRaw = match.groupValues[2]
                 val sanitizedPayload = sanitizeJsonPayload(payloadRaw)
                 val action = ActionCall(

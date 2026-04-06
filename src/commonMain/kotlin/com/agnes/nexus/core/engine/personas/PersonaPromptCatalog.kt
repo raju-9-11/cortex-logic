@@ -17,6 +17,7 @@ import com.agnes.nexus.core.engine.personas.soma.SomaPersonaPrompts
 object PersonaPromptCatalog {
     private val promptsByModule: Map<String, PersonaPrompt> = mapOf(
         "agnes" to AgnesPersonaPrompts.base,
+        "agnes_onboarding" to AgnesPersonaPrompts.onboarding,
         "titan" to TitanPersonaPrompts.base,
         "ledger" to LedgerPersonaPrompts.base,
         "atlas" to AtlasPersonaPrompts.base,
