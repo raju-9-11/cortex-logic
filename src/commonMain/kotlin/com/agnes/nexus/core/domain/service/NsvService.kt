@@ -21,6 +21,12 @@ object NsvService {
         "resource" to listOf("financialFriction", "resonanceROI"),
     )
 
+    /** Fields that are strings (not numeric) — everything else in DEFAULT_FIELDS is numeric. */
+    private val STRING_FIELDS: Set<String> = setOf("hormonalContext", "moodTrend")
+
+    /** Fields that are JSON arrays — these pass through without coercion. */
+    private val ARRAY_FIELDS: Set<String> = setOf("traumaMarkers")
+
     /** Legacy root-level alias → nested path mapping. */
     private val LEGACY_ALIASES: Map<String, Pair<String, String>> = mapOf(
         "cnsFatigue" to ("biological" to "cnsFatigue"),
@@ -75,7 +81,7 @@ object NsvService {
                         val nestedVal = inputDomain[field]
 
                         val value = pickDefined(rootVal, nestedVal)
-                        put(field, value ?: JsonNull)
+                        put(field, coerceField(field, value))
                     }
                 })
             }
@@ -408,5 +414,39 @@ object NsvService {
             if (v != null && v !is JsonNull) return v
         }
         return null
+    }
+
+    /**
+     * Coerce a JSON value to match the expected type for [fieldName].
+     *
+     * - **Numeric fields** (default): if the value is a JSON string, attempt to
+     *   parse it as a Double; return JsonNull on failure.
+     * - **String fields** (hormonalContext, moodTrend): pass through any primitive
+     *   as its string content.
+     * - **Array fields** (traumaMarkers): pass through if JsonArray, otherwise JsonNull.
+     * - **null / JsonNull**: always returns JsonNull.
+     */
+    private fun coerceField(fieldName: String, value: JsonElement?): JsonElement {
+        if (value == null || value is JsonNull) return JsonNull
+
+        return when {
+            fieldName in ARRAY_FIELDS -> {
+                if (value is JsonArray) value else JsonNull
+            }
+            fieldName in STRING_FIELDS -> {
+                // Accept any primitive as a string
+                (value as? JsonPrimitive)?.let { JsonPrimitive(it.content) } ?: JsonNull
+            }
+            else -> {
+                // Numeric field: must be a number or a string that parses as a number
+                when (value) {
+                    is JsonPrimitive -> {
+                        val dbl = value.doubleOrNull
+                        if (dbl != null && dbl.isFinite()) JsonPrimitive(dbl) else JsonNull
+                    }
+                    else -> JsonNull
+                }
+            }
+        }
     }
 }

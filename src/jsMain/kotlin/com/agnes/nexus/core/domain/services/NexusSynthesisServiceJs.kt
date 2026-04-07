@@ -133,6 +133,7 @@ class NexusSynthesisServiceJs(
             kotlinx.serialization.json.Json {
                 ignoreUnknownKeys = true
                 isLenient = true
+                coerceInputValues = true
             }.decodeFromString(NeuralStateVector.serializer(), json)
         } catch (_: Exception) {
             NeuralStateVector()

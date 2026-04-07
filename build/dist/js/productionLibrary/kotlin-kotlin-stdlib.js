@@ -57,12 +57,6 @@ if (typeof Math.clz32 === 'undefined') {
     };
   }(Math.log, Math.LN2);
 }
-if (typeof String.prototype.startsWith === 'undefined') {
-  Object.defineProperty(String.prototype, 'startsWith', {value: function (searchString, position) {
-    position = position || 0;
-    return this.lastIndexOf(searchString, position) === position;
-  }});
-}
 if (typeof String.prototype.endsWith === 'undefined') {
   Object.defineProperty(String.prototype, 'endsWith', {value: function (searchString, position) {
     var subjectString = this.toString();
@@ -72,6 +66,12 @@ if (typeof String.prototype.endsWith === 'undefined') {
     position -= searchString.length;
     var lastIndex = subjectString.indexOf(searchString, position);
     return lastIndex !== -1 && lastIndex === position;
+  }});
+}
+if (typeof String.prototype.startsWith === 'undefined') {
+  Object.defineProperty(String.prototype, 'startsWith', {value: function (searchString, position) {
+    position = position || 0;
+    return this.lastIndexOf(searchString, position) === position;
   }});
 }
 //endregion
@@ -102,8 +102,8 @@ if (typeof String.prototype.endsWith === 'undefined') {
   initMetadataForInterface(KtList, 'List', VOID, VOID, [Collection]);
   initMetadataForInterface(KtSet, 'Set', VOID, VOID, [Collection]);
   initMetadataForInterface(MutableIterable, 'MutableIterable');
-  initMetadataForInterface(KtMutableSet, 'MutableSet', VOID, VOID, [KtSet, Collection, MutableIterable]);
-  initMetadataForInterface(KtMutableList, 'MutableList', VOID, VOID, [KtList, Collection, MutableIterable]);
+  initMetadataForInterface(KtMutableSet, 'MutableSet', VOID, VOID, [KtSet, MutableIterable, Collection]);
+  initMetadataForInterface(KtMutableList, 'MutableList', VOID, VOID, [KtList, MutableIterable, Collection]);
   initMetadataForInterface(Entry, 'Entry');
   initMetadataForInterface(KtMap, 'Map');
   initMetadataForInterface(KtMutableMap, 'MutableMap', VOID, VOID, [KtMap]);
@@ -125,7 +125,7 @@ if (typeof String.prototype.endsWith === 'undefined') {
   initMetadataForInterface(Comparator, 'Comparator');
   initMetadataForObject(Unit, 'Unit');
   initMetadataForClass(AbstractCollection, 'AbstractCollection', VOID, VOID, [Collection]);
-  initMetadataForClass(AbstractMutableCollection, 'AbstractMutableCollection', VOID, AbstractCollection, [AbstractCollection, Collection, MutableIterable]);
+  initMetadataForClass(AbstractMutableCollection, 'AbstractMutableCollection', VOID, AbstractCollection, [AbstractCollection, MutableIterable, Collection]);
   initMetadataForClass(IteratorImpl, 'IteratorImpl');
   initMetadataForClass(ListIteratorImpl, 'ListIteratorImpl', VOID, IteratorImpl);
   initMetadataForClass(AbstractMutableList, 'AbstractMutableList', VOID, AbstractMutableCollection, [AbstractMutableCollection, KtMutableList]);
@@ -138,7 +138,7 @@ if (typeof String.prototype.endsWith === 'undefined') {
   initMetadataForClass(ArrayList, 'ArrayList', ArrayList_init_$Create$, AbstractMutableList, [AbstractMutableList, KtMutableList, RandomAccess]);
   initMetadataForClass(HashMap, 'HashMap', HashMap_init_$Create$, AbstractMutableMap, [AbstractMutableMap, KtMutableMap]);
   initMetadataForClass(HashMapKeys, 'HashMapKeys', VOID, AbstractMutableSet, [KtMutableSet, AbstractMutableSet]);
-  initMetadataForClass(HashMapValues, 'HashMapValues', VOID, AbstractMutableCollection, [Collection, MutableIterable, AbstractMutableCollection]);
+  initMetadataForClass(HashMapValues, 'HashMapValues', VOID, AbstractMutableCollection, [MutableIterable, Collection, AbstractMutableCollection]);
   initMetadataForClass(HashMapEntrySetBase, 'HashMapEntrySetBase', VOID, AbstractMutableSet, [KtMutableSet, AbstractMutableSet]);
   initMetadataForClass(HashMapEntrySet, 'HashMapEntrySet', VOID, HashMapEntrySetBase);
   initMetadataForClass(HashMapKeysDefault$iterator$1);
@@ -3488,10 +3488,10 @@ if (typeof String.prototype.endsWith === 'undefined') {
     return !(_this__u8e3s4 === _this__u8e3s4);
   }
   function isFinite(_this__u8e3s4) {
-    return !isInfinite_0(_this__u8e3s4) && !isNaN_1(_this__u8e3s4);
+    return !isInfinite(_this__u8e3s4) && !isNaN_0(_this__u8e3s4);
   }
   function isFinite_0(_this__u8e3s4) {
-    return !isInfinite(_this__u8e3s4) && !isNaN_0(_this__u8e3s4);
+    return !isInfinite_0(_this__u8e3s4) && !isNaN_1(_this__u8e3s4);
   }
   function isInfinite(_this__u8e3s4) {
     return _this__u8e3s4 === Infinity || _this__u8e3s4 === -Infinity;
@@ -15336,8 +15336,8 @@ if (typeof String.prototype.endsWith === 'undefined') {
   _.$_$.eh = createFailure;
   _.$_$.fh = ensureNotNull;
   _.$_$.gh = invoke;
-  _.$_$.hh = isFinite_0;
-  _.$_$.ih = isFinite;
+  _.$_$.hh = isFinite;
+  _.$_$.ih = isFinite_0;
   _.$_$.jh = isNaN_0;
   _.$_$.kh = lazy_0;
   _.$_$.lh = lazy;

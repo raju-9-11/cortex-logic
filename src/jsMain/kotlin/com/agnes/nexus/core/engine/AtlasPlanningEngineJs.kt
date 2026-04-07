@@ -23,7 +23,7 @@ import kotlin.js.JsExport
 @JsExport
 class AtlasPlanningEngineJs {
 
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json { ignoreUnknownKeys = true; coerceInputValues = true }
 
     /**
      * Build a dependency graph from a JSON array of AtlasTask objects.
