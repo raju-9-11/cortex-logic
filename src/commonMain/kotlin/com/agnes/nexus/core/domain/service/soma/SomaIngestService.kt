@@ -80,10 +80,12 @@ object OptimalBaseline {
     fun evaluateBiomarkerStatus(name: String, value: Float): String {
         val baseline = baselines[name.lowercase()] ?: return "unknown"
         return when {
-            value >= baseline.optimalMin!! && value <= baseline.optimalMax!! -> "optimal"
-            value >= baseline.normalMin!! && value <= baseline.normalMax!! -> "normal"
-            value < baseline.normalMin!! -> "low"
-            value > baseline.normalMax!! * 1.2f -> "critical"
+            baseline.optimalMin != null && baseline.optimalMax != null &&
+                value >= baseline.optimalMin && value <= baseline.optimalMax -> "optimal"
+            baseline.normalMin != null && baseline.normalMax != null &&
+                value >= baseline.normalMin && value <= baseline.normalMax -> "normal"
+            baseline.normalMin != null && value < baseline.normalMin -> "low"
+            baseline.normalMax != null && value > baseline.normalMax * 1.2f -> "critical"
             else -> "elevated"
         }
     }
