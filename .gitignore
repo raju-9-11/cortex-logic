@@ -1,4 +1,4 @@
-# Gradle build artifacts — keep build/dist/ for npm packaging
+# Gradle build artifacts — keep build/dist/js/productionLibrary/ for npm packaging
 .gradle/
 .kotlin/
 local.properties
@@ -17,3 +17,4 @@ build/tmp/
 build/js/
 build/libs/
 build/publications/
+build/dist/js/developmentLibrary/

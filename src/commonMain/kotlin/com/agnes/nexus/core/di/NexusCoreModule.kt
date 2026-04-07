@@ -1,6 +1,8 @@
 package com.agnes.nexus.core.di
 
 import com.agnes.nexus.core.domain.service.agnes.AgnesSessionLifecycleService
+import com.agnes.nexus.core.domain.service.agnes.BeliefGraphCompactionService
+import com.agnes.nexus.core.domain.service.agnes.BeliefTriggerEvaluator
 import com.agnes.nexus.core.domain.service.agnes.HalfLifeEngine
 import com.agnes.nexus.core.domain.service.atlas.AntiSnowplowService
 import com.agnes.nexus.core.domain.service.ledger.RunwayService
@@ -48,6 +50,8 @@ val nexusCoreModule = module {
     // ── Domain Services ───────────────────────────────────────────────────────
     single { AgnesSessionLifecycleService(get()) }
     single { HalfLifeEngine() }
+    single { BeliefGraphCompactionService() }
+    single { BeliefTriggerEvaluator() }
 
     // AntiSnowplowService: handoffService is optional (null by default).
     // Bind NexusHandoffService in a platform module to enable Scout delegation.

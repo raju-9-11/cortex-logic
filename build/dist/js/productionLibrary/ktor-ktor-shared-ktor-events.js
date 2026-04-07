@@ -15,15 +15,15 @@
 }(function (_, kotlin_kotlin, kotlin_io_ktor_ktor_utils) {
   'use strict';
   //region block: imports
-  var protoOf = kotlin_kotlin.$_$.cc;
-  var initMetadataForClass = kotlin_kotlin.$_$.ya;
+  var protoOf = kotlin_kotlin.$_$.dc;
+  var initMetadataForClass = kotlin_kotlin.$_$.za;
   var LockFreeLinkedListNode = kotlin_io_ktor_ktor_utils.$_$.d;
   var VOID = kotlin_kotlin.$_$.h;
   var CopyOnWriteHashMap = kotlin_io_ktor_ktor_utils.$_$.b;
-  var THROW_CCE = kotlin_kotlin.$_$.kg;
-  var equals = kotlin_kotlin.$_$.ra;
-  var addSuppressed = kotlin_kotlin.$_$.xg;
-  var Unit_instance = kotlin_kotlin.$_$.f5;
+  var THROW_CCE = kotlin_kotlin.$_$.ng;
+  var equals = kotlin_kotlin.$_$.sa;
+  var addSuppressed = kotlin_kotlin.$_$.ah;
+  var Unit_instance = kotlin_kotlin.$_$.g5;
   //endregion
   //region block: pre-declaration
   initMetadataForClass(EventDefinition, 'EventDefinition', EventDefinition);

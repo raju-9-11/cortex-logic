@@ -68,10 +68,12 @@ fun com.agnes.nexus.core.domain.models.SomaProfile.toHealthSnapshot(userId: Stri
         val baseline = OptimalBaseline.baselines[b.name.lowercase()]
         val status = when {
             baseline == null -> "unknown"
-            v >= baseline.optimalMin!! && v <= baseline.optimalMax!! -> "optimal"
-            v >= baseline.normalMin!! && v <= baseline.normalMax!! -> "normal"
-            v < baseline.normalMin!! -> "low"
-            v > baseline.normalMax!! -> "critical"
+            baseline.optimalMin != null && baseline.optimalMax != null &&
+                v >= baseline.optimalMin && v <= baseline.optimalMax -> "optimal"
+            baseline.normalMin != null && baseline.normalMax != null &&
+                v >= baseline.normalMin && v <= baseline.normalMax -> "normal"
+            baseline.normalMin != null && v < baseline.normalMin -> "low"
+            baseline.normalMax != null && v > baseline.normalMax -> "critical"
             else -> "elevated"
         }
         b.name to status

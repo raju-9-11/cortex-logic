@@ -12,12 +12,12 @@
 }(function (_, kotlin_kotlin) {
   'use strict';
   //region block: imports
-  var protoOf = kotlin_kotlin.$_$.cc;
-  var defineProp = kotlin_kotlin.$_$.qa;
-  var initMetadataForClass = kotlin_kotlin.$_$.ya;
-  var initMetadataForObject = kotlin_kotlin.$_$.eb;
+  var protoOf = kotlin_kotlin.$_$.dc;
+  var defineProp = kotlin_kotlin.$_$.ra;
+  var initMetadataForClass = kotlin_kotlin.$_$.za;
+  var initMetadataForObject = kotlin_kotlin.$_$.fb;
   var VOID = kotlin_kotlin.$_$.h;
-  var toString = kotlin_kotlin.$_$.nh;
+  var toString = kotlin_kotlin.$_$.qh;
   //endregion
   //region block: pre-declaration
   initMetadataForClass(atomicfu$AtomicRefArray$ref, 'AtomicArray');

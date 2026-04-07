@@ -2730,8 +2730,9 @@ class ActionHub(
         val encryptedData = doc["encryptedData"]?.jsonPrimitive?.content
         val iv = doc["iv"]?.jsonPrimitive?.content
         if (!encryptedData.isNullOrBlank() && !iv.isNullOrBlank() && vaultBoundary != null) {
+            val vault = vaultBoundary
             val decrypted = runCatching {
-                vaultBoundary!!.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey ?: "")
+                vault.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey ?: "")
             }.getOrNull()
             if (!decrypted.isNullOrBlank()) {
                 return runCatching { json.decodeFromString(TrainerProfile.serializer(), decrypted) }.getOrElse { TrainerProfile() }
@@ -2745,8 +2746,9 @@ class ActionHub(
         val layer = dataLayer ?: return
         val updated = profile.copy(updatedAt = nowIso())
         if (vaultBoundary != null) {
+            val vault = vaultBoundary
             val payloadJson = json.encodeToString(TrainerProfile.serializer(), updated)
-            val encrypted = runCatching { vaultBoundary!!.encrypt(payloadJson, encryptionKey ?: "") }.getOrNull() ?: return
+            val encrypted = runCatching { vault.encrypt(payloadJson, encryptionKey ?: "") }.getOrNull() ?: return
             layer.setDocument("titan_profiles", uid, mapOf(
                 "encryptedData" to encrypted.ciphertext,
                 "iv" to encrypted.iv,
@@ -3266,8 +3268,9 @@ class ActionHub(
         val encryptedData = doc["encryptedData"]?.jsonPrimitive?.content
         val iv = doc["iv"]?.jsonPrimitive?.content
         if (!encryptedData.isNullOrBlank() && !iv.isNullOrBlank() && encryptionKey != null && vaultBoundary != null) {
+            val vault = vaultBoundary
             val decrypted = runCatching {
-                vaultBoundary!!.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey)
+                vault.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey)
             }.getOrNull()
             if (!decrypted.isNullOrBlank()) {
                 return runCatching { json.decodeFromString(ScoutKnowledge.serializer(), decrypted) }.getOrElse { ScoutKnowledge() }
@@ -3281,8 +3284,9 @@ class ActionHub(
         val layer = dataLayer ?: return
         val updated = knowledge.copy(updatedAt = nowIso())
         if (encryptionKey != null && vaultBoundary != null) {
+            val vault = vaultBoundary
             val payloadJson = json.encodeToString(ScoutKnowledge.serializer(), updated)
-            val encrypted = runCatching { vaultBoundary!!.encrypt(payloadJson, encryptionKey) }.getOrNull() ?: return
+            val encrypted = runCatching { vault.encrypt(payloadJson, encryptionKey) }.getOrNull() ?: return
             layer.setDocument("scout_knowledge", uid, mapOf(
                 "encryptedData" to encrypted.ciphertext,
                 "iv" to encrypted.iv,
@@ -3589,8 +3593,9 @@ class ActionHub(
         val encryptedData = doc["encryptedData"]?.jsonPrimitive?.content
         val iv = doc["iv"]?.jsonPrimitive?.content
         if (!encryptedData.isNullOrBlank() && !iv.isNullOrBlank() && encryptionKey != null && vaultBoundary != null) {
+            val vault = vaultBoundary
             val decrypted = runCatching {
-                vaultBoundary!!.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey)
+                vault.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey)
             }.getOrNull()
             if (!decrypted.isNullOrBlank()) {
                 return runCatching { json.decodeFromString(ForgeProfile.serializer(), decrypted) }.getOrElse { ForgeProfile() }
@@ -3604,8 +3609,9 @@ class ActionHub(
         val layer = dataLayer ?: return
         val updated = profile.copy(updatedAt = nowIso())
         if (encryptionKey != null && vaultBoundary != null) {
+            val vault = vaultBoundary
             val payloadJson = json.encodeToString(ForgeProfile.serializer(), updated)
-            val encrypted = runCatching { vaultBoundary!!.encrypt(payloadJson, encryptionKey) }.getOrNull() ?: return
+            val encrypted = runCatching { vault.encrypt(payloadJson, encryptionKey) }.getOrNull() ?: return
             layer.setDocument("forge_sessions", uid, mapOf(
                 "encryptedData" to encrypted.ciphertext,
                 "iv" to encrypted.iv,
@@ -3872,8 +3878,9 @@ class ActionHub(
         val encryptedData = doc["encryptedData"]?.jsonPrimitive?.content
         val iv = doc["iv"]?.jsonPrimitive?.content
         if (!encryptedData.isNullOrBlank() && !iv.isNullOrBlank() && vaultBoundary != null) {
+            val vault = vaultBoundary
             val decrypted = runCatching {
-                vaultBoundary!!.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey ?: "")
+                vault.decrypt(EncryptedEnvelope(ciphertext = encryptedData, iv = iv), encryptionKey ?: "")
             }.getOrNull()
             if (!decrypted.isNullOrBlank()) {
                 return runCatching { json.decodeFromString(TherapyProfile.serializer(), decrypted) }.getOrElse { TherapyProfile() }
@@ -3887,8 +3894,9 @@ class ActionHub(
         val layer = dataLayer ?: return
         val updated = profile.copy(updatedAt = nowIso())
         if (vaultBoundary != null) {
+            val vault = vaultBoundary
             val payloadJson = json.encodeToString(TherapyProfile.serializer(), updated)
-            val encrypted = runCatching { vaultBoundary!!.encrypt(payloadJson, encryptionKey ?: "") }.getOrNull() ?: return
+            val encrypted = runCatching { vault.encrypt(payloadJson, encryptionKey ?: "") }.getOrNull() ?: return
             layer.setDocument("agnes_profiles", uid, mapOf(
                 "encryptedData" to encrypted.ciphertext,
                 "iv" to encrypted.iv,
@@ -4019,8 +4027,9 @@ class ActionHub(
             val obj = raw as? JsonObject ?: JsonObject(emptyMap())
             val id = obj["id"]?.jsonPrimitive?.contentOrNull ?: "belief_${seed}_$index"
             val label = obj["label"]?.jsonPrimitive?.contentOrNull ?: "Belief ${index + 1}"
-            val valence = when (obj["valence"]?.jsonPrimitive?.contentOrNull) {
-                "positive", "negative" -> obj["valence"]!!.jsonPrimitive.content
+            val valenceContent = obj["valence"]?.jsonPrimitive?.contentOrNull
+            val valence = when (valenceContent) {
+                "positive", "negative" -> valenceContent
                 else -> "neutral"
             }
             val intensity = (obj["intensity"]?.jsonPrimitive?.floatOrNull ?: 0.5f).coerceIn(0.0f, 1.0f)
@@ -4888,11 +4897,12 @@ class ActionHub(
 
         val encryptedObj = doc?.get("encryptedValues") as? JsonObject
         if (encryptionKey != null && vaultBoundary != null && encryptedObj != null) {
+            val vault = vaultBoundary
             val ciphertext = encryptedObj["ciphertext"]?.jsonPrimitive?.contentOrNull
             val iv = encryptedObj["iv"]?.jsonPrimitive?.contentOrNull
             if (ciphertext != null && iv != null) {
                 val decrypted = runCatching {
-                    vaultBoundary!!.decrypt(
+                    vault.decrypt(
                         com.agnes.nexus.core.domain.models.EncryptedEnvelope(ciphertext = ciphertext, iv = iv),
                         encryptionKey
                     )
@@ -4902,7 +4912,7 @@ class ActionHub(
                     val decryptedMap = decryptedJson.toMap().toMutableMap()
                     decryptedMap.remove(fieldId)
                     val jsonPayload = json.encodeToString(JsonObject.serializer(), mapToJsonObject(decryptedMap))
-                    val encrypted = vaultBoundary!!.encrypt(jsonPayload, encryptionKey)
+                    val encrypted = vault.encrypt(jsonPayload, encryptionKey)
                     payload["encryptedValues"] = mapOf(
                         "ciphertext" to encrypted.ciphertext,
                         "iv" to encrypted.iv
