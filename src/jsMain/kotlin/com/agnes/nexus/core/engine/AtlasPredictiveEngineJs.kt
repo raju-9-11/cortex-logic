@@ -26,7 +26,7 @@ import kotlin.math.round
 @JsExport
 class AtlasPredictiveEngineJs {
 
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json { ignoreUnknownKeys = true; coerceInputValues = true }
 
     /**
      * Compute the effective energy budget with biological, emotional, and resource modifiers.

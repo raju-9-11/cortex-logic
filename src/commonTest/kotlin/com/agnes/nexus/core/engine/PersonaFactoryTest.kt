@@ -486,14 +486,17 @@ class PersonaFactoryTest {
             nsv = nsv,
             moduleContext = mapOf("baseRole" to "Titan base.")
         )
-        assertTrue(result.contains("Recovery Score: 3.0/10"), "Titan should see recovery score")
-        assertTrue(result.contains("CNS Fatigue: 7.0/10"), "Titan should see CNS fatigue")
+        // Kotlin/JS formats 3.0 as "3", so match both "3.0/10" and "3/10"
+        assertTrue(result.contains("Recovery Score: 3/10") || result.contains("Recovery Score: 3.0/10"),
+            "Titan should see recovery score, got: ${result.lines().filter { "Recovery" in it }}")
+        assertTrue(result.contains("CNS Fatigue: 7/10") || result.contains("CNS Fatigue: 7.0/10"),
+            "Titan should see CNS fatigue, got: ${result.lines().filter { "CNS" in it }}")
     }
 
     @Test
     fun nsv_ledger_includesFinancialFriction() {
         val nsv = NeuralStateVector(
-            resource = ResourceState(financialFriction = 6.0, resonanceROI = "positive")
+            resource = ResourceState(financialFriction = 6.0, resonanceROI = 0.8)
         )
         val result = factory.assemble(
             moduleId = "ledger",
@@ -501,7 +504,9 @@ class PersonaFactoryTest {
             nsv = nsv,
             moduleContext = mapOf("baseRole" to "Ledger base.")
         )
-        assertTrue(result.contains("Financial Friction: 6.0/10"), "Ledger should see financial friction")
+        // Kotlin/JS formats 6.0 as "6", so match both "6.0/10" and "6/10"
+        assertTrue(result.contains("Financial Friction: 6/10") || result.contains("Financial Friction: 6.0/10"),
+            "Ledger should see financial friction, got: ${result.lines().filter { "Financial" in it }}")
     }
 
     @Test
