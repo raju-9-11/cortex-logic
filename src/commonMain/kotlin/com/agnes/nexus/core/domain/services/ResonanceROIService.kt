@@ -132,7 +132,10 @@ class ResonanceROIService {
                 (WEIGHT_EXPENSE_RATIO * expenseRatio) +
                 (WEIGHT_SAVINGS_GAP * savingsGap)
 
-        val financialFriction = clamp(rawFriction, MIN_FRICTION, MAX_FRICTION)
+        // Round to 1 decimal place before clamping to prevent floating-point accumulation
+        // from nudging boundary values (e.g. exactly 6.0) into the wrong tier on JS.
+        val roundedFriction = (kotlin.math.round(rawFriction.toDouble() * 10.0) / 10.0).toFloat()
+        val financialFriction = clamp(roundedFriction, MIN_FRICTION, MAX_FRICTION)
 
         // Calculate Resonance ROI
         val baseROI = (MAX_FRICTION - financialFriction) / MAX_FRICTION
