@@ -29,7 +29,8 @@ class DefaultSpineEventBus(
     
     private val recentEvents = mutableListOf<SpineEvent>()
     private val MAX_RECENT = 50
-    private val cascadeRules = mutableListOf<CascadeRule>()
+    // Indexed by trigger event type for O(1) lookup — replaces the old O(n) linear scan.
+    private val cascadeRuleIndex: MutableMap<String, MutableList<CascadeRule>> = mutableMapOf()
     private val validDomains = setOf("B", "E", "C", "R", "system")
     private val suppressionExpiry = mutableMapOf<String, TimeSource.Monotonic.ValueTimeMark>()
     private val validPriorities = mapOf("info" to 0, "alert" to 1, "critical" to 2)
@@ -133,9 +134,8 @@ class DefaultSpineEventBus(
         logger?.invoke(enforcedEvent)
 
         if (enforcedEvent.cascadeDepth < 3) {
-            val matching = cascadeRules.filter {
-                it.trigger == enforcedEvent.type && it.condition(enforcedEvent)
-            }
+            val matching = (cascadeRuleIndex[enforcedEvent.type] ?: emptyList())
+                .filter { it.condition(enforcedEvent) }
             matching.forEach { rule ->
                 rule.suppressionGates.forEach { gate -> setSuppression(gate.eventType, gate.durationMs) }
                 val cascaded = rule.transform(enforcedEvent).copy(
@@ -146,7 +146,11 @@ class DefaultSpineEventBus(
             }
         }
 
-        if (SpineGatePolicy.shouldPersistSilentHistory(enforcedEvent)) {
+        // Skip Firestore write when no subscriber is active and the event isn't audit-required.
+        // Avoids writes for system-internal events nobody is watching at the moment.
+        val hasListeners = _events.subscriptionCount.value > 0
+        val isAuditRequired = SpineGatePolicy.shouldPersistAsAuditEvent(enforcedEvent)
+        if (SpineGatePolicy.shouldPersistSilentHistory(enforcedEvent) && (hasListeners || isAuditRequired)) {
             logEvent(enforcedEvent)
         }
     }
@@ -187,7 +191,9 @@ class DefaultSpineEventBus(
     }
 
     override fun registerCascadeRules(rules: List<CascadeRule>) {
-        cascadeRules.addAll(rules)
+        rules.forEach { rule ->
+            cascadeRuleIndex.getOrPut(rule.trigger) { mutableListOf() }.add(rule)
+        }
     }
 
     override fun setSuppression(eventType: String, durationMs: Long) {

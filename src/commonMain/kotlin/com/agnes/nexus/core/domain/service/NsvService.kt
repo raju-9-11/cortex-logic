@@ -11,6 +11,10 @@ object NsvService {
 
     private val json = Json { ignoreUnknownKeys = true }
 
+    // Per-module result cache keyed by allowedPathsJson (stable per module).
+    // Value = (nsvJsonHashCode, formattedResult) — invalidated when NSV JSON changes.
+    private val formatModulePromptCache: MutableMap<String, Pair<Int, String>> = mutableMapOf()
+
     private val DOMAINS = listOf("biological", "emotional", "cognitive", "planning", "resource")
 
     private val DEFAULT_FIELDS: Map<String, List<String>> = mapOf(
@@ -217,6 +221,11 @@ object NsvService {
      * @param allowedPathsJson JSON array of strings like `["biological.cnsFatigue", ...]`
      */
     fun formatForModulePrompt(nsvJson: String, allowedPathsJson: String): String {
+        // Return cached result when NSV hasn't changed since last call for this module (Item 11)
+        val nsvHash = nsvJson.hashCode()
+        val cached = formatModulePromptCache[allowedPathsJson]
+        if (cached != null && cached.first == nsvHash) return cached.second
+
         val nsv = try {
             json.parseToJsonElement(nsvJson).jsonObject
         } catch (_: Exception) {
@@ -284,7 +293,10 @@ object NsvService {
         if (res.isNotEmpty()) sections.add("Resource: ${res.joinToString(", ")}")
 
         if (sections.size == 1) return ""
-        return sections.joinToString("\n")
+        val result = sections.joinToString("\n")
+        formatModulePromptCache[allowedPathsJson] = nsvHash to result
+        if (formatModulePromptCache.size > 12) formatModulePromptCache.remove(formatModulePromptCache.keys.first())
+        return result
     }
 
     /**

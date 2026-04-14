@@ -38,6 +38,10 @@ import com.agnes.nexus.core.engine.personas.soma.SomaPersonaPrompts
  */
 class DefaultPersonaFactory : PersonaFactory {
 
+    // Formatted NSV block cache keyed by "$moduleId|${nsv.hashCode()}[|soul|...]".
+    // Avoids re-running buildScopedNsvBlock on repeated calls with the same NSV state.
+    private val nsvBlockCache: MutableMap<String, String> = mutableMapOf()
+
     override fun assemble(
         moduleId: String,
         identity: UserIdentity, 
@@ -252,10 +256,21 @@ class DefaultPersonaFactory : PersonaFactory {
             Bio: ${identity.bio ?: "N/A"}
         """.trimIndent()
 
-        val nsvBlock = if (globalSoul != null) {
-            globalSoul.formatForPrompt()
-        } else {
-            buildScopedNsvBlock(moduleId, nsv)
+        // Bypass NSV formatting for modules with no read permissions; cache the result
+        // per (moduleId, nsv state) to skip repeated formatting within a session.
+        val readableMetrics = com.agnes.nexus.core.domain.service.NsvOwnershipService.getReadableMetrics(moduleId)
+        val nsvBlock = when {
+            readableMetrics.isEmpty() -> ""
+            globalSoul != null -> {
+                val key = "$moduleId|${nsv.hashCode()}|soul|${globalSoul.hashCode()}"
+                nsvBlockCache.getOrPut(key) { globalSoul.formatForPrompt() }
+                    .also { if (nsvBlockCache.size > 20) nsvBlockCache.remove(nsvBlockCache.keys.first()) }
+            }
+            else -> {
+                val key = "$moduleId|${nsv.hashCode()}"
+                nsvBlockCache.getOrPut(key) { buildScopedNsvBlock(moduleId, nsv) }
+                    .also { if (nsvBlockCache.size > 20) nsvBlockCache.remove(nsvBlockCache.keys.first()) }
+            }
         }
         val stateAwarenessBlock = buildStateAwarenessBlock(moduleId)
         val overlayBlock = buildOverlayBlock(personaPrompt, identity.agentPersonalityProvision.personaOverlays[moduleId])

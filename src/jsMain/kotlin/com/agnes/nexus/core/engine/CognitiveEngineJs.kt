@@ -11,8 +11,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.json.*
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /**
  * JS-facing bridge that exposes the KMP cognitive engine stack to TypeScript/React.
@@ -208,6 +211,13 @@ class CognitiveEngineJs {
         store.clearCredentials()
         initWithCredentialStore(store, preferredModel, isMock, onReady, onError)
     }
+
+    /**
+     * Returns the fallback history window size from [MemoryManager].
+     * Bridges the KMP constant to the Agnes TS layer so Agnes always reads
+     * the authoritative value from cortex-logic. (Item 5)
+     */
+    fun getFallbackContextWindow(): Int = MemoryManager.getFallbackContextWindow()
 
     /**
      * Clears all in-memory credentials and tears down the engine.
@@ -488,6 +498,111 @@ class CognitiveEngineJs {
         return CancellableTask(job)
     }
 
+    /**
+     * Full-orchestration streaming — KMP calls [jsRetrieveMemory] to resolve memory,
+     * runs PersonaFactory with NSV injection, then streams the LLM response.
+     *
+     * Memory retrieval is bridged via an inline [suspendCancellableCoroutine] so no
+     * extra coroutine class is generated (avoiding Kotlin/JS metadata ordering issues).
+     *
+     * @param moduleId          Agnes module ID (agnes, titan, ledger, …)
+     * @param userMessage       Raw user input text.
+     * @param historyJson       JSON array of Message objects (role + content).
+     * @param identity          User identity (name, pronouns, etc.).
+     * @param nsvJson           Serialised NeuralStateVector.
+     * @param globalSoulJson    Serialised GlobalSoul (optional, pass "{}").
+     * @param moduleContextJson Serialised Map of module-specific context.
+     *                          Include "baseRole" key to override the default persona prompt.
+     *                          Include "timeContext" key for temporal awareness.
+     * @param longTermSummary   Compacted long-term session summary (optional).
+     * @param jsRetrieveMemory  JS callback: (query, onComplete, onError) → Unit.
+     *                          Called once per turn with a semantic query derived from
+     *                          the user message; resolves to a string array of recalled facts.
+     * @param onChunk           Called for each streaming delta.
+     * @param onComplete        Called with final structured response.
+     * @param onError           Called on failure.
+     */
+    fun chatWithMemory(
+        moduleId: String,
+        userMessage: String,
+        historyJson: String,
+        identity: UserIdentityJs,
+        nsvJson: String = "{}",
+        globalSoulJson: String = "{}",
+        moduleContextJson: String = "{}",
+        longTermSummary: String = "",
+        jsRetrieveMemory: (query: String, onComplete: (Array<String>) -> Unit, onError: (String) -> Unit) -> Unit,
+        onChunk: (StreamChunkJs) -> Unit,
+        onComplete: (FinalResponseJs) -> Unit,
+        onError: (String) -> Unit,
+    ): CancellableTask {
+        val currentEngine = engine
+        if (isMock || currentEngine == null) {
+            onComplete(MOCK_FINAL_RESPONSE)
+            return CancellableTask(SupervisorJob().apply { complete() })
+        }
+
+        val job = scope.launch {
+            try {
+                // Bridge the JS callback into the coroutine using suspendCancellableCoroutine
+                // inline — no helper suspend fun, so no extra coroutine class is generated.
+                val memoryFacts: List<String> = try {
+                    suspendCancellableCoroutine { cont ->
+                        jsRetrieveMemory(
+                            userMessage,
+                            { facts -> if (cont.isActive) cont.resume(facts.toList()) },
+                            { err -> if (cont.isActive) cont.resumeWithException(RuntimeException(err)) },
+                        )
+                    }
+                } catch (_: Throwable) {
+                    emptyList()
+                }
+                val history = parseHistoryJson(historyJson)
+                val nsv = NeuralStateVectorJs(nsvJson).nsv
+                val globalSoul = parseGlobalSoulJson(globalSoulJson)
+                val moduleCtx = parseModuleContextJson(moduleContextJson)
+                val userIdentity = identity.toUserIdentity()
+
+                currentEngine.chatWithMemory(
+                    moduleId = moduleId,
+                    userMessage = userMessage,
+                    history = history,
+                    nsv = nsv,
+                    identity = userIdentity,
+                    moduleContext = moduleCtx,
+                    longTermSummary = longTermSummary,
+                    globalSoul = globalSoul,
+                    memoryFacts = memoryFacts,
+                ).collect { response ->
+                    if (response.isStreaming) {
+                        onChunk(
+                            StreamChunkJs(
+                                delta = response.content,
+                                isThinking = response.isThinking,
+                                isActing = false,
+                                currentActionType = null
+                            )
+                        )
+                    } else {
+                        onComplete(
+                            FinalResponseJs(
+                                content = response.content,
+                                thoughts = response.internalThoughts,
+                                actionsJson = serializeActions(response.actions),
+                                mutationsJson = serializeMutations(response.mutations)
+                            )
+                        )
+                    }
+                }
+            } catch (_: CancellationException) {
+                // Cancelled from TypeScript — don't call onError.
+            } catch (e: Throwable) {
+                onError(e.message ?: "chatWithMemory failed")
+            }
+        }
+        return CancellableTask(job)
+    }
+
     // ── Private helpers ───────────────────────────────────────────────────────
 
     /**
@@ -528,6 +643,29 @@ class CognitiveEngineJs {
             }
         } catch (_: Exception) {
             emptyList()
+        }
+    }
+
+    /**
+     * Parses a JSON object string into a [Map]<[String], [Any]?> for [CognitiveEngine.chatWithMemory].
+     *
+     * All JSON primitives are extracted as [String] values; `null` JSON entries map to `null`.
+     * Non-primitive values (arrays, nested objects) are serialized back to their JSON string
+     * representation so PersonaFactory can read them without further parsing.
+     */
+    private fun parseModuleContextJson(json: String): Map<String, Any?> {
+        if (json.isBlank() || json == "{}") return emptyMap()
+        return try {
+            LENIENT_JSON.parseToJsonElement(json).jsonObject.entries.associate { (k, v) ->
+                k to when {
+                    v is JsonNull -> null
+                    v is JsonPrimitive && v.isString -> v.content
+                    v is JsonPrimitive -> v.content  // numbers, booleans as strings
+                    else -> v.toString()             // nested objects/arrays as JSON string
+                }
+            }
+        } catch (_: Exception) {
+            emptyMap()
         }
     }
 
@@ -624,3 +762,4 @@ class CognitiveEngineJs {
         )
     }
 }
+

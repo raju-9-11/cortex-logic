@@ -12,6 +12,11 @@ object MemoryManager {
     private const val CONSOLIDATION_RATIO = 0.75
     private const val CONTEXT_WINDOW_SIZE = 15
 
+    /** Verbatim history window used before a session summary is ready. */
+    const val FALLBACK_CONTEXT_WINDOW = 40
+
+    fun getFallbackContextWindow(): Int = FALLBACK_CONTEXT_WINDOW
+
     /**
      * Estimates token count for a given text.
      * Uses 4 characters per token as a heuristic (OpenAI/standard).
