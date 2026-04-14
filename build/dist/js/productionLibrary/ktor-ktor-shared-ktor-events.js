@@ -15,15 +15,15 @@
 }(function (_, kotlin_kotlin, kotlin_io_ktor_ktor_utils) {
   'use strict';
   //region block: imports
-  var protoOf = kotlin_kotlin.$_$.dc;
-  var initMetadataForClass = kotlin_kotlin.$_$.za;
+  var protoOf = kotlin_kotlin.$_$.hc;
+  var initMetadataForClass = kotlin_kotlin.$_$.db;
   var LockFreeLinkedListNode = kotlin_io_ktor_ktor_utils.$_$.d;
-  var VOID = kotlin_kotlin.$_$.h;
+  var VOID = kotlin_kotlin.$_$.i;
   var CopyOnWriteHashMap = kotlin_io_ktor_ktor_utils.$_$.b;
-  var THROW_CCE = kotlin_kotlin.$_$.ng;
-  var equals = kotlin_kotlin.$_$.sa;
-  var addSuppressed = kotlin_kotlin.$_$.ah;
-  var Unit_instance = kotlin_kotlin.$_$.g5;
+  var THROW_CCE = kotlin_kotlin.$_$.sg;
+  var equals = kotlin_kotlin.$_$.wa;
+  var addSuppressed = kotlin_kotlin.$_$.fh;
+  var Unit_instance = kotlin_kotlin.$_$.i5;
   //endregion
   //region block: pre-declaration
   initMetadataForClass(EventDefinition, 'EventDefinition', EventDefinition);
@@ -35,22 +35,22 @@
   function HandlerRegistration() {
   }
   function Events() {
-    this.n2n_1 = new CopyOnWriteHashMap();
+    this.u2s_1 = new CopyOnWriteHashMap();
   }
-  protoOf(Events).o2n = function (definition, value) {
+  protoOf(Events).v2s = function (definition, value) {
     var exception = null;
-    var tmp0_safe_receiver = this.n2n_1.f28(definition);
+    var tmp0_safe_receiver = this.u2s_1.m2d(definition);
     if (tmp0_safe_receiver == null)
       null;
     else {
       // Inline function 'io.ktor.util.internal.LockFreeLinkedListHead.forEach' call
-      var tmp = tmp0_safe_receiver.t10();
+      var tmp = tmp0_safe_receiver.v10();
       var cur = tmp instanceof LockFreeLinkedListNode ? tmp : THROW_CCE();
       while (!equals(cur, tmp0_safe_receiver)) {
         if (cur instanceof HandlerRegistration) {
           var registration = cur;
           try {
-            var tmp_0 = registration.q2n_1;
+            var tmp_0 = registration.x2s_1;
             (typeof tmp_0 === 'function' ? tmp_0 : THROW_CCE())(value);
           } catch ($p) {
             if ($p instanceof Error) {
@@ -72,7 +72,7 @@
             }
           }
         }
-        cur = cur.e29();
+        cur = cur.l2e();
       }
     }
     var tmp1_safe_receiver = exception;

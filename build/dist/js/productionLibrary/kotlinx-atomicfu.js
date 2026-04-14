@@ -12,12 +12,12 @@
 }(function (_, kotlin_kotlin) {
   'use strict';
   //region block: imports
-  var protoOf = kotlin_kotlin.$_$.dc;
-  var defineProp = kotlin_kotlin.$_$.ra;
-  var initMetadataForClass = kotlin_kotlin.$_$.za;
-  var initMetadataForObject = kotlin_kotlin.$_$.fb;
-  var VOID = kotlin_kotlin.$_$.h;
-  var toString = kotlin_kotlin.$_$.qh;
+  var protoOf = kotlin_kotlin.$_$.hc;
+  var defineProp = kotlin_kotlin.$_$.va;
+  var initMetadataForClass = kotlin_kotlin.$_$.db;
+  var initMetadataForObject = kotlin_kotlin.$_$.jb;
+  var VOID = kotlin_kotlin.$_$.i;
+  var toString = kotlin_kotlin.$_$.xh;
   //endregion
   //region block: pre-declaration
   initMetadataForClass(atomicfu$AtomicRefArray$ref, 'AtomicArray');
@@ -142,29 +142,29 @@
   };
   protoOf(AtomicLong).atomicfu$getAndIncrement$long = function () {
     var _unary__edvuaz = this.kotlinx$atomicfu$value;
-    this.kotlinx$atomicfu$value = _unary__edvuaz.z2();
+    this.kotlinx$atomicfu$value = _unary__edvuaz.b3();
     return _unary__edvuaz;
   };
   protoOf(AtomicLong).atomicfu$getAndDecrement$long = function () {
     var _unary__edvuaz = this.kotlinx$atomicfu$value;
-    this.kotlinx$atomicfu$value = _unary__edvuaz.a3();
+    this.kotlinx$atomicfu$value = _unary__edvuaz.c3();
     return _unary__edvuaz;
   };
   protoOf(AtomicLong).atomicfu$getAndAdd$long = function (delta) {
     var oldValue = this.kotlinx$atomicfu$value;
-    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.u2(delta);
+    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.w2(delta);
     return oldValue;
   };
   protoOf(AtomicLong).atomicfu$addAndGet$long = function (delta) {
-    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.u2(delta);
+    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.w2(delta);
     return this.kotlinx$atomicfu$value;
   };
   protoOf(AtomicLong).atomicfu$incrementAndGet$long = function () {
-    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.z2();
+    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.b3();
     return this.kotlinx$atomicfu$value;
   };
   protoOf(AtomicLong).atomicfu$decrementAndGet$long = function () {
-    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.a3();
+    this.kotlinx$atomicfu$value = this.kotlinx$atomicfu$value.c3();
     return this.kotlinx$atomicfu$value;
   };
   protoOf(AtomicLong).toString = function () {
