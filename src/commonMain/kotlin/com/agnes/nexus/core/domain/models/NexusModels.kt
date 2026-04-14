@@ -445,6 +445,18 @@ data class TrainerProfile(
     val plannedWorkouts: List<PlannedWorkout>? = null,
     val directWriteMode: Boolean = false,
     val customFields: List<TitanCustomField>? = null,
+    /** Values recorded for custom fields — keyed by field ID, contains array of timestamped values. */
+    val customFieldValues: Map<String, List<TitanCustomFieldValue>>? = null,
+    /** Structured fitness goals with deadlines and progress tracking. */
+    val goals: List<TitanGoal>? = null,
+    /** User's personal exercise library (defaults to canonical set, extensible). */
+    val exerciseLibrary: List<ExerciseLibraryEntry>? = null,
+    /** Recovery plan state (global recovery mode). */
+    val recoveryPlan: TitanRecoveryPlanSnapshot? = null,
+    /** Daily recovery check-ins (newest first). */
+    val recoveryCheckins: List<TitanRecoveryCheckinSnapshot>? = null,
+    /** Active long-term training program (e.g. "Starting Strength", 12 weeks). */
+    val activeProgram: TitanActiveProgram? = null,
     val medicalOnboardingComplete: Boolean? = null,
     val knownConditions: List<String> = emptyList(),
     val medications: List<String> = emptyList(),
@@ -505,7 +517,11 @@ data class TitanActivity(
     val sleepHours: Double? = null,
     val dayToDayNotes: String? = null,
     val recoveryNotes: String? = null,
-    val occupation: String? = null
+    val occupation: String? = null,
+    /** Equipment available to the user. Drives safe exercise substitutions. */
+    val equipment: List<String>? = null,
+    /** Preferred weight unit for session logging: "kg" | "lbs". */
+    val preferredWeightUnit: String? = null
 )
 
 @Serializable
@@ -513,7 +529,10 @@ data class TitanHistory(
     val yearsTraining: Int = 0,
     val injuryHistory: List<String> = emptyList(),
     val surgeryHistory: List<String> = emptyList(),
-    val injuries: List<String> = emptyList(),
+    /** Structured injury records. Breaking change from previous List<String>. */
+    val injuries: List<TitanInjury> = emptyList(),
+    /** Preserved for backwards compatibility with old string-array injury data. */
+    val legacyInjuryStrings: List<String>? = null,
     val goals: List<String> = emptyList(),
     val bodyGoals: String? = null
 )
@@ -536,7 +555,17 @@ data class Exercise(
     val sets: Int? = null,
     val reps: String? = null,
     val notes: String? = null,
-    val rpe: Int? = null
+    val rpe: Int? = null,
+    /** Tempo scheme, e.g. "3-1-1-0" (eccentric-pause-concentric-top). */
+    val tempoScheme: String? = null,
+    /** Target rest between sets in seconds. Drives live rest timer in session logger. */
+    val restSeconds: Int? = null,
+    /** Equipment required: "barbell" | "dumbbell" | "cable" | "kettlebell" | "bodyweight" | "machine" | "band" | "other". */
+    val equipment: String? = null,
+    /** Primary muscle groups trained. Used for frequency analytics. */
+    val muscleGroups: List<String>? = null,
+    /** Name of another exercise in the same routine that this exercise is paired with as a superset. */
+    val supersetWith: String? = null
 )
 
 // --- Spec-compliant Movement (non-rigid tag-based model) ---
@@ -595,6 +624,8 @@ data class WorkoutSession(
     val totalVolume: Int? = null,
     val rpe: Int? = null,
     val notes: String? = null,
+    /** Marks a session logged during recovery mode (light activity). */
+    val recoverySession: Boolean? = null,
     val status: String = "completed" // completed | partial | abandoned
 )
 
@@ -621,6 +652,8 @@ data class SleepEntry(
     val awakenings: Int? = null,
     val notes: String? = null,
     val tags: List<String>? = null,
+    /** Heart Rate Variability in milliseconds (typical range 20-200 ms). Higher = better recovery. */
+    val hrv: Double? = null,
     val recordedAt: String = ""
 )
 
@@ -664,7 +697,9 @@ data class BodyWeightMeasurements(
     val leftArm: Double? = null,
     val rightArm: Double? = null,
     val leftLeg: Double? = null,
-    val rightLeg: Double? = null
+    val rightLeg: Double? = null,
+    val neck: Double? = null,
+    val calves: Double? = null
 )
 
 @Serializable
@@ -675,6 +710,8 @@ data class BodyWeightEntry(
     val bodyFatPct: Double? = null,
     val measurements: BodyWeightMeasurements? = null,
     val notes: String? = null,
+    /** Firebase Storage URL for progress photo taken on this date. */
+    val photoUrl: String? = null,
     val recordedAt: String = ""
 )
 
@@ -686,6 +723,10 @@ data class CardioSession(
     val durationMinutes: Int = 0,
     val distanceKm: Double? = null,
     val avgHeartRate: Int? = null,
+    /** Peak heart rate recorded during session (bpm). */
+    val maxHeartRate: Int? = null,
+    /** Time spent (minutes) in each HR training zone. */
+    val hrZones: HrZoneDistribution? = null,
     val calories: Int? = null,
     val notes: String? = null,
     val rpe: Int? = null,
@@ -780,6 +821,92 @@ data class TitanCustomField(
     val range: List<Double>? = null, // [min, max]
     val options: List<String>? = null,
     val createdAt: Long = 0L
+)
+
+/**
+ * A single recorded value for a custom field.
+ * Stored in TrainerProfile.customFieldValues keyed by field ID.
+ */
+@Serializable
+data class TitanCustomFieldValue(
+    val recordedAt: String = "",
+    /** The recorded value — stringified regardless of field type for serialization simplicity. */
+    val value: String = "",
+    /** Optional date the value is for (e.g. "2024-01-15"). Defaults to recordedAt date. */
+    val date: String? = null,
+    val note: String? = null
+)
+
+/**
+ * Serializable recovery plan stored in TrainerProfile.
+ * Uses String dates and string enums for Firestore/JSON compatibility.
+ */
+@Serializable
+data class TitanRecoveryPlanSnapshot(
+    val id: String = "",
+    val active: Boolean = false,
+    val reasons: List<String> = emptyList(),  // RecoveryReason enum names
+    val type: String = "rest",                // "rest" | "active" | "rehab" | "deload"
+    val startDate: String = "",
+    val endDate: String = "",
+    val suggestedDurationDays: Int? = null,
+    val severity: String = "medium",          // "low" | "medium" | "high"
+    val notes: String? = null,
+    val bodyRegion: String? = null,
+    val templateId: String? = null,
+    val aiSummary: String? = null,
+    val somaSummary: String? = null,
+    val agnesSummary: String? = null
+)
+
+/**
+ * Daily recovery check-in stored in TrainerProfile.recoveryCheckins.
+ */
+@Serializable
+data class TitanRecoveryCheckinSnapshot(
+    val date: String = "",
+    val pain: Int = 0,         // 0-10 scale
+    val fatigue: Int = 0,      // 0-10 scale
+    val sleepQuality: Int = 0, // 0-10 scale
+    val mood: Int = 0,         // 0-10 scale
+    val notes: String? = null,
+    val skipped: Boolean = false
+)
+
+/**
+ * Active long-term training program (e.g. "Starting Strength", 12 weeks).
+ * Stored in TrainerProfile.activeProgram.
+ */
+@Serializable
+data class TitanActiveProgram(
+    val id: String = "",
+    val name: String = "",
+    val startDate: String = "",
+    val durationWeeks: Int = 0,
+    val description: String? = null,
+    val phases: List<TitanActiveProgramPhase>? = null
+)
+
+@Serializable
+data class TitanActiveProgramPhase(
+    val name: String = "",
+    val weekStart: Int = 1,  // 1-based
+    val weekEnd: Int = 1,    // 1-based
+    val description: String? = null
+)
+
+/**
+ * Heart rate zone distribution for a cardio session.
+ * Minutes spent in each zone based on % of maxHR:
+ * Z1 <60%, Z2 60-70%, Z3 70-80%, Z4 80-90%, Z5 >90%.
+ */
+@Serializable
+data class HrZoneDistribution(
+    val z1: Double = 0.0,
+    val z2: Double = 0.0,
+    val z3: Double = 0.0,
+    val z4: Double = 0.0,
+    val z5: Double = 0.0
 )
 
 @Serializable
@@ -1424,9 +1551,20 @@ data class TitanGoal(
     val completed: Boolean = false,
     val currentValue: Double = 0.0,
     val targetValue: Double = 0.0,
+    /** Snapshot of currentValue at goal creation — used for directional progress on lower-is-better metrics. */
+    val startValue: Double? = null,
     val unit: String = "",
+    /** Optional: link to a specific exercise for lift_1rm goals. */
+    val exerciseName: String? = null,
     val deadline: String? = null,
-    val createdAt: String = ""
+    /** Goal lifecycle: "active" | "achieved" | "missed" | "abandoned". */
+    val status: String = "active",
+    val achievedDate: String? = null,
+    val notes: String? = null,
+    /** Semantic metric taxonomy: "lift_1rm" | "body_weight" | "body_fat_pct" | "run_pace" | "cardio_distance" | "weekly_sessions" | "custom". */
+    val metric: String? = null,
+    val createdAt: String = "",
+    val updatedAt: String = ""
 )
 
 @Serializable
@@ -1590,7 +1728,14 @@ data class TherapyProfile(
     val sentimentGravity: Float = 0.0f,          // 0.0-1.0; triggers Deep Session invite at > 0.8
     val currentSessionMode: String? = null,       // "CASUAL", "DEEP", "IMPROMPTU"
     val lastSessionSummary: String? = null,
+    /** Structured session notes with clinical annotations (parity with web SessionNote[]). */
+    val sessionNotes: List<SessionNote> = emptyList(),
+    /** Emergency contact for crisis situations. Safety-critical field. */
+    val emergencyContact: EmergencyContact? = null,
+    /** Psychiatric history for clinical context. Safety-critical field. */
+    val psychiatricHistory: PsychiatricHistory? = null,
     val extensibility: ModuleProfileExtensibility = ModuleProfileExtensibility(),
+    val createdAt: String? = null,
     val updatedAt: String? = null
 )
 
@@ -1612,7 +1757,9 @@ data class TherapyContext(
      * Somatic loop preference (parity with web `somaticEnabled`).
      * Default-true semantics: null/absent is treated as enabled.
      */
-    val somaticEnabled: Boolean? = null
+    val somaticEnabled: Boolean? = null,
+    /** Raw intake transcript messages for continuity (parity with web baseContext.intakeTranscript). */
+    val intakeTranscript: List<Map<String, String>> = emptyList()
 )
 
 @Serializable
@@ -1635,6 +1782,88 @@ data class SessionSummary(
     val summary: String,
     val keyInsights: List<String> = emptyList(),
     val theme: String? = null
+)
+
+/**
+ * Structured session note with clinical annotations.
+ * Parity with web `SessionNote` (types.ts:1387-1400).
+ */
+@Serializable
+data class SessionNote(
+    val id: String,
+    val note: String,
+    val timestamp: String,
+    val sessionId: String? = null,
+    /** Working hypothesis about client's core pain at session close. */
+    val formulationUpdate: String? = null,
+    /** Threads opened but not resolved — carry into next session. */
+    val unfinishedBusiness: String? = null,
+    /** Therapeutic exercises or reflections suggested for between sessions. */
+    val homeworkSuggested: String? = null,
+    /** Quality of therapeutic alliance at session close: building, testing, established, rupture_detected. */
+    val allianceQuality: String? = null
+)
+
+/**
+ * Emergency contact for crisis situations. Safety-critical field.
+ * Parity with web TherapyIntakeProfile.emergencyContact (types.ts:1407-1411).
+ */
+@Serializable
+data class EmergencyContact(
+    val name: String? = null,
+    val relationship: String? = null,
+    val phone: String? = null
+)
+
+/**
+ * Psychiatric history for clinical context. Safety-critical field.
+ * Parity with web TherapyIntakeProfile.psychiatricHistory (types.ts:1412-1418).
+ */
+@Serializable
+data class PsychiatricHistory(
+    val hasInpatientHistory: Boolean? = null,
+    val mostRecentHospitalization: String? = null,   // ISO date
+    val currentMedications: List<String> = emptyList(),
+    val diagnosedConditions: List<String> = emptyList()
+)
+
+/**
+ * Active therapy session state — the in-flight conversation ("short-term memory").
+ * Parity with web ActiveSession (agnes/types.ts:21-27).
+ */
+@Serializable
+data class ActiveTherapySession(
+    val id: String,
+    val emotionalTrend: List<String> = emptyList(),   // e.g. ["anxious", "calm", "reflective"]
+    val startedAt: Long = 0L,
+    val lastUpdatedAt: Long = 0L
+)
+
+/**
+ * Result of belief invitation evaluation — whether the system should invite the user
+ * to a belief exploration session based on their belief graph state.
+ * Parity with web BeliefInvitationDecision (belief-trigger-service.ts:18-34).
+ */
+@Serializable
+data class BeliefInvitationDecision(
+    val shouldInvite: Boolean = false,
+    val summary: String = "",
+    val rationale: List<String> = emptyList(),
+    val fingerprint: String = "",
+    val confidence: Double = 0.0,
+    val triggeringBeliefs: List<String> = emptyList(),
+    val metrics: BeliefInvitationMetrics = BeliefInvitationMetrics()
+)
+
+@Serializable
+data class BeliefInvitationMetrics(
+    val totalNodes: Int = 0,
+    val negativeCount: Int = 0,
+    val highIntensityNegativeCount: Int = 0,
+    val severeNegativeCount: Int = 0,
+    val averageNegativeIntensity: Double = 0.0,
+    val resilience: Double? = null,
+    val stressLoad: Double? = null
 )
 
 // ═══════════════════════════════════════════════

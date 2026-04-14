@@ -70,7 +70,7 @@ object TitanContextFormatter {
 
         sb.appendLine("HISTORY & GOALS:")
         sb.appendLine("Years Training: ${profile.history.yearsTraining.takeIf { it > 0 } ?: "Unknown"}")
-        val injuriesLine = profile.history.injuries.joinToString(", ").ifBlank { "None" }
+        val injuriesLine = profile.history.injuries.joinToString(", ") { "${it.bodyPart}: ${it.description} (${it.severity}/${it.status})" }.ifBlank { "None" }
         sb.appendLine("Injuries: $injuriesLine")
 
         val goalsLine = profile.history.goals.joinToString(", ").ifBlank {
