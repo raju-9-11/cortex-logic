@@ -340,7 +340,7 @@
   function addFormatStructureForTime(structure) {
     this.e4i(structure);
   }
-  initMetadataForInterface(AbstractWithDateTimeBuilder, 'AbstractWithDateTimeBuilder', VOID, VOID, [AbstractWithDateBuilder, AbstractWithTimeBuilder, WithTime, WithDate]);
+  initMetadataForInterface(AbstractWithDateTimeBuilder, 'AbstractWithDateTimeBuilder', VOID, VOID, [AbstractWithDateBuilder, AbstractWithTimeBuilder, WithDate, WithTime]);
   function offsetHours$default(padding, $super) {
     padding = padding === VOID ? Padding_ZERO_getInstance() : padding;
     var tmp;
