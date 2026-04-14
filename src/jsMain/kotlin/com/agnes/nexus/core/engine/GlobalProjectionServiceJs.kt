@@ -3,6 +3,23 @@ package com.agnes.nexus.core.engine
 import com.agnes.nexus.core.domain.service.GlobalProjectionService
 import kotlin.js.JsExport
 
+/**
+ * JS facade for [GlobalProjectionService].
+ *
+ * ## Why only two methods?
+ * [GlobalProjectionService] is a **pure-computation object** — it contains no I/O, no
+ * Firestore access, and no coroutines. Its two methods perform deterministic calculations
+ * from JSON strings and return a result immediately. This makes them safe to expose as
+ * synchronous JS functions without any callback wrapper.
+ *
+ * All Firestore operations that involve a GlobalProjection document (getProjection,
+ * updateCrossFunctionalState, syncFromProfile, approveSoulWrite, etc.) are intentionally
+ * implemented in the agnes TypeScript layer (`src/lib/services/global-projection-service.ts`).
+ * They depend on the Firebase SDK, the vault encryption key, and the agnes data layer — all
+ * platform-specific concerns that belong in TS, not in shared KMP code.
+ *
+ * Do NOT add Firestore-backed methods here. Extend the TS service instead.
+ */
 @JsExport
 class GlobalProjectionServiceJs {
 

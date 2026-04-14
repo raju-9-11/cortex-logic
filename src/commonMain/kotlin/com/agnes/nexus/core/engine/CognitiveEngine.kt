@@ -85,6 +85,40 @@ class CognitiveEngine(
             isThinking = false
         ))
     }
+
+    /**
+     * Full-orchestration variant of [chat] with pre-resolved memory context.
+     *
+     * Memory retrieval is performed by the caller before invoking this method.
+     * The [memoryFacts] list is passed directly as [memoryContext] to [chat],
+     * which hands them to [MemoryManager] alongside any [longTermSummary].
+     *
+     * All other behaviour (PersonaFactory, MemoryManager, LlmProvider, LlmSanitizer) is
+     * identical to [chat].
+     */
+    suspend fun chatWithMemory(
+        moduleId: String,
+        userMessage: String,
+        history: List<Message>,
+        nsv: NeuralStateVector,
+        identity: UserIdentity,
+        moduleContext: Map<String, Any?> = emptyMap(),
+        longTermSummary: String = "",
+        globalSoul: GlobalSoul? = null,
+        memoryFacts: List<String> = emptyList(),
+    ): Flow<AgentResponse> {
+        return chat(
+            moduleId = moduleId,
+            userMessage = userMessage,
+            history = history,
+            nsv = nsv,
+            identity = identity,
+            memoryContext = memoryFacts,
+            longTermSummary = longTermSummary,
+            moduleContext = moduleContext,
+            globalSoul = globalSoul,
+        )
+    }
 }
 
 data class AgentResponse(
