@@ -89,27 +89,34 @@ object NsvService {
             // Version
             put("version", input["version"] ?: JsonPrimitive(1))
 
-            // lastUpdated
-            val baseLU = JsonObject(emptyMap())
+            // lastUpdated — flatten any nested objects to dot-separated keys
+            // so the output always matches the Map<String, String> model.
             val inputLU = input["lastUpdated"]?.jsonObjectOrNull ?: JsonObject(emptyMap())
             put("lastUpdated", buildJsonObject {
-                for ((k, v) in baseLU) put(k, v)
-                for ((k, v) in inputLU) put(k, v)
+                fun flattenLU(prefix: String, obj: JsonObject) {
+                    for ((k, v) in obj) {
+                        val key = if (prefix.isEmpty()) k else "$prefix.$k"
+                        when (v) {
+                            is JsonObject -> flattenLU(key, v)
+                            else -> put(key, v)
+                        }
+                    }
+                }
+                flattenLU("", inputLU)
             })
 
             // Legacy aliases are rebound from the completed result object below.
         }
 
         // Re-bind legacy aliases from the result domains
-        val resultObj = json.parseToJsonElement(json.encodeToString(JsonObject.serializer(), result)).jsonObject
         val finalObj = buildJsonObject {
-            for ((k, v) in resultObj) {
+            for ((k, v) in result) {
                 if (k in LEGACY_ALIASES) continue // skip, we'll re-add
                 put(k, v)
             }
             for ((alias, path) in LEGACY_ALIASES) {
                 val (d, f) = path
-                val domainVal = resultObj[d]?.jsonObjectOrNull?.get(f) ?: JsonNull
+                val domainVal = result[d]?.jsonObjectOrNull?.get(f) ?: JsonNull
                 put(alias, domainVal)
             }
         }
@@ -434,11 +441,9 @@ object NsvService {
                 if (value is JsonArray) value else JsonNull
             }
             fieldName in STRING_FIELDS -> {
-                // Accept any primitive as a string
                 (value as? JsonPrimitive)?.let { JsonPrimitive(it.content) } ?: JsonNull
             }
             else -> {
-                // Numeric field: must be a number or a string that parses as a number
                 when (value) {
                     is JsonPrimitive -> {
                         val dbl = value.doubleOrNull

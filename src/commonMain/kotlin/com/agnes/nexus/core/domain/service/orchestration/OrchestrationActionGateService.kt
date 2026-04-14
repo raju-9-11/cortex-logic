@@ -148,7 +148,7 @@ object OrchestrationActionGateService {
 
     /**
      * Evaluate an action gate decision.
-     * @param inputJson JSON with: moduleId, actionType, payload, autopilotLevel, historyMode, isGuest, activeThreadId, persistencePolicy, now
+     * @param inputJson JSON with: moduleId, actionType, payload, autopilotLevel, historyMode, isGuest, activeThreadId, persistencePolicy, moduleSessionActive, now
      * @param actionLabel Human-readable label for the action
      * @return JSON with: shouldDispatch (Boolean), metadata (ActionOrchestrationMetadata)
      */
@@ -162,6 +162,7 @@ object OrchestrationActionGateService {
         val isGuest = input["isGuest"]?.jsonPrimitive?.booleanOrNull ?: false
         val activeThreadId = input["activeThreadId"]?.jsonPrimitive?.contentOrNull
         val persistencePolicy = input["persistencePolicy"]?.jsonPrimitive?.contentOrNull ?: "auto"
+        val moduleSessionActive = input["moduleSessionActive"]?.jsonPrimitive?.booleanOrNull ?: false
         val now = input["now"]?.jsonPrimitive?.contentOrNull ?: ""
 
         val source = if (moduleId == "nexus" || OrchestrationContracts.isPrimaryAgentId(moduleId)) moduleId else "nexus"
@@ -203,7 +204,13 @@ object OrchestrationActionGateService {
                 canMutateState = false,
             )
         } else {
-            OrchestrationPolicyService.getExecutionPolicy(autopilotLevel, proposal.toString(), highRisk = highRisk)
+            OrchestrationPolicyService.getExecutionPolicy(
+                autopilotLevel = autopilotLevel,
+                proposalJson = proposal.toString(),
+                highRisk = highRisk,
+                moduleSessionActive = moduleSessionActive,
+                moduleId = moduleId,
+            )
         }
 
         val effectiveHistoryMode = if (historyModeInput == "silent" || policy.historyMode == "silent") "silent" else "standard"

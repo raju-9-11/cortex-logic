@@ -49,7 +49,7 @@ dependencyResolutionManagement {
 In `app/build.gradle.kts`:
 
 ```kotlin
-api("com.agnes.nexus:cortex:1.0.0")
+api("com.agnes.nexus:cortex:1.5.1")
 ```
 
 ### CI / GitHub Actions

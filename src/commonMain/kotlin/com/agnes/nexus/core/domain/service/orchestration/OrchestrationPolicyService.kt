@@ -6,7 +6,7 @@ import kotlinx.serialization.json.*
 @Serializable
 data class ApprovalRequirement(
     val required: Boolean,
-    val reason: String, // "manual_level" | "explicit_gate" | "high_risk" | "conflict" | "guest_scope" | "none"
+    val reason: String, // "manual_level" | "explicit_gate" | "high_risk" | "conflict" | "guest_scope" | "session_trusted" | "none"
 )
 
 @Serializable
@@ -71,12 +71,21 @@ object OrchestrationPolicyService {
 
     /**
      * Determine execution policy for a proposal at a given autopilot level.
+     *
+     * [moduleSessionActive] signals that the requesting module is inside an active user-facing
+     * session (e.g. a live Agnes therapy session). When true, the module's own non-high-risk
+     * mutations are trusted to auto-dispatch without the user-level approval gate, regardless
+     * of the global autopilot setting. Explicit per-action gates ([requiresApproval] in the
+     * proposal) and high-risk inferences still apply. Defaults to false to preserve existing
+     * callers.
      */
     fun getExecutionPolicy(
         autopilotLevel: Int,
         proposalJson: String,
         hasConflict: Boolean = false,
         highRisk: Boolean = false,
+        moduleSessionActive: Boolean = false,
+        moduleId: String = "",
     ): ExecutionPolicy {
         val proposal = json.parseToJsonElement(proposalJson).jsonObject
         val patientScope = proposal["patientScope"]?.jsonPrimitive?.contentOrNull ?: "USER"
@@ -112,6 +121,20 @@ object OrchestrationPolicyService {
                 executionMode = "manual",
                 historyMode = "standard",
                 canMutateState = false,
+            )
+        }
+
+        // Session-trusted bypass: a module in an active session may auto-dispatch its own
+        // non-high-risk writes without the autopilot-level approval gate. Explicit gates and
+        // high-risk inferences above still short-circuit before we reach here, so this only
+        // affects ordinary medium/low-risk mutations coming from the module whose session is
+        // active.
+        if (moduleSessionActive && moduleId.isNotEmpty() && !highRisk && !hasConflict) {
+            return ExecutionPolicy(
+                requiresApproval = ApprovalRequirement(false, "session_trusted"),
+                executionMode = "autonomous",
+                historyMode = "standard",
+                canMutateState = true,
             )
         }
 
@@ -176,5 +199,10 @@ object OrchestrationPolicyService {
         proposalJson: String,
         hasConflict: Boolean = false,
         highRisk: Boolean = false,
-    ): String = json.encodeToString(ExecutionPolicy.serializer(), getExecutionPolicy(autopilotLevel, proposalJson, hasConflict, highRisk))
+        moduleSessionActive: Boolean = false,
+        moduleId: String = "",
+    ): String = json.encodeToString(
+        ExecutionPolicy.serializer(),
+        getExecutionPolicy(autopilotLevel, proposalJson, hasConflict, highRisk, moduleSessionActive, moduleId),
+    )
 }

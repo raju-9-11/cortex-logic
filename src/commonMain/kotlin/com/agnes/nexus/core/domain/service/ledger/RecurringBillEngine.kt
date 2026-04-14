@@ -251,8 +251,8 @@ object RecurringBillEngine {
 
         return buildJsonObject {
             put("updatedProfile", json.parseToJsonElement(updatedProfileJson))
-            put("autoPosted", json.encodeToJsonElement(autoPosted))
-            put("pendingRules", json.encodeToJsonElement(pendingRules))
+            put("autoPosted", json.encodeToJsonElement(listTransactionSerializer, autoPosted))
+            put("pendingRules", json.encodeToJsonElement(listRecurringRuleSerializer, pendingRules))
         }.toString()
     }
 
@@ -355,15 +355,15 @@ object RecurringBillEngine {
         val updated = buildJsonObject {
             for ((k, v) in base) {
                 when (k) {
-                    "recurringRules" -> put("recurringRules", json.encodeToJsonElement(recurringRules))
-                    "transactions" -> put("transactions", json.encodeToJsonElement(transactions))
+                    "recurringRules" -> put("recurringRules", json.encodeToJsonElement(listRecurringRuleSerializer, recurringRules))
+                    "transactions" -> put("transactions", json.encodeToJsonElement(listTransactionSerializer, transactions))
                     "updatedAt" -> put("updatedAt", JsonPrimitive(updatedAt))
                     else -> put(k, v)
                 }
             }
             // Ensure fields are present even if not in original
-            if (!base.containsKey("recurringRules")) put("recurringRules", json.encodeToJsonElement(recurringRules))
-            if (!base.containsKey("transactions")) put("transactions", json.encodeToJsonElement(transactions))
+            if (!base.containsKey("recurringRules")) put("recurringRules", json.encodeToJsonElement(listRecurringRuleSerializer, recurringRules))
+            if (!base.containsKey("transactions")) put("transactions", json.encodeToJsonElement(listTransactionSerializer, transactions))
             if (!base.containsKey("updatedAt")) put("updatedAt", JsonPrimitive(updatedAt))
         }
         return updated.toString()
@@ -441,12 +441,8 @@ object RecurringBillEngine {
     private val listRecurringRuleSerializer = kotlinx.serialization.builtins.ListSerializer(RecurringRule.serializer())
     private val listTransactionSerializer = kotlinx.serialization.builtins.ListSerializer(Transaction.serializer())
 
-    // Make encodeToJsonElement usable for typed lists
-    private fun Json.encodeToJsonElement(rules: List<RecurringRule>): JsonElement =
-        encodeToJsonElement(listRecurringRuleSerializer, rules)
-
-    private fun Json.encodeToJsonElement(txs: List<Transaction>): JsonElement =
-        encodeToJsonElement(listTransactionSerializer, txs)
+    // Serializer helpers — use direct serializer calls at each site to avoid
+    // overload ambiguity that causes JVM platform declaration clashes after type erasure.
 
     private fun Json.encodeToString(rules: List<RecurringRule>): String =
         encodeToString(listRecurringRuleSerializer, rules)

@@ -1,5 +1,6 @@
 package com.agnes.nexus.core.engine.personas.ledger
 
+import com.agnes.nexus.core.domain.automation.AutomationRule
 import com.agnes.nexus.core.engine.personas.PersonaPrompt
 import kotlin.math.ceil
 import kotlin.math.max
@@ -454,14 +455,6 @@ object LedgerPersonaPrompts {
      */
     data class TaxYearSummary(
         val estimatedTaxableIncome: Double? = null
-    )
-
-    /**
-     * Represents an automation suggestion rule.
-     */
-    data class AutomationRule(
-        val name: String,
-        val isEnabled: Boolean
     )
 
     /**
