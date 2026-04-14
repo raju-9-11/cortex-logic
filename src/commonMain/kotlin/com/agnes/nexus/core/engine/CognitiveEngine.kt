@@ -1,5 +1,6 @@
 package com.agnes.nexus.core.engine
 
+import com.agnes.nexus.core.domain.model.GlobalSoul
 import com.agnes.nexus.core.domain.models.Message
 import com.agnes.nexus.core.domain.models.NeuralStateVector
 import com.agnes.nexus.core.domain.models.ActionCall
@@ -28,11 +29,10 @@ class CognitiveEngine(
         memoryContext: List<String> = emptyList(),
         longTermSummary: String = "",
         moduleContext: Map<String, Any?> = emptyMap(),
-        imageContent: String? = null
+        imageContent: String? = null,
+        globalSoul: GlobalSoul? = null
     ): Flow<AgentResponse> = flow {
-        // TODO(GlobalSoul-migration): Replace NeuralStateVector.formatForPrompt() with GlobalSoul.formatForPrompt()
-        // once GlobalSoul is wired through NeuralProjectionService.
-        val baseSystemPrompt = personaFactory.assemble(moduleId, identity, nsv, moduleContext, longTermSummary)
+        val baseSystemPrompt = personaFactory.assemble(moduleId, identity, nsv, moduleContext, longTermSummary, globalSoul)
         
         // 1. Build optimized cognitive context
         val cognitiveContext = MemoryManager.buildContext(

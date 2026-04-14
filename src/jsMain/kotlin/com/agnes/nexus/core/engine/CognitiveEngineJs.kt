@@ -1,5 +1,6 @@
 package com.agnes.nexus.core.engine
 
+import com.agnes.nexus.core.domain.model.GlobalSoul
 import com.agnes.nexus.core.domain.models.Message
 import com.agnes.nexus.core.domain.models.MessageRole
 import com.agnes.nexus.core.domain.models.NeuralStateVector
@@ -258,6 +259,7 @@ class CognitiveEngineJs {
         historyJson: String,
         identity: UserIdentityJs,
         nsvJson: String = "{}",
+        globalSoulJson: String = "{}",
         onChunk: (StreamChunkJs) -> Unit,
         onComplete: (FinalResponseJs) -> Unit,
         onError: (String) -> Unit
@@ -271,6 +273,7 @@ class CognitiveEngineJs {
         val history = parseHistoryJson(historyJson)
         val nsv = NeuralStateVectorJs(nsvJson).nsv
         val userIdentity = identity.toUserIdentity()
+        val globalSoul = parseGlobalSoulJson(globalSoulJson)
 
         val job = scope.launch {
             try {
@@ -279,7 +282,8 @@ class CognitiveEngineJs {
                     userMessage = userMessage,
                     history = history,
                     nsv = nsv,
-                    identity = userIdentity
+                    identity = userIdentity,
+                    globalSoul = globalSoul
                 ).collect { response ->
                     if (response.isStreaming) {
                         onChunk(
@@ -527,9 +531,21 @@ class CognitiveEngineJs {
         }
     }
 
+    /** Parses a JSON-encoded GlobalSoul from the TypeScript layer. Returns null for blank/empty/malformed input. */
+    private fun parseGlobalSoulJson(json: String): GlobalSoul? {
+        if (json.isBlank() || json == "{}") return null
+        return try {
+            LENIENT_JSON.decodeFromString<GlobalSoul>(json)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     /**
      * PersonaFactory implementation that returns a fixed system prompt string.
      * Used by [chatWithContext] to bypass the default NSV-aware persona assembly.
+     * All parameters other than the stored [systemPrompt] are intentionally ignored —
+     * the caller has already pre-assembled the full system prompt and owns its content.
      */
     private inner class PassthroughPersonaFactory(
         private val systemPrompt: String
@@ -539,7 +555,8 @@ class CognitiveEngineJs {
             identity: UserIdentity,
             nsv: NeuralStateVector,
             moduleContext: Map<String, Any?>,
-            longTermSummary: String?
+            longTermSummary: String?,
+            globalSoul: GlobalSoul?
         ): String = systemPrompt
     }
 
@@ -598,6 +615,7 @@ class CognitiveEngineJs {
     // ── Constants ─────────────────────────────────────────────────────────────
 
     private companion object {
+        val LENIENT_JSON = Json { ignoreUnknownKeys = true; coerceInputValues = true }
         val MOCK_FINAL_RESPONSE = FinalResponseJs(
             content = "Neural link simulation active.",
             thoughts = null,

@@ -3,8 +3,10 @@ package com.agnes.nexus.core.domain.services
 import com.agnes.nexus.core.domain.model.AgentSource
 import com.agnes.nexus.core.domain.model.AutopilotLevel
 import com.agnes.nexus.core.domain.models.EncryptedEnvelope
+import com.agnes.nexus.core.domain.model.GlobalSoul
 import com.agnes.nexus.core.domain.models.NeuralStateVector
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.serialization.json.JsonObject
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -30,6 +32,12 @@ interface NeuralProjectionService {
     suspend fun updateNsv(patch: Map<String, Any?>)
     suspend fun getCompactedInsights(): List<String>
     suspend fun addInsight(insight: String)
+
+    /** Observe the derived GlobalSoul vector. Returns empty flow by default for backward compat. */
+    fun observeGlobalSoul(): Flow<GlobalSoul> = emptyFlow()
+
+    /** Snapshot of the current GlobalSoul. Returns null by default for backward compat. */
+    fun getCurrentGlobalSoul(): GlobalSoul? = null
 }
 
 /**
@@ -197,7 +205,11 @@ data class SpineEventPayload(
     val confidence: Float = 1.0f,
     val requiresApproval: Boolean = false,
     val patientScope: SpinePatientScope = SpinePatientScope.USER,
-    val occurredAt: Long = Clock.System.now().toEpochMilliseconds()
+    val occurredAt: Long = Clock.System.now().toEpochMilliseconds(),
+    /** Pre-resolved notification title produced by [NotificationContentResolver]. */
+    val notificationTitle: String? = null,
+    /** Pre-resolved notification body produced by [NotificationContentResolver]. */
+    val notificationBody: String? = null
 ) {
     fun toSpineEvent(): SpineEvent {
         val pri = when (priority) {
@@ -208,7 +220,12 @@ data class SpineEventPayload(
         val now = Clock.System.now().toEpochMilliseconds()
         // Preserve the domain field in attributes under "_domain" so that SpineEvent.domain
         // computed property can resolve it correctly (mutations-based resolution is optional).
-        val enrichedData = if (domain != "system") data + mapOf("_domain" to domain) else data
+        var enrichedData = if (domain != "system") data + mapOf("_domain" to domain) else data
+        // Propagate pre-resolved notification content into the event attributes so that
+        // downstream consumers (Cloud Functions, Android FCM handler) can read them without
+        // needing access to the resolver.
+        if (notificationTitle != null) enrichedData = enrichedData + ("_notificationTitle" to notificationTitle)
+        if (notificationBody != null) enrichedData = enrichedData + ("_notificationBody" to notificationBody)
         return SpineEvent(
             header = SpineHeader(source = source, timestamp = now, occurredAt = occurredAt, processedAt = now, priority = pri),
             payload = SpinePayload(intent = type, attributes = enrichedData, mutations = mutations),

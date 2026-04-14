@@ -1,5 +1,6 @@
 package com.agnes.nexus.core.engine
 
+import com.agnes.nexus.core.domain.model.GlobalSoul
 import com.agnes.nexus.core.domain.models.AgentPersonalityProvision
 import com.agnes.nexus.core.domain.models.NeuralStateVector
 
@@ -18,6 +19,11 @@ data class UserIdentity(
 
 /**
  * Persona Factory - handles agent identity assembly.
+ *
+ * @param globalSoul  When non-null, the compact 5-vector GlobalSoul is used for
+ *                    LLM-facing prompt injection instead of the verbose NeuralStateVector.
+ *                    The NSV is still available for module-specific logic (behavior overrides,
+ *                    Atlas planning engine, etc.) but the LLM sees the normalized GlobalSoul.
  */
 interface PersonaFactory {
     fun assemble(
@@ -25,6 +31,7 @@ interface PersonaFactory {
         identity: UserIdentity,
         nsv: NeuralStateVector,
         moduleContext: Map<String, Any?> = emptyMap(),
-        longTermSummary: String? = null
+        longTermSummary: String? = null,
+        globalSoul: GlobalSoul? = null
     ): String
 }

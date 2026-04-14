@@ -1,5 +1,6 @@
 package com.agnes.nexus.core.engine
 
+import com.agnes.nexus.core.domain.model.GlobalSoul
 import com.agnes.nexus.core.domain.models.NeuralStateVector
 import com.agnes.nexus.core.domain.models.SomaProfile
 import com.agnes.nexus.core.domain.models.AtlasProfile
@@ -42,7 +43,8 @@ class DefaultPersonaFactory : PersonaFactory {
         identity: UserIdentity, 
         nsv: NeuralStateVector,
         moduleContext: Map<String, Any?>,
-        longTermSummary: String?
+        longTermSummary: String?,
+        globalSoul: GlobalSoul?
     ): String {
         val personaPrompt = PersonaPromptCatalog.promptFor(moduleId)
         // If the caller passes a pre-built system prompt via moduleContext["baseRole"],
@@ -250,7 +252,11 @@ class DefaultPersonaFactory : PersonaFactory {
             Bio: ${identity.bio ?: "N/A"}
         """.trimIndent()
 
-        val nsvBlock = buildScopedNsvBlock(moduleId, nsv)
+        val nsvBlock = if (globalSoul != null) {
+            globalSoul.formatForPrompt()
+        } else {
+            buildScopedNsvBlock(moduleId, nsv)
+        }
         val stateAwarenessBlock = buildStateAwarenessBlock(moduleId)
         val overlayBlock = buildOverlayBlock(personaPrompt, identity.agentPersonalityProvision.personaOverlays[moduleId])
         

@@ -1,5 +1,6 @@
 package com.agnes.nexus.core.engine.personas.ledger
 
+import com.agnes.nexus.core.domain.automation.AUTOMATION_ACTION_IDS
 import com.agnes.nexus.core.domain.models.FieldDefinition
 import com.agnes.nexus.core.domain.models.FieldType
 import com.agnes.nexus.core.domain.models.LedgerBudgetCategory
@@ -359,12 +360,8 @@ object LedgerPromptBuilder {
             "update_retirement_plan",
             "delete_retirement_plan",
             "project_retirement",
-            // Automation suggestions
-            "create_automation_rule",
-            "update_automation_rule",
-            "delete_automation_rule",
-            "dismiss_suggestion",
-            "add_default_automation_rules",
+            // Automation suggestions — sourced from AUTOMATION_ACTION_IDS to stay in sync.
+            *AUTOMATION_ACTION_IDS.toTypedArray(),
             // Receipts
             "add_receipt",
             "delete_receipt",

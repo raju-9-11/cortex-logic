@@ -175,6 +175,7 @@ class SchedulerService(
     }
 }
 
+@kotlinx.serialization.Serializable
 data class ScheduleDefinition(
     val id: String,
     val moduleId: String,

@@ -35,7 +35,7 @@ class AtlasPredictiveEngineJs {
      * @return Effective energy budget clamped to [0.0, 10.0].
      */
     fun computeEffectiveEnergyBudget(nsvJson: String): Double {
-        val nsv = json.decodeFromString<NeuralStateVector>(nsvJson)
+        val nsv = parseNsv(nsvJson)
         return computeEffectiveBudget(nsv)
     }
 
@@ -45,7 +45,7 @@ class AtlasPredictiveEngineJs {
      * @param nsvJson JSON NeuralStateVector.
      */
     fun getSafePlanningThreshold(nsvJson: String): Double {
-        val nsv = json.decodeFromString<NeuralStateVector>(nsvJson)
+        val nsv = parseNsv(nsvJson)
         return computeEffectiveBudget(nsv) * 0.8
     }
 
@@ -56,7 +56,7 @@ class AtlasPredictiveEngineJs {
      * @param nsvJson         JSON NeuralStateVector.
      */
     fun isOverloaded(totalEnergyCost: Double, nsvJson: String): Boolean {
-        val nsv = json.decodeFromString<NeuralStateVector>(nsvJson)
+        val nsv = parseNsv(nsvJson)
         return totalEnergyCost > computeEffectiveBudget(nsv) * 0.8
     }
 
@@ -72,7 +72,7 @@ class AtlasPredictiveEngineJs {
      * @return Score in [0, 10], one decimal place.
      */
     fun computeBurnoutTrajectoryScore(nsvHistoryJson: String): Double {
-        val history = json.decodeFromString<List<NeuralStateVector>>(nsvHistoryJson)
+        val history = parseNsvList(nsvHistoryJson)
         if (history.size < 2) return 0.0
 
         val newest = history[0]
@@ -108,8 +108,8 @@ class AtlasPredictiveEngineJs {
      * @param previousNsvJson JSON of the previous NeuralStateVector.
      */
     fun computeTransitionRisk(currentNsvJson: String, previousNsvJson: String): Double {
-        val current = json.decodeFromString<NeuralStateVector>(currentNsvJson)
-        val previous = json.decodeFromString<NeuralStateVector>(previousNsvJson)
+        val current = parseNsv(currentNsvJson)
+        val previous = parseNsv(previousNsvJson)
 
         fun agg(nsv: NeuralStateVector) =
             (nsv.cognitive.planningLoad ?: 0.0) +
@@ -140,7 +140,7 @@ class AtlasPredictiveEngineJs {
      * @return JSON { nextState, newCleanCount, isBurnout, emitOverload }
      */
     fun evaluateNextState(currentState: String, nsvJson: String, consecutiveClearCount: Int): String {
-        val nsv = json.decodeFromString<NeuralStateVector>(nsvJson)
+        val nsv = parseNsv(nsvJson)
 
         // Raw metric extraction (matches TS: planningLoad fallback to deadlinePressure)
         val rawPlanningLoad = nsv.cognitive.planningLoad ?: nsv.planning.deadlinePressure ?: 0.0
@@ -280,6 +280,24 @@ class AtlasPredictiveEngineJs {
     }
 
     // ─── Private helpers ─────────────────────────────────────────────────────
+
+    /** Safely deserialize a JSON string to NeuralStateVector, returning defaults on failure. */
+    private fun parseNsv(nsvJson: String): NeuralStateVector {
+        return try {
+            json.decodeFromString<NeuralStateVector>(nsvJson)
+        } catch (_: Exception) {
+            NeuralStateVector()
+        }
+    }
+
+    /** Safely deserialize a JSON array of NeuralStateVector snapshots, returning empty list on failure. */
+    private fun parseNsvList(nsvListJson: String): List<NeuralStateVector> {
+        return try {
+            json.decodeFromString<List<NeuralStateVector>>(nsvListJson)
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
 
     /** Pure energy budget computation — matches AtlasPredictiveService.computeEffectiveEnergyBudget. */
     private fun computeEffectiveBudget(nsv: NeuralStateVector): Double {
