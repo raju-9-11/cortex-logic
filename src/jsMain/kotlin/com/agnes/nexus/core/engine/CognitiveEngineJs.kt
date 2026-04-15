@@ -300,8 +300,8 @@ class CognitiveEngineJs {
                             StreamChunkJs(
                                 delta = response.content,
                                 isThinking = response.isThinking,
-                                isActing = false,
-                                currentActionType = null
+                                isActing = response.isActing,
+                                currentActionType = response.currentActionType,
                             )
                         )
                     } else {
@@ -474,8 +474,8 @@ class CognitiveEngineJs {
                             StreamChunkJs(
                                 delta = response.content,
                                 isThinking = response.isThinking,
-                                isActing = false,
-                                currentActionType = null
+                                isActing = response.isActing,
+                                currentActionType = response.currentActionType,
                             )
                         )
                     } else {
@@ -579,8 +579,8 @@ class CognitiveEngineJs {
                             StreamChunkJs(
                                 delta = response.content,
                                 isThinking = response.isThinking,
-                                isActing = false,
-                                currentActionType = null
+                                isActing = response.isActing,
+                                currentActionType = response.currentActionType,
                             )
                         )
                     } else {

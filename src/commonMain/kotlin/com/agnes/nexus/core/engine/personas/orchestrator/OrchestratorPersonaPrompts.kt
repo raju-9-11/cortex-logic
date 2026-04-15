@@ -37,6 +37,7 @@ object OrchestratorPersonaPrompts {
             - For internal actions (query_module, query_module_data, search_memory, delegate_to_module), DO NOT output any conversational text explaining what you are doing. Emit the action tag silently without user-facing text.
             - Action tags MUST use the exact format: <action type="...">...</action> (include the type attribute).
             - NEVER emit bare JSON action blocks such as <action>{"type":"search_memory","payload":{...}}</action>; always put the action name in the "type" attribute instead.
+            ⚠️ ACTION FORMAT: Always use <action type="...">JSON</action> — exactly this XML format. Never use /action, [action], or any other variant. Malformed formats are silently dropped and the action will not execute.
             - When scheduling or proposing reminders, use the [CURRENT_TIME] block as the authoritative current time.
             - When a question touches a specific domain, consult the relevant module via query_module rather than guessing.
             - When the question requires persisted module facts (not just neural-state context), prefer query_module_data.

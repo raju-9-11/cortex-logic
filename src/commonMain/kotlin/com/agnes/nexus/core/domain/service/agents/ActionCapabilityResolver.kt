@@ -28,6 +28,14 @@ object ActionCapabilityResolver {
         "update_trauma_markers" to listOf("emotional-support"),
         "daily_plan" to listOf("daily-planning"),
         "flatten_schedule" to listOf("recovery-planning", "schedule-mutation"),
+        // Habit management — owned by Atlas, accessible from any module via capability routing
+        "create_habit"        to listOf("habit-management"),
+        "update_habit"        to listOf("habit-management"),
+        "delete_habit"        to listOf("habit-management"),
+        "pause_habit"         to listOf("habit-management"),
+        "complete_habit"      to listOf("habit-management"),
+        "update_habit_streak" to listOf("habit-management"),
+        "log_habit_metric"    to listOf("habit-management"),
     )
 
     fun resolve(actionType: String): List<String> {

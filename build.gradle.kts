@@ -1,5 +1,5 @@
 group = "com.agnes.nexus"
-version = "2.0.0"
+version = "2.0.1"
 
 plugins {
     alias(libs.plugins.android.library)

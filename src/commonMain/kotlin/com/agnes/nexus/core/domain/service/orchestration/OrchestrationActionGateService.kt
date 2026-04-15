@@ -18,12 +18,15 @@ object OrchestrationActionGateService {
 
     private val NON_MUTATING_ACTIONS = setOf(
         "propose_reminder", "query_reminders", "query_module_data", "query_memory",
-        "search_memory", "web_search", "query_profile", "analyze_trends",
-        "analyze_spending", "analyze_medical_image", "compare_periods",
+        "search_memory", "web_search", "expanded_web_search", "query_profile",
+        "analyze_trends", "analyze_spending", "analyze_medical_image", "compare_periods",
         "suggest_interventions", "suggest_field", "identify_correlations",
         "generate_summary", "detect_data_hint", "navigate_to_module",
         "delegate_to_module", "create_module_handoff", "apply_program_template",
         "suggest_progression",
+        // Scout read-only actions
+        "list_sessions", "resume_session", "commit_research",
+        "start_deep_research", "analyze_knowledge_gaps",
         // Merged from Agnes TS NON_MUTATING_ACTIONS
         "create_emotional_support_session", "create_workout_plan",
         "create_medical_review", "create_financial_plan_request",

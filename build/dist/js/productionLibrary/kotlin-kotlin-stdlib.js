@@ -105,8 +105,8 @@ if (typeof String.prototype.startsWith === 'undefined') {
   initMetadataForInterface(KtList, 'List', VOID, VOID, [Collection]);
   initMetadataForInterface(KtSet, 'Set', VOID, VOID, [Collection]);
   initMetadataForInterface(MutableIterable, 'MutableIterable');
-  initMetadataForInterface(KtMutableSet, 'MutableSet', VOID, VOID, [KtSet, MutableIterable, Collection]);
-  initMetadataForInterface(KtMutableList, 'MutableList', VOID, VOID, [KtList, MutableIterable, Collection]);
+  initMetadataForInterface(KtMutableSet, 'MutableSet', VOID, VOID, [KtSet, Collection, MutableIterable]);
+  initMetadataForInterface(KtMutableList, 'MutableList', VOID, VOID, [KtList, Collection, MutableIterable]);
   initMetadataForInterface(Entry, 'Entry');
   initMetadataForInterface(KtMap, 'Map');
   initMetadataForInterface(KtMutableMap, 'MutableMap', VOID, VOID, [KtMap]);
@@ -128,7 +128,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
   initMetadataForInterface(Comparator, 'Comparator');
   initMetadataForObject(Unit, 'Unit');
   initMetadataForClass(AbstractCollection, 'AbstractCollection', VOID, VOID, [Collection]);
-  initMetadataForClass(AbstractMutableCollection, 'AbstractMutableCollection', VOID, AbstractCollection, [AbstractCollection, MutableIterable, Collection]);
+  initMetadataForClass(AbstractMutableCollection, 'AbstractMutableCollection', VOID, AbstractCollection, [AbstractCollection, Collection, MutableIterable]);
   initMetadataForClass(IteratorImpl, 'IteratorImpl');
   initMetadataForClass(ListIteratorImpl, 'ListIteratorImpl', VOID, IteratorImpl);
   initMetadataForClass(AbstractMutableList, 'AbstractMutableList', VOID, AbstractMutableCollection, [AbstractMutableCollection, KtMutableList]);
@@ -141,7 +141,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
   initMetadataForClass(ArrayList, 'ArrayList', ArrayList_init_$Create$, AbstractMutableList, [AbstractMutableList, KtMutableList, RandomAccess]);
   initMetadataForClass(HashMap, 'HashMap', HashMap_init_$Create$, AbstractMutableMap, [AbstractMutableMap, KtMutableMap]);
   initMetadataForClass(HashMapKeys, 'HashMapKeys', VOID, AbstractMutableSet, [KtMutableSet, AbstractMutableSet]);
-  initMetadataForClass(HashMapValues, 'HashMapValues', VOID, AbstractMutableCollection, [MutableIterable, Collection, AbstractMutableCollection]);
+  initMetadataForClass(HashMapValues, 'HashMapValues', VOID, AbstractMutableCollection, [Collection, MutableIterable, AbstractMutableCollection]);
   initMetadataForClass(HashMapEntrySetBase, 'HashMapEntrySetBase', VOID, AbstractMutableSet, [KtMutableSet, AbstractMutableSet]);
   initMetadataForClass(HashMapEntrySet, 'HashMapEntrySet', VOID, HashMapEntrySetBase);
   initMetadataForClass(HashMapKeysDefault$iterator$1);
@@ -11896,6 +11896,34 @@ if (typeof String.prototype.startsWith === 'undefined') {
   function get_lastIndex_3(_this__u8e3s4) {
     return charSequenceLength(_this__u8e3s4) - 1 | 0;
   }
+  function substringBefore(_this__u8e3s4, delimiter, missingDelimiterValue) {
+    missingDelimiterValue = missingDelimiterValue === VOID ? _this__u8e3s4 : missingDelimiterValue;
+    var index = indexOf_7(_this__u8e3s4, delimiter);
+    var tmp;
+    if (index === -1) {
+      tmp = missingDelimiterValue;
+    } else {
+      // Inline function 'kotlin.text.substring' call
+      // Inline function 'kotlin.js.asDynamic' call
+      tmp = _this__u8e3s4.substring(0, index);
+    }
+    return tmp;
+  }
+  function substringAfter(_this__u8e3s4, delimiter, missingDelimiterValue) {
+    missingDelimiterValue = missingDelimiterValue === VOID ? _this__u8e3s4 : missingDelimiterValue;
+    var index = indexOf_7(_this__u8e3s4, delimiter);
+    var tmp;
+    if (index === -1) {
+      tmp = missingDelimiterValue;
+    } else {
+      var tmp1 = index + delimiter.length | 0;
+      // Inline function 'kotlin.text.substring' call
+      var endIndex = _this__u8e3s4.length;
+      // Inline function 'kotlin.js.asDynamic' call
+      tmp = _this__u8e3s4.substring(tmp1, endIndex);
+    }
+    return tmp;
+  }
   function contains_10(_this__u8e3s4, other, ignoreCase) {
     ignoreCase = ignoreCase === VOID ? false : ignoreCase;
     var tmp;
@@ -12041,7 +12069,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
     }
     return destination;
   }
-  function substringBefore(_this__u8e3s4, delimiter, missingDelimiterValue) {
+  function substringBefore_0(_this__u8e3s4, delimiter, missingDelimiterValue) {
     missingDelimiterValue = missingDelimiterValue === VOID ? _this__u8e3s4 : missingDelimiterValue;
     var index = indexOf_6(_this__u8e3s4, delimiter);
     var tmp;
@@ -12054,7 +12082,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
     }
     return tmp;
   }
-  function substringAfter(_this__u8e3s4, delimiter, missingDelimiterValue) {
+  function substringAfter_0(_this__u8e3s4, delimiter, missingDelimiterValue) {
     missingDelimiterValue = missingDelimiterValue === VOID ? _this__u8e3s4 : missingDelimiterValue;
     var index = indexOf_6(_this__u8e3s4, delimiter);
     var tmp;
@@ -15337,83 +15365,85 @@ if (typeof String.prototype.startsWith === 'undefined') {
   _.$_$.ye = startsWith;
   _.$_$.ze = startsWith_3;
   _.$_$.af = startsWith_1;
-  _.$_$.bf = substringAfter;
-  _.$_$.cf = substringBefore;
-  _.$_$.df = take_1;
-  _.$_$.ef = toBooleanStrictOrNull;
-  _.$_$.ff = toDoubleOrNull;
-  _.$_$.gf = toDouble;
-  _.$_$.hf = toIntOrNull;
-  _.$_$.if = toInt;
-  _.$_$.jf = toInt_0;
-  _.$_$.kf = toLongOrNull;
-  _.$_$.lf = toLong_0;
-  _.$_$.mf = toString_3;
-  _.$_$.nf = toString_2;
-  _.$_$.of = toUByte;
-  _.$_$.pf = toUInt;
-  _.$_$.qf = toULongOrNull;
-  _.$_$.rf = toULong;
-  _.$_$.sf = toUShort;
-  _.$_$.tf = trimEnd_0;
-  _.$_$.uf = trimEnd;
-  _.$_$.vf = trimIndent;
-  _.$_$.wf = trimMargin;
-  _.$_$.xf = trimStart;
-  _.$_$.yf = trim_0;
-  _.$_$.zf = trim;
-  _.$_$.ag = uppercaseChar;
-  _.$_$.bg = Duration;
-  _.$_$.cg = Uuid;
-  _.$_$.dg = ArithmeticException;
-  _.$_$.eg = Char;
-  _.$_$.fg = Comparable;
-  _.$_$.gg = Comparator;
-  _.$_$.hg = DeepRecursiveFunction;
-  _.$_$.ig = DeepRecursiveScope;
-  _.$_$.jg = Enum;
-  _.$_$.kg = Error_0;
-  _.$_$.lg = Exception;
-  _.$_$.mg = IllegalArgumentException;
-  _.$_$.ng = IllegalStateException;
-  _.$_$.og = Long;
-  _.$_$.pg = NoSuchElementException;
-  _.$_$.qg = Pair;
-  _.$_$.rg = Result;
-  _.$_$.sg = RuntimeException;
-  _.$_$.tg = THROW_CCE;
-  _.$_$.ug = THROW_IAE;
-  _.$_$.vg = Triple;
-  _.$_$.wg = UByteArray;
-  _.$_$.xg = UByte;
-  _.$_$.yg = UIntArray;
-  _.$_$.zg = UInt;
-  _.$_$.ah = ULongArray;
-  _.$_$.bh = ULong;
-  _.$_$.ch = UShortArray;
-  _.$_$.dh = UShort;
-  _.$_$.eh = Unit;
-  _.$_$.fh = UnsupportedOperationException;
-  _.$_$.gh = addSuppressed;
-  _.$_$.hh = arrayOf;
-  _.$_$.ih = closeFinally;
-  _.$_$.jh = countTrailingZeroBits;
-  _.$_$.kh = createFailure;
-  _.$_$.lh = ensureNotNull;
-  _.$_$.mh = invoke;
-  _.$_$.nh = isFinite;
-  _.$_$.oh = isFinite_0;
-  _.$_$.ph = isNaN_0;
-  _.$_$.qh = lazy_0;
-  _.$_$.rh = lazy;
-  _.$_$.sh = noWhenBranchMatchedException;
-  _.$_$.th = plus_5;
-  _.$_$.uh = stackTraceToString;
-  _.$_$.vh = throwKotlinNothingValueException;
-  _.$_$.wh = throwOnFailure;
-  _.$_$.xh = throwUninitializedPropertyAccessException;
-  _.$_$.yh = toString_0;
-  _.$_$.zh = to;
+  _.$_$.bf = substringAfter_0;
+  _.$_$.cf = substringAfter;
+  _.$_$.df = substringBefore;
+  _.$_$.ef = substringBefore_0;
+  _.$_$.ff = take_1;
+  _.$_$.gf = toBooleanStrictOrNull;
+  _.$_$.hf = toDoubleOrNull;
+  _.$_$.if = toDouble;
+  _.$_$.jf = toIntOrNull;
+  _.$_$.kf = toInt;
+  _.$_$.lf = toInt_0;
+  _.$_$.mf = toLongOrNull;
+  _.$_$.nf = toLong_0;
+  _.$_$.of = toString_3;
+  _.$_$.pf = toString_2;
+  _.$_$.qf = toUByte;
+  _.$_$.rf = toUInt;
+  _.$_$.sf = toULongOrNull;
+  _.$_$.tf = toULong;
+  _.$_$.uf = toUShort;
+  _.$_$.vf = trimEnd_0;
+  _.$_$.wf = trimEnd;
+  _.$_$.xf = trimIndent;
+  _.$_$.yf = trimMargin;
+  _.$_$.zf = trimStart;
+  _.$_$.ag = trim_0;
+  _.$_$.bg = trim;
+  _.$_$.cg = uppercaseChar;
+  _.$_$.dg = Duration;
+  _.$_$.eg = Uuid;
+  _.$_$.fg = ArithmeticException;
+  _.$_$.gg = Char;
+  _.$_$.hg = Comparable;
+  _.$_$.ig = Comparator;
+  _.$_$.jg = DeepRecursiveFunction;
+  _.$_$.kg = DeepRecursiveScope;
+  _.$_$.lg = Enum;
+  _.$_$.mg = Error_0;
+  _.$_$.ng = Exception;
+  _.$_$.og = IllegalArgumentException;
+  _.$_$.pg = IllegalStateException;
+  _.$_$.qg = Long;
+  _.$_$.rg = NoSuchElementException;
+  _.$_$.sg = Pair;
+  _.$_$.tg = Result;
+  _.$_$.ug = RuntimeException;
+  _.$_$.vg = THROW_CCE;
+  _.$_$.wg = THROW_IAE;
+  _.$_$.xg = Triple;
+  _.$_$.yg = UByteArray;
+  _.$_$.zg = UByte;
+  _.$_$.ah = UIntArray;
+  _.$_$.bh = UInt;
+  _.$_$.ch = ULongArray;
+  _.$_$.dh = ULong;
+  _.$_$.eh = UShortArray;
+  _.$_$.fh = UShort;
+  _.$_$.gh = Unit;
+  _.$_$.hh = UnsupportedOperationException;
+  _.$_$.ih = addSuppressed;
+  _.$_$.jh = arrayOf;
+  _.$_$.kh = closeFinally;
+  _.$_$.lh = countTrailingZeroBits;
+  _.$_$.mh = createFailure;
+  _.$_$.nh = ensureNotNull;
+  _.$_$.oh = invoke;
+  _.$_$.ph = isFinite;
+  _.$_$.qh = isFinite_0;
+  _.$_$.rh = isNaN_0;
+  _.$_$.sh = lazy_0;
+  _.$_$.th = lazy;
+  _.$_$.uh = noWhenBranchMatchedException;
+  _.$_$.vh = plus_5;
+  _.$_$.wh = stackTraceToString;
+  _.$_$.xh = throwKotlinNothingValueException;
+  _.$_$.yh = throwOnFailure;
+  _.$_$.zh = throwUninitializedPropertyAccessException;
+  _.$_$.ai = toString_0;
+  _.$_$.bi = to;
   //endregion
   return _;
 }));

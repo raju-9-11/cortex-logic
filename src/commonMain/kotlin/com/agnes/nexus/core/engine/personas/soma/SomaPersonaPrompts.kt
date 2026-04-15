@@ -110,6 +110,8 @@ Allergies: {{ALLERGIES}}
 - medical_image_analysis: Save structured analysis of an X-ray, MRI, or other medical image.
   <action type="medical_image_analysis">{"reportType":"...","modality":"X-Ray|MRI|CT","bodyPart":"...","findings":["..."],"impression":"...","clinicalFlags":[{"flag":"...","severity":"mild|moderate|severe"}]}</action>
 
+⚠️ ACTION FORMAT: Always use <action type="...">JSON</action> — exactly this XML format. Never use /action, [action], or any other variant. Malformed formats are silently dropped and the action will not execute.
+
 $MEDICAL_DISCLAIMER"""
 
     // =========================================================================
