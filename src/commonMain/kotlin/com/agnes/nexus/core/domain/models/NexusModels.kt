@@ -2,8 +2,13 @@ package com.agnes.nexus.core.domain.models
 
 import com.agnes.nexus.core.domain.model.GlobalSoul
 import com.agnes.nexus.core.domain.model.toGlobalSoul
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -1305,9 +1310,28 @@ data class AtlasReminderPreferences(
     val weeklyReviewEnabled: Boolean = true
 )
 
+/**
+ * Accepts both JSON strings and JSON numbers for the `value` field.
+ * TypeScript sends `value: string | number`; kotlinx cannot coerce numbers to
+ * String automatically, so without this serializer the entire AtlasProfile
+ * deserialization throws and the AI persona falls back to the no-data path.
+ */
+private object FlexibleStringSerializer : KSerializer<String> {
+    override val descriptor = PrimitiveSerialDescriptor("FlexibleString", PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: String) = encoder.encodeString(value)
+    override fun deserialize(decoder: Decoder): String {
+        val element = (decoder as JsonDecoder).decodeJsonElement()
+        return when {
+            element is JsonPrimitive -> element.content
+            else -> ""
+        }
+    }
+}
+
 @Serializable
 data class HabitLogEntry(
     val date: String = "",
+    @Serializable(with = FlexibleStringSerializer::class)
     val value: String = "",
     val notes: String? = null
 )
@@ -1407,8 +1431,301 @@ data class DebtItem(
     val minPayment: Double? = null,
     val type: DebtType? = null,
     val dueDay: Int? = null,
-    val variableRate: Boolean = false
+    val variableRate: Boolean = false,
+    val interestPaid: Double? = null,
+    val originalBalance: Double? = null
 )
+
+// -- Account sub-system --
+
+@Serializable
+enum class LedgerAccountType { CHECKING, SAVINGS, INVESTMENT, CREDIT_CARD, CASH, OTHER }
+
+@Serializable
+data class LedgerAccount(
+    val id: String = "",
+    val name: String = "",
+    val type: LedgerAccountType = LedgerAccountType.CHECKING,
+    val balance: Double = 0.0,
+    val currency: String? = null,
+    val institutionName: String? = null,
+    val lastFour: String? = null,
+    val isDefault: Boolean = false,
+    val color: String? = null,
+    val notes: String? = null,
+    val creditLimit: Double? = null,
+    val paymentDueDay: Int? = null,
+    val statementDay: Int? = null,
+    val createdAt: String = "",
+    val updatedAt: String = ""
+)
+
+@Serializable
+data class LedgerAccountTransfer(
+    val id: String = "",
+    val date: String = "",
+    val fromAccountId: String = "",
+    val toAccountId: String = "",
+    val amount: Double = 0.0,
+    val notes: String? = null
+)
+
+// -- Recurring Rules --
+
+@Serializable
+data class LedgerRecurringRule(
+    val id: String = "",
+    val description: String = "",
+    val amount: Double = 0.0,
+    val type: String = "expense",
+    val category: String = "",
+    val frequency: String = "monthly",
+    val startDate: String = "",
+    val nextDueDate: String = "",
+    val lastPostedDate: String? = null,
+    val accountId: String? = null,
+    val budgetCategoryId: String? = null,
+    val taxCategory: String? = null,
+    val isActive: Boolean = true,
+    val autoPost: Boolean = false,
+    val notes: String? = null,
+    val createdAt: String = ""
+)
+
+// -- Cash Flow Forecast --
+
+@Serializable
+data class LedgerCashFlowEvent(
+    val date: String = "",
+    val label: String = "",
+    val amount: Double = 0.0,
+    val type: String = "expense",
+    val source: String = "recurring"
+)
+
+@Serializable
+data class LedgerCashFlowForecastDay(
+    val date: String = "",
+    val netFlow: Double = 0.0,
+    val runningBalance: Double = 0.0,
+    val events: List<LedgerCashFlowEvent> = emptyList()
+)
+
+@Serializable
+data class LedgerCashFlowForecast(
+    val generatedAt: String = "",
+    val horizon: Int = 30,
+    val startingBalance: Double = 0.0,
+    val days: List<LedgerCashFlowForecastDay> = emptyList(),
+    val lowestPoint: LedgerCashFlowPoint? = null,
+    val highestPoint: LedgerCashFlowPoint? = null,
+    val endBalance: Double = 0.0
+)
+
+@Serializable
+data class LedgerCashFlowPoint(
+    val date: String = "",
+    val balance: Double = 0.0
+)
+
+// -- Savings Goals --
+
+@Serializable
+data class LedgerSavingsGoal(
+    val id: String = "",
+    val name: String = "",
+    val targetAmount: Double = 0.0,
+    val currentAmount: Double = 0.0,
+    val targetDate: String? = null,
+    val monthlyContribution: Double? = null
+)
+
+// -- Goal Milestones --
+
+@Serializable
+data class LedgerGoalMilestone(
+    val id: String = "",
+    val amount: Double = 0.0,
+    val label: String = "",
+    val achieved: Boolean = false,
+    val achievedAt: String? = null
+)
+
+// -- Alerts & Notifications --
+
+@Serializable
+data class LedgerAlertRule(
+    val id: String = "",
+    val type: String = "budget_breach",
+    val label: String = "",
+    val severity: String = "info",
+    val isEnabled: Boolean = true,
+    val threshold: Double? = null,
+    val entityId: String? = null,
+    val createdAt: String = ""
+)
+
+@Serializable
+data class LedgerAlertNotification(
+    val id: String = "",
+    val ruleId: String? = null,
+    val type: String = "",
+    val severity: String = "info",
+    val title: String = "",
+    val message: String = "",
+    val createdAt: String = "",
+    val dismissedAt: String? = null,
+    val snoozedUntil: String? = null,
+    val actionTab: String? = null
+)
+
+// -- Automation --
+
+@Serializable
+data class LedgerAutomationRule(
+    val id: String = "",
+    val name: String = "",
+    val isEnabled: Boolean = true,
+    val triggerType: String = "spending_exceeds",
+    val triggerThreshold: Double? = null,
+    val triggerEntityId: String? = null,
+    val triggerCategory: String? = null,
+    val suggestionType: String = "review_budget",
+    val suggestionMessage: String = "",
+    val createdAt: String = ""
+)
+
+@Serializable
+data class LedgerAutomationSuggestion(
+    val id: String = "",
+    val ruleId: String = "",
+    val ruleName: String = "",
+    val suggestionType: String = "",
+    val message: String = "",
+    val generatedAt: String = "",
+    val dismissedAt: String? = null
+)
+
+// -- Receipts --
+
+@Serializable
+data class LedgerReceipt(
+    val id: String = "",
+    val label: String = "",
+    val amount: Double = 0.0,
+    val date: String = "",
+    val transactionId: String? = null,
+    val category: String? = null,
+    val taxCategory: String? = null,
+    val taxYear: Int? = null,
+    val imageRef: String? = null,
+    val notes: String? = null,
+    val createdAt: String = ""
+)
+
+// -- Currency --
+
+@Serializable
+data class LedgerCurrencyRate(
+    val from: String = "",
+    val to: String = "",
+    val rate: Double = 1.0,
+    val recordedAt: String = ""
+)
+
+// -- Calendar Events --
+
+@Serializable
+data class LedgerCalendarEvent(
+    val id: String = "",
+    val type: String = "custom",
+    val title: String = "",
+    val date: String = "",
+    val amount: Double? = null,
+    val isIncome: Boolean? = null,
+    val color: String? = null,
+    val entityId: String? = null,
+    val notes: String? = null
+)
+
+// -- Portfolio --
+
+@Serializable
+data class LedgerPortfolioSnapshot(
+    val id: String = "",
+    val date: String = "",
+    val totalValue: Double = 0.0,
+    val totalCost: Double = 0.0,
+    val unrealizedGain: Double = 0.0,
+    val dividendsReceived: Double = 0.0,
+    val allocationByType: Map<String, Double> = emptyMap(),
+    val note: String? = null
+)
+
+// -- Credit --
+
+@Serializable
+data class LedgerCreditFactor(
+    val name: String = "",
+    val impact: String = "neutral",
+    val description: String = ""
+)
+
+// -- Retirement --
+
+@Serializable
+data class LedgerRetirementPlan(
+    val id: String = "",
+    val name: String = "",
+    val currentAge: Int = 30,
+    val targetRetirementAge: Int = 65,
+    val currentSavings: Double = 0.0,
+    val monthlyContribution: Double = 0.0,
+    val expectedAnnualReturnPct: Double = 7.0,
+    val inflationRatePct: Double = 3.0,
+    val targetMonthlyIncome: Double = 0.0,
+    val notes: String? = null,
+    val createdAt: String = "",
+    val updatedAt: String = ""
+)
+
+@Serializable
+data class LedgerRetirementProjection(
+    val planId: String = "",
+    val generatedAt: String = "",
+    val yearsToRetirement: Int = 0,
+    val projectedNestEgg: Double = 0.0,
+    val requiredNestEgg: Double = 0.0,
+    val monthlyIncomeSupported: Double = 0.0,
+    val onTrack: Boolean = false,
+    val shortfallOrSurplus: Double = 0.0,
+    val fourPercentRuleMonthly: Double = 0.0,
+    val milestones: List<LedgerRetirementMilestone> = emptyList()
+)
+
+@Serializable
+data class LedgerRetirementMilestone(
+    val year: Int = 0,
+    val age: Int = 0,
+    val projectedBalance: Double = 0.0
+)
+
+// -- Tax --
+
+@Serializable
+data class LedgerTaxYearSummary(
+    val taxYear: Int = 0,
+    val generatedAt: String = "",
+    val totalIncome: Double = 0.0,
+    val totalExpenses: Double = 0.0,
+    val deductibleExpenses: Double = 0.0,
+    val totalDeductions: Double = 0.0,
+    val estimatedTaxableIncome: Double = 0.0,
+    val categoryBreakdown: Map<String, Double> = emptyMap(),
+    val deductibleTransactionIds: List<String> = emptyList()
+)
+
+// -- Profile (Root Aggregate) --
 
 @Serializable
 data class LedgerProfile(
@@ -1435,9 +1752,37 @@ data class LedgerProfile(
     val budgetCategories: List<LedgerBudgetCategory> = emptyList(),
     val financialGoals: List<LedgerFinancialGoal> = emptyList(),
     val extensibility: ModuleProfileExtensibility = ModuleProfileExtensibility(),
-    val runwayDays: Float? = null,             // Days of survival = liquidAssets / dailyBurnRate
+    val runwayDays: Float? = null,
     val resonanceSwipes: List<ResonanceSwipeData> = emptyList(),
-    val taxSummaryJson: String? = null,         // Serialized TaxSummary JSON
+    val taxSummaryJson: String? = null,
+    // --- New sub-system collections (web parity) ---
+    val accounts: List<LedgerAccount> = emptyList(),
+    val transferHistory: List<LedgerAccountTransfer> = emptyList(),
+    val netWorthHistory: List<LedgerNetWorthSnapshot> = emptyList(),
+    val recurringRules: List<LedgerRecurringRule> = emptyList(),
+    val lastCashFlowForecast: LedgerCashFlowForecast? = null,
+    val subscriptions: List<LedgerSubscription> = emptyList(),
+    val investments: List<LedgerInvestment> = emptyList(),
+    val portfolioHistory: List<LedgerPortfolioSnapshot> = emptyList(),
+    val alertRules: List<LedgerAlertRule> = emptyList(),
+    val dismissedAlertIds: List<String> = emptyList(),
+    val taxDeductions: List<TaxDeduction> = emptyList(),
+    val lastTaxSummary: LedgerTaxYearSummary? = null,
+    val creditScoreHistory: List<LedgerCreditScore> = emptyList(),
+    val creditFactors: List<LedgerCreditFactor> = emptyList(),
+    val insurancePolicies: List<LedgerInsurancePolicy> = emptyList(),
+    val retirementPlans: List<LedgerRetirementPlan> = emptyList(),
+    val lastRetirementProjection: LedgerRetirementProjection? = null,
+    val automationRules: List<LedgerAutomationRule> = emptyList(),
+    val dismissedSuggestionIds: List<String> = emptyList(),
+    val receipts: List<LedgerReceipt> = emptyList(),
+    val currencyRates: List<LedgerCurrencyRate> = emptyList(),
+    val savingsGoals: List<LedgerSavingsGoal> = emptyList(),
+    val extensionValues: Map<String, String> = emptyMap(),
+    val resonanceCoefficients: Map<String, Double> = emptyMap(),
+    val financialStreakCount: Int = 0,
+    val financialStreakLastMilestone: Int = 0,
+    val documentAnalysisEnabled: Boolean = false,
     val createdAt: String = "",
     val updatedAt: String = ""
 )
@@ -1471,7 +1816,8 @@ data class LedgerExpense(
     val name: String,
     val amount: Double,
     val category: String = "other",
-    val isFixed: Boolean = false
+    val isFixed: Boolean = false,
+    val taxCategory: String? = null
 )
 
 @Serializable
@@ -1494,7 +1840,14 @@ data class LedgerTransaction(
     val amount: Double = 0.0,
     val type: String = "expense",
     val category: String = "Other",
+    val resonanceScore: Double? = null,
+    val resonanceFeedback: Boolean? = null,
+    val isRecurring: Boolean? = null,
+    val recurringRuleId: String? = null,
+    val accountId: String? = null,
+    val goalId: String? = null,
     val budgetCategoryId: String? = null,
+    val taxCategory: String? = null,
     val notes: String? = null
 )
 
@@ -1518,6 +1871,7 @@ data class LedgerFinancialGoal(
     val monthlyContribution: Double = 0.0,
     val priority: String = "medium",
     val notes: String? = null,
+    val milestones: List<LedgerGoalMilestone> = emptyList(),
     val createdAt: String = ""
 )
 
@@ -1540,7 +1894,10 @@ data class TaxDeduction(
     val taxYear: Int = 0,
     val name: String = "",
     val amount: Double = 0.0,
-    val category: String = "other"
+    val category: String = "other",
+    val notes: String? = null,
+    val receiptRef: String? = null,
+    val createdAt: String = ""
 )
 
 @Serializable
@@ -1574,8 +1931,17 @@ data class LedgerSubscription(
     val category: String = "",
     val amount: Double = 0.0,
     val billingCycle: String = "monthly",
+    val monthlyEquivalent: Double = 0.0,
     val status: String = "active",
-    val nextRenewalDate: String? = null
+    val nextRenewalDate: String? = null,
+    val trialEndsAt: String? = null,
+    val reminderDays: Int? = null,
+    val website: String? = null,
+    val notes: String? = null,
+    val color: String? = null,
+    val accountId: String? = null,
+    val createdAt: String = "",
+    val updatedAt: String = ""
 )
 
 @Serializable
@@ -1583,8 +1949,18 @@ data class LedgerInvestment(
     val id: String = "",
     val name: String = "",
     val ticker: String? = null,
+    val type: String = "stock",
+    val quantity: Double = 0.0,
+    val costBasis: Double = 0.0,
+    val currentPrice: Double = 0.0,
     val currentValue: Double = 0.0,
-    val costBasis: Double = 0.0
+    val totalCost: Double = 0.0,
+    val dividendsReceived: Double? = null,
+    val accountId: String? = null,
+    val notes: String? = null,
+    val purchasedAt: String? = null,
+    val lastUpdatedAt: String = "",
+    val createdAt: String = ""
 ) {
     val unrealizedGain: Double get() = currentValue - costBasis
     val unrealizedGainPct: Double get() = if (costBasis > 0) unrealizedGain / costBasis * 100 else 0.0
@@ -1608,16 +1984,21 @@ data class LedgerRetirementGoal(
 
 @Serializable
 data class LedgerNetWorthSnapshot(
+    val id: String = "",
     val date: String = "",
     val netWorth: Double = 0.0,
     val totalAssets: Double = 0.0,
-    val totalLiabilities: Double = 0.0
+    val totalLiabilities: Double = 0.0,
+    val note: String? = null
 )
 
 @Serializable
 data class LedgerCreditScore(
+    val id: String = "",
     val score: Int = 0,
-    val recordedAt: String = ""
+    val bureau: String = "fico",
+    val recordedAt: String = "",
+    val notes: String? = null
 )
 
 @Serializable
@@ -1630,10 +2011,21 @@ data class LedgerCreditCard(
 @Serializable
 data class LedgerInsurancePolicy(
     val id: String = "",
+    val name: String = "",
     val type: String = "health",
     val provider: String = "",
     val premium: Double = 0.0,
-    val frequency: String = "monthly"
+    val frequency: String = "monthly",
+    val monthlyPremium: Double = 0.0,
+    val coverageAmount: Double? = null,
+    val deductible: Double? = null,
+    val policyNumber: String? = null,
+    val nextRenewalDate: String = "",
+    val startDate: String = "",
+    val isActive: Boolean = true,
+    val notes: String? = null,
+    val createdAt: String = "",
+    val updatedAt: String = ""
 )
 
 // --- Scout ---

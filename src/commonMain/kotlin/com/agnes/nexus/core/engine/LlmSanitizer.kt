@@ -88,29 +88,34 @@ class LlmSanitizer {
     fun sanitize(content: String, retainSpacings: Boolean = false): SanitizedResult {
         if (content.isEmpty()) return SanitizedResult("")
 
+        // 0. Normalize LLM-hallucinated /action slash format → proper XML
+        // Some models emit `/action type="...">{...}` (slash-command style) instead of `<action type="...">{...}</action>`.
+        // Rewrite to `<action type="...">` so all downstream regexes handle it uniformly.
+        val normalized = content.replace(Regex("""/action(\s+type=["'][^"']+["']>)"""), "<action$1")
+
         // 1. Extract thought content (first match wins, cross-matched tags supported)
-        val thoughtMatch = Regex("<thought>([\\s\\S]*?)</thought>").find(content)
-            ?: Regex("<thinking>([\\s\\S]*?)</thinking>").find(content)
-            ?: Regex("<think>([\\s\\S]*?)</think>").find(content)
-            ?: Regex("<thinking>([\\s\\S]*?)</thought>").find(content)
-            ?: Regex("<thought>([\\s\\S]*?)</thinking>").find(content)
-            ?: Regex("<think>([\\s\\S]*?)</thought>").find(content)
-            ?: Regex("<thought>([\\s\\S]*?)</think>").find(content)
+        val thoughtMatch = Regex("<thought>([\\s\\S]*?)</thought>").find(normalized)
+            ?: Regex("<thinking>([\\s\\S]*?)</thinking>").find(normalized)
+            ?: Regex("<think>([\\s\\S]*?)</think>").find(normalized)
+            ?: Regex("<thinking>([\\s\\S]*?)</thought>").find(normalized)
+            ?: Regex("<thought>([\\s\\S]*?)</thinking>").find(normalized)
+            ?: Regex("<think>([\\s\\S]*?)</thought>").find(normalized)
+            ?: Regex("<thought>([\\s\\S]*?)</think>").find(normalized)
         val thoughtText = thoughtMatch?.groupValues?.get(1)?.trim()
 
         // 2. Identify if currently thinking (unclosed tags, any closer counts)
-        val hasThoughtOpener = content.contains("<thought>") || content.contains("<think>") || content.contains("<thinking>")
-        val hasThoughtCloser = content.contains("</thought>") || content.contains("</think>") || content.contains("</thinking>")
+        val hasThoughtOpener = normalized.contains("<thought>") || normalized.contains("<think>") || normalized.contains("<thinking>")
+        val hasThoughtCloser = normalized.contains("</thought>") || normalized.contains("</think>") || normalized.contains("</thinking>")
         val isThinking = hasThoughtOpener && !hasThoughtCloser
 
         // Check if currently acting — unclosed <action type="..."> present with no </action> yet (streaming)
-        val actionOpenMatch = Regex("""<action\s+type=["']?([^"'\s>]+)["']?>[\s\S]*$""", RegexOption.IGNORE_CASE).find(content)
+        val actionOpenMatch = Regex("""<action\s+type=["']?([^"'\s>]+)["']?>[\s\S]*$""", RegexOption.IGNORE_CASE).find(normalized)
         val isActing = actionOpenMatch != null &&
-            content.lowercase().indexOf("</action>", actionOpenMatch.range.first) == -1
+            normalized.lowercase().indexOf("</action>", actionOpenMatch.range.first) == -1
         val currentActionType = actionOpenMatch?.groupValues?.get(1)
 
         // 3. Clean public text - replace closed tags with space
-        var publicText = content
+        var publicText = normalized
             .replace(Regex("<thought>[\\s\\S]*?</thought>"), " ")
             .replace(Regex("<think>[\\s\\S]*?</think>"), " ")
             .replace(Regex("<thinking>[\\s\\S]*?</thinking>"), " ")
@@ -163,7 +168,10 @@ class LlmSanitizer {
      * Extracts all <action> tags and returns them as ActionCall objects.
      */
     fun parseActions(content: String): List<ActionCall> {
-        val normalized = content.replace(Regex("[\\u201C\\u201D\\u2018\\u2019]"), "\"")
+        val normalized = content
+            .replace(Regex("[\\u201C\\u201D\\u2018\\u2019]"), "\"")
+            // Normalize /action slash-command format → proper XML before regex matching
+            .replace(Regex("""/action(\s+type=["'][^"']+["']>)"""), "<action\$1")
         val dedup = linkedMapOf<String, ActionCall>()
 
         val actionRegex = Regex("<action\\s+type=\"([^\"]+)\">([\\s\\S]*?)</action>", RegexOption.IGNORE_CASE)

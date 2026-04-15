@@ -61,12 +61,14 @@ class CognitiveEngine(
                 ""
             }
 
-            if (delta.isNotEmpty() || sanitized.isThinking) {
+            if (delta.isNotEmpty() || sanitized.isThinking || sanitized.isActing) {
                 emit(AgentResponse(
                     content = delta,
                     isStreaming = true,
                     internalThoughts = sanitized.internalThoughts,
-                    isThinking = sanitized.isThinking
+                    isThinking = sanitized.isThinking,
+                    isActing = sanitized.isActing,
+                    currentActionType = sanitized.currentActionType,
                 ))
                 publicTextAccumulated = nextPublicTotal
             }
@@ -127,5 +129,7 @@ data class AgentResponse(
     val actions: List<ActionCall> = emptyList(),
     val mutations: List<ExtractedMutation> = emptyList(),
     val isStreaming: Boolean = false,
-    val isThinking: Boolean = false
+    val isThinking: Boolean = false,
+    val isActing: Boolean = false,
+    val currentActionType: String? = null,
 )

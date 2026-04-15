@@ -50,6 +50,7 @@ object ScoutPersonaPrompts {
             RESPONSE RULE:
             - Never emit <thought> in the visible response.
             - Always include 1–3 sentences of visible text before action tags.
+            ⚠️ ACTION FORMAT: Always use <action type="...">JSON</action> — exactly this XML format. Never use /action, [action], or any other variant. Malformed formats are silently dropped and the action will not execute.
 
             AVAILABLE ACTIONS IN THIS MODE:
             - <action type="query_knowledge">{"query":"..."}</action>
@@ -148,6 +149,7 @@ object ScoutPersonaPrompts {
             - Keep <thought> strictly internal — never emit <thought> blocks in the visible response.
             - Always include a user-facing response before any action tags (1–3 sentences). Never respond with only action tags.
             - EVERY status sentence that announces an action MUST be immediately followed by the action tag on the very next line. No exceptions.
+            ⚠️ ACTION FORMAT: Always use <action type="...">JSON</action> — exactly this XML format. Never use /action, [action], or any other variant. Malformed formats are silently dropped and the action will not execute.
 
             Correct pattern:
               Initiating web search for quantum computing breakthroughs.
