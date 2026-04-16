@@ -105,8 +105,8 @@ if (typeof String.prototype.endsWith === 'undefined') {
   initMetadataForInterface(KtList, 'List', VOID, VOID, [Collection]);
   initMetadataForInterface(KtSet, 'Set', VOID, VOID, [Collection]);
   initMetadataForInterface(MutableIterable, 'MutableIterable');
-  initMetadataForInterface(KtMutableSet, 'MutableSet', VOID, VOID, [KtSet, MutableIterable, Collection]);
-  initMetadataForInterface(KtMutableList, 'MutableList', VOID, VOID, [KtList, MutableIterable, Collection]);
+  initMetadataForInterface(KtMutableSet, 'MutableSet', VOID, VOID, [KtSet, Collection, MutableIterable]);
+  initMetadataForInterface(KtMutableList, 'MutableList', VOID, VOID, [KtList, Collection, MutableIterable]);
   initMetadataForInterface(Entry, 'Entry');
   initMetadataForInterface(KtMap, 'Map');
   initMetadataForInterface(KtMutableMap, 'MutableMap', VOID, VOID, [KtMap]);
@@ -128,7 +128,7 @@ if (typeof String.prototype.endsWith === 'undefined') {
   initMetadataForInterface(Comparator, 'Comparator');
   initMetadataForObject(Unit, 'Unit');
   initMetadataForClass(AbstractCollection, 'AbstractCollection', VOID, VOID, [Collection]);
-  initMetadataForClass(AbstractMutableCollection, 'AbstractMutableCollection', VOID, AbstractCollection, [AbstractCollection, MutableIterable, Collection]);
+  initMetadataForClass(AbstractMutableCollection, 'AbstractMutableCollection', VOID, AbstractCollection, [AbstractCollection, Collection, MutableIterable]);
   initMetadataForClass(IteratorImpl, 'IteratorImpl');
   initMetadataForClass(ListIteratorImpl, 'ListIteratorImpl', VOID, IteratorImpl);
   initMetadataForClass(AbstractMutableList, 'AbstractMutableList', VOID, AbstractMutableCollection, [AbstractMutableCollection, KtMutableList]);
@@ -141,7 +141,7 @@ if (typeof String.prototype.endsWith === 'undefined') {
   initMetadataForClass(ArrayList, 'ArrayList', ArrayList_init_$Create$, AbstractMutableList, [AbstractMutableList, KtMutableList, RandomAccess]);
   initMetadataForClass(HashMap, 'HashMap', HashMap_init_$Create$, AbstractMutableMap, [AbstractMutableMap, KtMutableMap]);
   initMetadataForClass(HashMapKeys, 'HashMapKeys', VOID, AbstractMutableSet, [KtMutableSet, AbstractMutableSet]);
-  initMetadataForClass(HashMapValues, 'HashMapValues', VOID, AbstractMutableCollection, [MutableIterable, Collection, AbstractMutableCollection]);
+  initMetadataForClass(HashMapValues, 'HashMapValues', VOID, AbstractMutableCollection, [Collection, MutableIterable, AbstractMutableCollection]);
   initMetadataForClass(HashMapEntrySetBase, 'HashMapEntrySetBase', VOID, AbstractMutableSet, [KtMutableSet, AbstractMutableSet]);
   initMetadataForClass(HashMapEntrySet, 'HashMapEntrySet', VOID, HashMapEntrySetBase);
   initMetadataForClass(HashMapKeysDefault$iterator$1);
