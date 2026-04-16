@@ -1,9 +1,13 @@
 package com.agnes.nexus.core.engine
 
 import com.agnes.nexus.core.domain.model.GlobalSoul
+import com.agnes.nexus.core.domain.models.AtlasProfile
+import com.agnes.nexus.core.domain.models.LedgerProfile
 import com.agnes.nexus.core.domain.models.Message
 import com.agnes.nexus.core.domain.models.MessageRole
 import com.agnes.nexus.core.domain.models.NeuralStateVector
+import com.agnes.nexus.core.domain.models.SomaProfile
+import com.agnes.nexus.core.domain.models.TrainerProfile
 import io.ktor.client.*
 import io.ktor.client.engine.js.*
 import kotlinx.coroutines.CoroutineScope
@@ -12,7 +16,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.*
+import kotlinx.serialization.serializer
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -649,9 +655,15 @@ class CognitiveEngineJs {
     /**
      * Parses a JSON object string into a [Map]<[String], [Any]?> for [CognitiveEngine.chatWithMemory].
      *
-     * All JSON primitives are extracted as [String] values; `null` JSON entries map to `null`.
-     * Non-primitive values (arrays, nested objects) are serialized back to their JSON string
-     * representation so PersonaFactory can read them without further parsing.
+     * Known typed-profile keys ([TYPED_PROFILE_SERIALIZERS]) are decoded into their concrete Kotlin
+     * data classes so `DefaultPersonaFactory`'s `as? AtlasProfile` / `as? TrainerProfile` /
+     * `as? SomaProfile` / `as? LedgerProfile` casts succeed and live task/goal/habit/etc. data
+     * reaches the prompt. Without this revival step, those casts return null and every persona
+     * falls back to a data-less template — the LLM then truthfully reports "clean slate."
+     *
+     * Unknown object/array keys are preserved as their JSON string (original behavior) for
+     * consumers like `SomaPersonaPrompts.context(...)` that do string-template interpolation.
+     * Primitives are extracted as [String]; JSON `null` maps to `null`.
      */
     private fun parseModuleContextJson(json: String): Map<String, Any?> {
         if (json.isBlank() || json == "{}") return emptyMap()
@@ -661,12 +673,36 @@ class CognitiveEngineJs {
                     v is JsonNull -> null
                     v is JsonPrimitive && v.isString -> v.content
                     v is JsonPrimitive -> v.content  // numbers, booleans as strings
-                    else -> v.toString()             // nested objects/arrays as JSON string
+                    else -> decodeTypedProfileOrString(k, v)
                 }
             }
         } catch (_: Exception) {
             emptyMap()
         }
+    }
+
+    /**
+     * If [key] is a known typed-profile key, attempt to decode [element] into its Kotlin
+     * data class via `kotlinx.serialization`. Falls back to the JSON string representation
+     * on unknown keys or decode failure (so string-template consumers keep working and a
+     * malformed profile does not crash the whole context bridge).
+     */
+    private fun decodeTypedProfileOrString(key: String, element: JsonElement): Any {
+        val serializer = TYPED_PROFILE_SERIALIZERS[key]
+        if (serializer != null) {
+            try {
+                val decoded = LENIENT_JSON.decodeFromJsonElement(serializer, element)
+                if (decoded != null) return decoded
+            } catch (e: Throwable) {
+                // Silent swallow is what let the original bug sit for so long — make it audible.
+                console.warn(
+                    "[CognitiveEngineJs] Failed to decode moduleContext[\"$key\"] " +
+                        "into its typed profile (${e.message}); falling back to JSON string. " +
+                        "Persona will not see live data for this key."
+                )
+            }
+        }
+        return element.toString()
     }
 
     /** Parses a JSON-encoded GlobalSoul from the TypeScript layer. Returns null for blank/empty/malformed input. */
@@ -753,7 +789,30 @@ class CognitiveEngineJs {
     // ── Constants ─────────────────────────────────────────────────────────────
 
     private companion object {
-        val LENIENT_JSON = Json { ignoreUnknownKeys = true; coerceInputValues = true }
+        val LENIENT_JSON = Json {
+            ignoreUnknownKeys = true
+            coerceInputValues = true
+            isLenient = true
+            explicitNulls = false
+        }
+
+        /**
+         * moduleContext keys whose values are typed Kotlin data classes rather than opaque blobs.
+         *
+         * Entries listed here are deserialized from their JSON form at the JS/KMP boundary, so
+         * `DefaultPersonaFactory` (common code) can consume them directly via `as? XProfile`.
+         * Add new keys here whenever a module starts handing a typed profile through
+         * `moduleContext` — without this registration, the value round-trips as a JSON String
+         * and the persona's typed cast silently yields null.
+         */
+        val TYPED_PROFILE_SERIALIZERS: Map<String, KSerializer<*>> = mapOf(
+            "atlas_profile" to serializer<AtlasProfile>(),
+            "titan_profile" to serializer<TrainerProfile>(),
+            "titan_soma_profile" to serializer<SomaProfile>(),
+            "soma_profile" to serializer<SomaProfile>(),
+            "ledger_profile" to serializer<LedgerProfile>(),
+        )
+
         val MOCK_FINAL_RESPONSE = FinalResponseJs(
             content = "Neural link simulation active.",
             thoughts = null,
