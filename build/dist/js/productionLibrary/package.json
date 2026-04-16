@@ -1,6 +1,6 @@
 {
   "name": "cortex",
-  "version": "2.0.1",
+  "version": "1.0.0",
   "main": "cortex.js",
   "types": "cortex.d.ts",
   "devDependencies": {},
