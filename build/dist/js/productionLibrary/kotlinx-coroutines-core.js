@@ -206,6 +206,11 @@
   initMetadataForCoroutine($hasNextCOROUTINE$6, CoroutineImpl);
   initMetadataForClass(SendBroadcast, 'SendBroadcast', VOID, VOID, [Waiter]);
   initMetadataForClass(BufferedChannelIterator, 'BufferedChannelIterator', VOID, VOID, [Waiter], [0, 3]);
+  function close$default(cause, $super) {
+    cause = cause === VOID ? null : cause;
+    return $super === VOID ? this.m13(cause) : $super.m13.call(this, cause);
+  }
+  initMetadataForInterface(SendChannel, 'SendChannel', VOID, VOID, VOID, [1]);
   function cancel$default_0(cause, $super) {
     cause = cause === VOID ? null : cause;
     var tmp;
@@ -218,12 +223,7 @@
     return tmp;
   }
   initMetadataForInterface(ReceiveChannel, 'ReceiveChannel', VOID, VOID, VOID, [0]);
-  function close$default(cause, $super) {
-    cause = cause === VOID ? null : cause;
-    return $super === VOID ? this.m13(cause) : $super.m13.call(this, cause);
-  }
-  initMetadataForInterface(SendChannel, 'SendChannel', VOID, VOID, VOID, [1]);
-  initMetadataForClass(BufferedChannel, 'BufferedChannel', VOID, VOID, [ReceiveChannel, SendChannel], [1, 4, 0, 3]);
+  initMetadataForClass(BufferedChannel, 'BufferedChannel', VOID, VOID, [SendChannel, ReceiveChannel], [1, 4, 0, 3]);
   initMetadataForClass(WaiterEB, 'WaiterEB');
   initMetadataForClass(ReceiveCatching, 'ReceiveCatching', VOID, VOID, [Waiter]);
   initMetadataForObject(Factory, 'Factory');
@@ -267,7 +267,7 @@
   initMetadataForClass(Symbol, 'Symbol');
   initMetadataForInterface(SelectInstance, 'SelectInstance');
   initMetadataForClass(ClauseData, 'ClauseData', VOID, VOID, VOID, [1]);
-  initMetadataForClass(SelectImplementation, 'SelectImplementation', VOID, VOID, [CancelHandler, Waiter, SelectInstance], [0, 2]);
+  initMetadataForClass(SelectImplementation, 'SelectImplementation', VOID, VOID, [CancelHandler, SelectInstance, Waiter], [0, 2]);
   initMetadataForClass(TrySelectDetailedResult, 'TrySelectDetailedResult', VOID, Enum);
   initMetadataForClass(SetTimeoutBasedDispatcher, 'SetTimeoutBasedDispatcher', VOID, CoroutineDispatcher, [CoroutineDispatcher, Delay], [1]);
   initMetadataForObject(NodeDispatcher, 'NodeDispatcher', VOID, SetTimeoutBasedDispatcher, VOID, [1]);
