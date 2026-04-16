@@ -338,6 +338,7 @@
   var toList_0 = kotlin_kotlin.$_$.kd;
   var firstOrNull_0 = kotlin_kotlin.$_$.yd;
   var Char = kotlin_kotlin.$_$.gg;
+  var getKClassFromExpression = kotlin_kotlin.$_$.f;
   var trimEnd_0 = kotlin_kotlin.$_$.vf;
   var listOfNotNull_0 = kotlin_kotlin.$_$.s7;
   var reversed_0 = kotlin_kotlin.$_$.ue;
@@ -366,6 +367,7 @@
   var Exception_init_$Create$ = kotlin_kotlin.$_$.p1;
   var defineProp = kotlin_kotlin.$_$.wa;
   var toList_1 = kotlin_kotlin.$_$.e9;
+  var serializer_1 = kotlin_org_jetbrains_kotlinx_kotlinx_serialization_core.$_$.u2;
   var Js_instance = kotlin_io_ktor_ktor_client_core.$_$.b;
   var HttpClient = kotlin_io_ktor_ktor_client_core.$_$.h;
   var toList_2 = kotlin_org_jetbrains_kotlinx_kotlinx_coroutines_core.$_$.b;
@@ -124399,6 +124401,77 @@
     }
     return tmp_0;
   }
+  function warnIfTypedProfileLostInTransit($this, moduleId, moduleContext) {
+    var tmp;
+    switch (moduleId) {
+      case 'atlas':
+        tmp = to('atlas_profile', 'AtlasProfile');
+        break;
+      case 'titan':
+        tmp = to('titan_profile', 'TrainerProfile');
+        break;
+      case 'ledger':
+        tmp = to('ledger_profile', 'LedgerProfile');
+        break;
+      case 'soma':
+        tmp = to('soma_profile', 'SomaProfile');
+        break;
+      default:
+        return Unit_instance;
+    }
+    var expected = tmp;
+    var key = expected.lg();
+    var typeName = expected.mg();
+    var tmp1_elvis_lhs = moduleContext.j2(key);
+    var tmp_0;
+    if (tmp1_elvis_lhs == null) {
+      return Unit_instance;
+    } else {
+      tmp_0 = tmp1_elvis_lhs;
+    }
+    var value = tmp_0;
+    var tmp_1;
+    switch (key) {
+      case 'atlas_profile':
+        tmp_1 = value instanceof AtlasProfile;
+        break;
+      case 'titan_profile':
+        tmp_1 = value instanceof TrainerProfile;
+        break;
+      case 'ledger_profile':
+        tmp_1 = value instanceof LedgerProfile;
+        break;
+      case 'soma_profile':
+        tmp_1 = value instanceof SomaProfile;
+        break;
+      default:
+        tmp_1 = false;
+        break;
+    }
+    var isAlreadyTyped = tmp_1;
+    if (isAlreadyTyped)
+      return Unit_instance;
+    var tmp_2;
+    if (typeof value === 'string') {
+      tmp_2 = startsWith(value, '{') || startsWith(value, '[');
+    } else {
+      tmp_2 = false;
+    }
+    var looksLikeRawJson = tmp_2;
+    var tmp_3;
+    if (looksLikeRawJson) {
+      tmp_3 = 'value is a raw JSON String \u2014 typed revival failed at the JS/KMP bridge (check earlier [CognitiveEngineJs] decode warning)';
+    } else {
+      if (typeof value === 'string') {
+        tmp_3 = 'value is a plain String \u2014 the JS layer may be sending a stringified blob instead of a structured object';
+      } else {
+        var tmp3_elvis_lhs = getKClassFromExpression(value).za();
+        tmp_3 = 'value is a ' + (tmp3_elvis_lhs == null ? 'unknown type' : tmp3_elvis_lhs) + ' (not a ' + typeName + ') \u2014 check that the JS hook passes the structured profile object, not a projection or wrapper';
+      }
+    }
+    var hint = tmp_3;
+    println('[PersonaFactory] WARNING: moduleContext["' + key + '"] should be a ' + typeName + ' but ' + hint + '. ' + (moduleId + ' persona will receive NO live data and may report an empty state.'));
+  }
   function fallbackBase($this, moduleId, identity) {
     switch (moduleId) {
       case 'agnes':
@@ -124418,75 +124491,99 @@
   function buildModuleContextBlock($this, moduleId, context) {
     if (context.p())
       return '';
-    var tmp;
+    var tmp = context.j2(moduleId + '_profile_status');
+    var profileStatus = (!(tmp == null) ? typeof tmp === 'string' : false) ? tmp : null;
+    if (!(profileStatus == null) && !(profileStatus === 'loaded')) {
+      println('[PersonaFactory] ' + moduleId + ' chat firing with ' + moduleId + '_profile_status="' + profileStatus + '" \u2014 ' + "persona will be given a data-status block (no live profile). If you expected loaded data, the profile subscription likely hadn't hydrated before the chat was sent.");
+      var statusBlock;
+      switch (profileStatus) {
+        case 'loading':
+          statusBlock = "[MODULE DATA STATUS]\nThe user's data for this module is currently loading.\nDo NOT assume any profile data is available. If the user asks about their data, let them know it is still being fetched and suggest trying again shortly.\nYou may still answer general questions.";
+          break;
+        case 'unavailable':
+          statusBlock = "[MODULE DATA STATUS]\nThe user's profile data is temporarily unavailable due to a connectivity or access issue.\nDo NOT fabricate or hallucinate any data. If the user asks about their data, explain that it could not be loaded right now and suggest they check their connection or try again later.\nYou may still answer general questions.";
+          break;
+        case 'empty':
+          statusBlock = "[MODULE DATA STATUS]\nThe user has no profile data yet for this module. This is likely a new user who hasn't completed setup.\nGuide them through getting started rather than referring to nonexistent data.";
+          break;
+        default:
+          statusBlock = '';
+          break;
+      }
+      // Inline function 'kotlin.text.isNotBlank' call
+      var this_0 = statusBlock;
+      if (!isBlank(this_0))
+        return statusBlock;
+    }
+    var tmp_0;
     switch (moduleId) {
       case 'agnes':
-        var tmp_0 = context.j2('onboardingComplete');
-        var tmp1_elvis_lhs = (!(tmp_0 == null) ? typeof tmp_0 === 'boolean' : false) ? tmp_0 : null;
-        var onboardingComplete = tmp1_elvis_lhs == null ? true : tmp1_elvis_lhs;
+        var tmp_1 = context.j2('onboardingComplete');
+        var tmp2_elvis_lhs = (!(tmp_1 == null) ? typeof tmp_1 === 'boolean' : false) ? tmp_1 : null;
+        var onboardingComplete = tmp2_elvis_lhs == null ? true : tmp2_elvis_lhs;
         if (!onboardingComplete)
           return buildAgnesOnboardingContextBlock($this, context);
-        var tmp2_elvis_lhs = context.j2('backgroundSummary');
-        var tmp3_elvis_lhs = tmp2_elvis_lhs == null ? context.j2('childhood') : tmp2_elvis_lhs;
-        var background = tmp3_elvis_lhs == null ? 'Unknown' : tmp3_elvis_lhs;
-        var tmp4_safe_receiver = context.j2('struggles');
-        var tmp_1;
-        if (tmp4_safe_receiver == null) {
-          tmp_1 = null;
-        } else {
-          // Inline function 'kotlin.let' call
-          tmp_1 = isInterface(tmp4_safe_receiver, KtList) ? tmp4_safe_receiver : null;
-        }
-
-        var tmp5_safe_receiver = tmp_1;
-        var tmp6_elvis_lhs = tmp5_safe_receiver == null ? null : joinToString(tmp5_safe_receiver, ', ');
-        var struggles = tmp6_elvis_lhs == null ? 'None stated' : tmp6_elvis_lhs;
-        var tmp7_safe_receiver = context.j2('goals');
+        var tmp3_elvis_lhs = context.j2('backgroundSummary');
+        var tmp4_elvis_lhs = tmp3_elvis_lhs == null ? context.j2('childhood') : tmp3_elvis_lhs;
+        var background = tmp4_elvis_lhs == null ? 'Unknown' : tmp4_elvis_lhs;
+        var tmp5_safe_receiver = context.j2('struggles');
         var tmp_2;
-        if (tmp7_safe_receiver == null) {
+        if (tmp5_safe_receiver == null) {
           tmp_2 = null;
         } else {
           // Inline function 'kotlin.let' call
-          tmp_2 = isInterface(tmp7_safe_receiver, KtList) ? tmp7_safe_receiver : null;
+          tmp_2 = isInterface(tmp5_safe_receiver, KtList) ? tmp5_safe_receiver : null;
         }
 
-        var tmp8_safe_receiver = tmp_2;
-        var tmp9_elvis_lhs = tmp8_safe_receiver == null ? null : joinToString(tmp8_safe_receiver, ', ');
-        var goals = tmp9_elvis_lhs == null ? 'None stated' : tmp9_elvis_lhs;
-        var tmp10_elvis_lhs = context.j2('communicationStyle');
-        var style = tmp10_elvis_lhs == null ? 'Standard' : tmp10_elvis_lhs;
-        tmp = trimIndent('\n                [ABOUT YOUR CLIENT]\n                Background: ' + toString(background) + '\n                Dealing with: ' + struggles + '\n                Therapeutic Goals: ' + goals + '\n                Communication Style: ' + toString(style) + '\n                \n                HOW TO USE THIS:\n                You already know this person. You\'ve done intake together. Don\'t re-introduce yourself or re-ask basic questions. Pick up naturally \u2014 like a therapist who remembers their client.\n                \n                NEVER say "Based on our established baseline" or "I have access to your context". You REMEMBER them.\n                ');
+        var tmp6_safe_receiver = tmp_2;
+        var tmp7_elvis_lhs = tmp6_safe_receiver == null ? null : joinToString(tmp6_safe_receiver, ', ');
+        var struggles = tmp7_elvis_lhs == null ? 'None stated' : tmp7_elvis_lhs;
+        var tmp8_safe_receiver = context.j2('goals');
+        var tmp_3;
+        if (tmp8_safe_receiver == null) {
+          tmp_3 = null;
+        } else {
+          // Inline function 'kotlin.let' call
+          tmp_3 = isInterface(tmp8_safe_receiver, KtList) ? tmp8_safe_receiver : null;
+        }
+
+        var tmp9_safe_receiver = tmp_3;
+        var tmp10_elvis_lhs = tmp9_safe_receiver == null ? null : joinToString(tmp9_safe_receiver, ', ');
+        var goals = tmp10_elvis_lhs == null ? 'None stated' : tmp10_elvis_lhs;
+        var tmp11_elvis_lhs = context.j2('communicationStyle');
+        var style = tmp11_elvis_lhs == null ? 'Standard' : tmp11_elvis_lhs;
+        tmp_0 = trimIndent('\n                [ABOUT YOUR CLIENT]\n                Background: ' + toString(background) + '\n                Dealing with: ' + struggles + '\n                Therapeutic Goals: ' + goals + '\n                Communication Style: ' + toString(style) + '\n                \n                HOW TO USE THIS:\n                You already know this person. You\'ve done intake together. Don\'t re-introduce yourself or re-ask basic questions. Pick up naturally \u2014 like a therapist who remembers their client.\n                \n                NEVER say "Based on our established baseline" or "I have access to your context". You REMEMBER them.\n                ');
         break;
       case 'atlas':
-        tmp = buildAtlasOnboardingContextBlock($this, context);
+        tmp_0 = buildAtlasOnboardingContextBlock($this, context);
         break;
       case 'ledger':
-        var tmp_3 = context.j2('onboardingComplete');
-        var tmp11_elvis_lhs = (!(tmp_3 == null) ? typeof tmp_3 === 'boolean' : false) ? tmp_3 : null;
-        var onboardingComplete_0 = tmp11_elvis_lhs == null ? true : tmp11_elvis_lhs;
+        var tmp_4 = context.j2('onboardingComplete');
+        var tmp12_elvis_lhs = (!(tmp_4 == null) ? typeof tmp_4 === 'boolean' : false) ? tmp_4 : null;
+        var onboardingComplete_0 = tmp12_elvis_lhs == null ? true : tmp12_elvis_lhs;
         if (!onboardingComplete_0)
           return buildLedgerOnboardingContextBlock($this, context);
-        var tmp_4 = context.j2('ledger_profile');
-        var profile = tmp_4 instanceof LedgerProfile ? tmp_4 : null;
-        tmp = !(profile == null) ? buildLedgerRuntimeContextFromProfile($this, profile) : '';
+        var tmp_5 = context.j2('ledger_profile');
+        var profile = tmp_5 instanceof LedgerProfile ? tmp_5 : null;
+        tmp_0 = !(profile == null) ? buildLedgerRuntimeContextFromProfile($this, profile) : '';
         break;
       case 'titan':
-        tmp = buildTitanOnboardingContextBlock($this, context);
+        tmp_0 = buildTitanOnboardingContextBlock($this, context);
         break;
       case 'scout':
-        tmp = buildScoutOnboardingContextBlock($this, context);
+        tmp_0 = buildScoutOnboardingContextBlock($this, context);
         break;
       case 'forge':
-        tmp = buildForgeOnboardingContextBlock($this, context);
+        tmp_0 = buildForgeOnboardingContextBlock($this, context);
         break;
       case 'orchestrator':
-        tmp = buildOrchestratorOnboardingContextBlock($this, context);
+        tmp_0 = buildOrchestratorOnboardingContextBlock($this, context);
         break;
       default:
-        tmp = '';
+        tmp_0 = '';
         break;
     }
-    return tmp;
+    return tmp_0;
   }
   function buildAtlasOnboardingContextBlock($this, context) {
     var tmp = context.j2('onboardingComplete');
@@ -125202,6 +125299,7 @@
   protoOf(DefaultPersonaFactory).wdq = function (moduleId, identity, nsv, moduleContext, longTermSummary, globalSoul) {
     var personaPrompt = PersonaPromptCatalog_getInstance().pdx(moduleId);
     var baseRole = baseRoleFromContext(this, moduleContext);
+    warnIfTypedProfileLostInTransit(this, moduleId, moduleContext);
     var tmp;
     switch (moduleId) {
       case 'titan':
@@ -138243,6 +138341,8 @@
   function CognitiveEngineJs$Companion$LENIENT_JSON$lambda($this$Json) {
     $this$Json.u3z_1 = true;
     $this$Json.y3z_1 = true;
+    $this$Json.v3z_1 = true;
+    $this$Json.t3z_1 = false;
     return Unit_instance;
   }
   function CognitiveEngineJs$chat$slambda$slambda($onChunk, $onComplete, this$0, resultContinuation) {
@@ -138569,7 +138669,7 @@
             if (v instanceof JsonPrimitive) {
               tmp_0 = v.f41();
             } else {
-              tmp_0 = toString(v);
+              tmp_0 = decodeTypedProfileOrString($this, k, v);
             }
           }
         }
@@ -138589,6 +138689,24 @@
       tmp = tmp_2;
     }
     return tmp;
+  }
+  function decodeTypedProfileOrString($this, key, element) {
+    var serializer = Companion_getInstance_317().zel_1.j2(key);
+    if (!(serializer == null)) {
+      try {
+        var decoded = Companion_getInstance_317().yel_1.b3z(serializer, element);
+        if (!(decoded == null))
+          return decoded;
+      } catch ($p) {
+        if ($p instanceof Error) {
+          var e = $p;
+          console.warn('[CognitiveEngineJs] Failed to decode moduleContext["' + key + '"] ' + ('into its typed profile (' + e.message + '); falling back to JSON string. ') + 'Persona will not see live data for this key.');
+        } else {
+          throw $p;
+        }
+      }
+    }
+    return toString(element);
   }
   function parseGlobalSoulJson($this, json) {
     if (isBlank(json) || json === '{}')
@@ -138616,11 +138734,11 @@
     return tmp;
   }
   function PassthroughPersonaFactory($outer, systemPrompt) {
-    this.bem_1 = $outer;
-    this.aem_1 = systemPrompt;
+    this.cem_1 = $outer;
+    this.bem_1 = systemPrompt;
   }
   protoOf(PassthroughPersonaFactory).wdq = function (moduleId, identity, nsv, moduleContext, longTermSummary, globalSoul) {
-    return this.aem_1;
+    return this.bem_1;
   };
   function serializeActions($this, actions) {
     if (actions.p())
@@ -138678,7 +138796,33 @@
     Companion_instance_313 = this;
     var tmp = this;
     tmp.yel_1 = Json(VOID, CognitiveEngineJs$Companion$LENIENT_JSON$lambda);
-    this.zel_1 = new FinalResponseJs('Neural link simulation active.', null, '[]', '[]');
+    var tmp_0 = this;
+    // Inline function 'kotlinx.serialization.serializer' call
+    // Inline function 'kotlinx.serialization.internal.cast' call
+    var this_0 = serializer_1(createKType(getKClass(AtlasProfile), arrayOf([]), false));
+    var tmp$ret$1 = isInterface(this_0, KSerializer) ? this_0 : THROW_CCE();
+    var tmp_1 = to('atlas_profile', tmp$ret$1);
+    // Inline function 'kotlinx.serialization.serializer' call
+    // Inline function 'kotlinx.serialization.internal.cast' call
+    var this_1 = serializer_1(createKType(getKClass(TrainerProfile), arrayOf([]), false));
+    var tmp$ret$3 = isInterface(this_1, KSerializer) ? this_1 : THROW_CCE();
+    var tmp_2 = to('titan_profile', tmp$ret$3);
+    // Inline function 'kotlinx.serialization.serializer' call
+    // Inline function 'kotlinx.serialization.internal.cast' call
+    var this_2 = serializer_1(createKType(getKClass(SomaProfile), arrayOf([]), false));
+    var tmp$ret$5 = isInterface(this_2, KSerializer) ? this_2 : THROW_CCE();
+    var tmp_3 = to('titan_soma_profile', tmp$ret$5);
+    // Inline function 'kotlinx.serialization.serializer' call
+    // Inline function 'kotlinx.serialization.internal.cast' call
+    var this_3 = serializer_1(createKType(getKClass(SomaProfile), arrayOf([]), false));
+    var tmp$ret$7 = isInterface(this_3, KSerializer) ? this_3 : THROW_CCE();
+    var tmp_4 = to('soma_profile', tmp$ret$7);
+    // Inline function 'kotlinx.serialization.serializer' call
+    // Inline function 'kotlinx.serialization.internal.cast' call
+    var this_4 = serializer_1(createKType(getKClass(LedgerProfile), arrayOf([]), false));
+    var tmp$ret$9 = isInterface(this_4, KSerializer) ? this_4 : THROW_CCE();
+    tmp_0.zel_1 = mapOf([tmp_1, tmp_2, tmp_3, tmp_4, to('ledger_profile', tmp$ret$9)]);
+    this.aem_1 = new FinalResponseJs('Neural link simulation active.', null, '[]', '[]');
   }
   var Companion_instance_313;
   function Companion_getInstance_317() {
@@ -138687,13 +138831,13 @@
     return Companion_instance_313;
   }
   function sam$kotlinx_coroutines_flow_FlowCollector$0_0(function_0) {
-    this.cem_1 = function_0;
+    this.dem_1 = function_0;
   }
   protoOf(sam$kotlinx_coroutines_flow_FlowCollector$0_0).g15 = function (value, $completion) {
-    return this.cem_1(value, $completion);
+    return this.dem_1(value, $completion);
   };
   protoOf(sam$kotlinx_coroutines_flow_FlowCollector$0_0).o3 = function () {
-    return this.cem_1;
+    return this.dem_1;
   };
   protoOf(sam$kotlinx_coroutines_flow_FlowCollector$0_0).equals = function (other) {
     var tmp;
@@ -138714,13 +138858,13 @@
     return hashCode(this.o3());
   };
   function sam$kotlinx_coroutines_flow_FlowCollector$0_1(function_0) {
-    this.dem_1 = function_0;
+    this.eem_1 = function_0;
   }
   protoOf(sam$kotlinx_coroutines_flow_FlowCollector$0_1).g15 = function (value, $completion) {
-    return this.dem_1(value, $completion);
+    return this.eem_1(value, $completion);
   };
   protoOf(sam$kotlinx_coroutines_flow_FlowCollector$0_1).o3 = function () {
-    return this.dem_1;
+    return this.eem_1;
   };
   protoOf(sam$kotlinx_coroutines_flow_FlowCollector$0_1).equals = function (other) {
     var tmp;
@@ -138741,13 +138885,13 @@
     return hashCode(this.o3());
   };
   function sam$kotlinx_coroutines_flow_FlowCollector$0_2(function_0) {
-    this.eem_1 = function_0;
+    this.fem_1 = function_0;
   }
   protoOf(sam$kotlinx_coroutines_flow_FlowCollector$0_2).g15 = function (value, $completion) {
-    return this.eem_1(value, $completion);
+    return this.fem_1(value, $completion);
   };
   protoOf(sam$kotlinx_coroutines_flow_FlowCollector$0_2).o3 = function () {
-    return this.eem_1;
+    return this.fem_1;
   };
   protoOf(sam$kotlinx_coroutines_flow_FlowCollector$0_2).equals = function (other) {
     var tmp;
@@ -138768,12 +138912,12 @@
     return hashCode(this.o3());
   };
   function CognitiveEngineJs$initWithCredentialStore$slambda($store, $isMockMode, this$0, $preferredModel, $onReady, $onError, resultContinuation) {
-    this.nem_1 = $store;
-    this.oem_1 = $isMockMode;
-    this.pem_1 = this$0;
-    this.qem_1 = $preferredModel;
-    this.rem_1 = $onReady;
-    this.sem_1 = $onError;
+    this.oem_1 = $store;
+    this.pem_1 = $isMockMode;
+    this.qem_1 = this$0;
+    this.rem_1 = $preferredModel;
+    this.sem_1 = $onReady;
+    this.tem_1 = $onError;
     CoroutineImpl.call(this, resultContinuation);
   }
   protoOf(CognitiveEngineJs$initWithCredentialStore$slambda).k1a = function ($this$launch, $completion) {
@@ -138795,7 +138939,7 @@
             this.c9_1 = 3;
             this.c9_1 = 2;
             this.b9_1 = 1;
-            suspendResult = this.nem_1.yem(this);
+            suspendResult = this.oem_1.zem(this);
             if (suspendResult === get_COROUTINE_SUSPENDED()) {
               return suspendResult;
             }
@@ -138803,25 +138947,25 @@
             continue $sm;
           case 1:
             var keys = suspendResult;
-            if (!keys.udo() && !this.oem_1) {
-              this.pem_1.ben_1 = true;
+            if (!keys.udo() && !this.pem_1) {
+              this.qem_1.cen_1 = true;
             }
 
-            var keyProvider = this.nem_1.een();
+            var keyProvider = this.oem_1.fen();
             var httpClient = HttpClient(Js_instance);
             var transport = new KtorLlmTransport(httpClient);
             var tmp_0;
-            var this_0 = this.qem_1;
+            var this_0 = this.rem_1;
             if (!isBlank(this_0)) {
-              tmp_0 = new LlmClient(keyProvider, transport, this.qem_1);
+              tmp_0 = new LlmClient(keyProvider, transport, this.rem_1);
             } else {
               tmp_0 = new LlmClient(keyProvider, transport);
             }
 
             var client = tmp_0;
-            this.pem_1.aen_1 = client;
-            this.pem_1.zem_1 = new CognitiveEngine(client, new DefaultPersonaFactory(), new LlmSanitizer());
-            this.rem_1();
+            this.qem_1.ben_1 = client;
+            this.qem_1.aen_1 = new CognitiveEngine(client, new DefaultPersonaFactory(), new LlmSanitizer());
+            this.sem_1();
             this.c9_1 = 3;
             this.b9_1 = 4;
             continue $sm;
@@ -138837,7 +138981,7 @@
               if (tmp_2 instanceof Error) {
                 var e = this.e9_1;
                 var tmp0_elvis_lhs = e.message;
-                this.sem_1(tmp0_elvis_lhs == null ? 'Credential store initialization failed' : tmp0_elvis_lhs);
+                this.tem_1(tmp0_elvis_lhs == null ? 'Credential store initialization failed' : tmp0_elvis_lhs);
                 this.b9_1 = 4;
                 continue $sm;
               } else {
@@ -138863,8 +139007,8 @@
      while (true);
   };
   protoOf(CognitiveEngineJs$initWithCredentialStore$slambda).l1a = function ($this$launch, completion) {
-    var i = new CognitiveEngineJs$initWithCredentialStore$slambda(this.nem_1, this.oem_1, this.pem_1, this.qem_1, this.rem_1, this.sem_1, completion);
-    i.tem_1 = $this$launch;
+    var i = new CognitiveEngineJs$initWithCredentialStore$slambda(this.oem_1, this.pem_1, this.qem_1, this.rem_1, this.sem_1, this.tem_1, completion);
+    i.uem_1 = $this$launch;
     return i;
   };
   function CognitiveEngineJs$initWithCredentialStore$slambda_0($store, $isMockMode, this$0, $preferredModel, $onReady, $onError, resultContinuation) {
@@ -138876,17 +139020,17 @@
     return l;
   }
   function CognitiveEngineJs$chat$slambda($currentEngine, $moduleId, $userMessage, $history, $nsv, $userIdentity, $globalSoul, $onError, $onChunk, $onComplete, this$0, resultContinuation) {
-    this.nen_1 = $currentEngine;
-    this.oen_1 = $moduleId;
-    this.pen_1 = $userMessage;
-    this.qen_1 = $history;
-    this.ren_1 = $nsv;
-    this.sen_1 = $userIdentity;
-    this.ten_1 = $globalSoul;
-    this.uen_1 = $onError;
-    this.ven_1 = $onChunk;
-    this.wen_1 = $onComplete;
-    this.xen_1 = this$0;
+    this.oen_1 = $currentEngine;
+    this.pen_1 = $moduleId;
+    this.qen_1 = $userMessage;
+    this.ren_1 = $history;
+    this.sen_1 = $nsv;
+    this.ten_1 = $userIdentity;
+    this.uen_1 = $globalSoul;
+    this.ven_1 = $onError;
+    this.wen_1 = $onChunk;
+    this.xen_1 = $onComplete;
+    this.yen_1 = this$0;
     CoroutineImpl.call(this, resultContinuation);
   }
   protoOf(CognitiveEngineJs$chat$slambda).k1a = function ($this$launch, $completion) {
@@ -138908,8 +139052,8 @@
             this.c9_1 = 3;
             this.c9_1 = 2;
             this.b9_1 = 1;
-            var tmp_0 = this.nen_1.qdr(this.oen_1, this.pen_1, this.qen_1, this.ren_1, this.sen_1, VOID, VOID, VOID, VOID, this.ten_1);
-            var tmp_1 = CognitiveEngineJs$chat$slambda$slambda_0(this.ven_1, this.wen_1, this.xen_1, null);
+            var tmp_0 = this.oen_1.qdr(this.pen_1, this.qen_1, this.ren_1, this.sen_1, this.ten_1, VOID, VOID, VOID, VOID, this.uen_1);
+            var tmp_1 = CognitiveEngineJs$chat$slambda$slambda_0(this.wen_1, this.xen_1, this.yen_1, null);
             suspendResult = tmp_0.p14(new sam$kotlinx_coroutines_flow_FlowCollector$0_0(tmp_1), this);
             if (suspendResult === get_COROUTINE_SUSPENDED()) {
               return suspendResult;
@@ -138932,7 +139076,7 @@
               if (tmp_3 instanceof Error) {
                 var e = this.e9_1;
                 var tmp0_elvis_lhs = e.message;
-                this.uen_1(tmp0_elvis_lhs == null ? 'Chat failed with an unknown error' : tmp0_elvis_lhs);
+                this.ven_1(tmp0_elvis_lhs == null ? 'Chat failed with an unknown error' : tmp0_elvis_lhs);
                 this.b9_1 = 4;
                 continue $sm;
               } else {
@@ -138958,8 +139102,8 @@
      while (true);
   };
   protoOf(CognitiveEngineJs$chat$slambda).l1a = function ($this$launch, completion) {
-    var i = new CognitiveEngineJs$chat$slambda(this.nen_1, this.oen_1, this.pen_1, this.qen_1, this.ren_1, this.sen_1, this.ten_1, this.uen_1, this.ven_1, this.wen_1, this.xen_1, completion);
-    i.yen_1 = $this$launch;
+    var i = new CognitiveEngineJs$chat$slambda(this.oen_1, this.pen_1, this.qen_1, this.ren_1, this.sen_1, this.ten_1, this.uen_1, this.ven_1, this.wen_1, this.xen_1, this.yen_1, completion);
+    i.zen_1 = $this$launch;
     return i;
   };
   function CognitiveEngineJs$chat$slambda_0($currentEngine, $moduleId, $userMessage, $history, $nsv, $userIdentity, $globalSoul, $onError, $onChunk, $onComplete, this$0, resultContinuation) {
@@ -138971,11 +139115,11 @@
     return l;
   }
   function CognitiveEngineJs$generateText$slambda($systemPrompt, $provider, $prompt, $onComplete, $onError, resultContinuation) {
-    this.heo_1 = $systemPrompt;
-    this.ieo_1 = $provider;
-    this.jeo_1 = $prompt;
-    this.keo_1 = $onComplete;
-    this.leo_1 = $onError;
+    this.ieo_1 = $systemPrompt;
+    this.jeo_1 = $provider;
+    this.keo_1 = $prompt;
+    this.leo_1 = $onComplete;
+    this.meo_1 = $onError;
     CoroutineImpl.call(this, resultContinuation);
   }
   protoOf(CognitiveEngineJs$generateText$slambda).k1a = function ($this$launch, $completion) {
@@ -138997,10 +139141,10 @@
             this.c9_1 = 3;
             this.c9_1 = 2;
             var tmp_0 = this;
-            var tmp0_elvis_lhs = this.heo_1;
-            tmp_0.neo_1 = tmp0_elvis_lhs == null ? 'You are a helpful assistant.' : tmp0_elvis_lhs;
+            var tmp0_elvis_lhs = this.ieo_1;
+            tmp_0.oeo_1 = tmp0_elvis_lhs == null ? 'You are a helpful assistant.' : tmp0_elvis_lhs;
             this.b9_1 = 1;
-            suspendResult = toList_2(this.ieo_1.rdv(this.neo_1, emptyList(), this.jeo_1), VOID, this);
+            suspendResult = toList_2(this.jeo_1.rdv(this.oeo_1, emptyList(), this.keo_1), VOID, this);
             if (suspendResult === get_COROUTINE_SUSPENDED()) {
               return suspendResult;
             }
@@ -139008,7 +139152,7 @@
             continue $sm;
           case 1:
             var tokens = suspendResult;
-            this.keo_1(joinToString(tokens, ''));
+            this.leo_1(joinToString(tokens, ''));
             this.c9_1 = 3;
             this.b9_1 = 4;
             continue $sm;
@@ -139024,7 +139168,7 @@
               if (tmp_2 instanceof Error) {
                 var e = this.e9_1;
                 var tmp1_elvis_lhs = e.message;
-                this.leo_1(tmp1_elvis_lhs == null ? 'Text generation failed with an unknown error' : tmp1_elvis_lhs);
+                this.meo_1(tmp1_elvis_lhs == null ? 'Text generation failed with an unknown error' : tmp1_elvis_lhs);
                 this.b9_1 = 4;
                 continue $sm;
               } else {
@@ -139050,8 +139194,8 @@
      while (true);
   };
   protoOf(CognitiveEngineJs$generateText$slambda).l1a = function ($this$launch, completion) {
-    var i = new CognitiveEngineJs$generateText$slambda(this.heo_1, this.ieo_1, this.jeo_1, this.keo_1, this.leo_1, completion);
-    i.meo_1 = $this$launch;
+    var i = new CognitiveEngineJs$generateText$slambda(this.ieo_1, this.jeo_1, this.keo_1, this.leo_1, this.meo_1, completion);
+    i.neo_1 = $this$launch;
     return i;
   };
   function CognitiveEngineJs$generateText$slambda_0($systemPrompt, $provider, $prompt, $onComplete, $onError, resultContinuation) {
@@ -139063,12 +139207,12 @@
     return l;
   }
   function CognitiveEngineJs$analyzeImage$slambda($provider, $systemPrompt, $prompt, $imageDataUrl, $onComplete, $onError, resultContinuation) {
-    this.weo_1 = $provider;
-    this.xeo_1 = $systemPrompt;
-    this.yeo_1 = $prompt;
-    this.zeo_1 = $imageDataUrl;
-    this.aep_1 = $onComplete;
-    this.bep_1 = $onError;
+    this.xeo_1 = $provider;
+    this.yeo_1 = $systemPrompt;
+    this.zeo_1 = $prompt;
+    this.aep_1 = $imageDataUrl;
+    this.bep_1 = $onComplete;
+    this.cep_1 = $onError;
     CoroutineImpl.call(this, resultContinuation);
   }
   protoOf(CognitiveEngineJs$analyzeImage$slambda).k1a = function ($this$launch, $completion) {
@@ -139090,7 +139234,7 @@
             this.c9_1 = 3;
             this.c9_1 = 2;
             this.b9_1 = 1;
-            suspendResult = toList_2(this.weo_1.idr(this.xeo_1, emptyList(), this.yeo_1, this.zeo_1), VOID, this);
+            suspendResult = toList_2(this.xeo_1.idr(this.yeo_1, emptyList(), this.zeo_1, this.aep_1), VOID, this);
             if (suspendResult === get_COROUTINE_SUSPENDED()) {
               return suspendResult;
             }
@@ -139098,7 +139242,7 @@
             continue $sm;
           case 1:
             var tokens = suspendResult;
-            this.aep_1(joinToString(tokens, ''));
+            this.bep_1(joinToString(tokens, ''));
             this.c9_1 = 3;
             this.b9_1 = 4;
             continue $sm;
@@ -139114,7 +139258,7 @@
               if (tmp_1 instanceof Error) {
                 var e = this.e9_1;
                 var tmp0_elvis_lhs = e.message;
-                this.bep_1(tmp0_elvis_lhs == null ? 'Image analysis failed with an unknown error' : tmp0_elvis_lhs);
+                this.cep_1(tmp0_elvis_lhs == null ? 'Image analysis failed with an unknown error' : tmp0_elvis_lhs);
                 this.b9_1 = 4;
                 continue $sm;
               } else {
@@ -139140,8 +139284,8 @@
      while (true);
   };
   protoOf(CognitiveEngineJs$analyzeImage$slambda).l1a = function ($this$launch, completion) {
-    var i = new CognitiveEngineJs$analyzeImage$slambda(this.weo_1, this.xeo_1, this.yeo_1, this.zeo_1, this.aep_1, this.bep_1, completion);
-    i.cep_1 = $this$launch;
+    var i = new CognitiveEngineJs$analyzeImage$slambda(this.xeo_1, this.yeo_1, this.zeo_1, this.aep_1, this.bep_1, this.cep_1, completion);
+    i.dep_1 = $this$launch;
     return i;
   };
   function CognitiveEngineJs$analyzeImage$slambda_0($provider, $systemPrompt, $prompt, $imageDataUrl, $onComplete, $onError, resultContinuation) {
@@ -139153,16 +139297,16 @@
     return l;
   }
   function CognitiveEngineJs$chatWithContext$slambda($engine, $moduleId, $userMessage, $history, $memoryContext, $longTermSummary, $onError, $onChunk, $onComplete, this$0, resultContinuation) {
-    this.lep_1 = $engine;
-    this.mep_1 = $moduleId;
-    this.nep_1 = $userMessage;
-    this.oep_1 = $history;
-    this.pep_1 = $memoryContext;
-    this.qep_1 = $longTermSummary;
-    this.rep_1 = $onError;
-    this.sep_1 = $onChunk;
-    this.tep_1 = $onComplete;
-    this.uep_1 = this$0;
+    this.mep_1 = $engine;
+    this.nep_1 = $moduleId;
+    this.oep_1 = $userMessage;
+    this.pep_1 = $history;
+    this.qep_1 = $memoryContext;
+    this.rep_1 = $longTermSummary;
+    this.sep_1 = $onError;
+    this.tep_1 = $onChunk;
+    this.uep_1 = $onComplete;
+    this.vep_1 = this$0;
     CoroutineImpl.call(this, resultContinuation);
   }
   protoOf(CognitiveEngineJs$chatWithContext$slambda).k1a = function ($this$launch, $completion) {
@@ -139184,8 +139328,8 @@
             this.c9_1 = 3;
             this.c9_1 = 2;
             this.b9_1 = 1;
-            var tmp_0 = this.lep_1.qdr(this.mep_1, this.nep_1, this.oep_1, (new NeuralStateVectorJs()).wep_1, new UserIdentity('User', 'they/them'), this.pep_1, this.qep_1);
-            var tmp_1 = CognitiveEngineJs$chatWithContext$slambda$slambda_0(this.sep_1, this.tep_1, this.uep_1, null);
+            var tmp_0 = this.mep_1.qdr(this.nep_1, this.oep_1, this.pep_1, (new NeuralStateVectorJs()).xep_1, new UserIdentity('User', 'they/them'), this.qep_1, this.rep_1);
+            var tmp_1 = CognitiveEngineJs$chatWithContext$slambda$slambda_0(this.tep_1, this.uep_1, this.vep_1, null);
             suspendResult = tmp_0.p14(new sam$kotlinx_coroutines_flow_FlowCollector$0_1(tmp_1), this);
             if (suspendResult === get_COROUTINE_SUSPENDED()) {
               return suspendResult;
@@ -139208,7 +139352,7 @@
               if (tmp_3 instanceof Error) {
                 var e = this.e9_1;
                 var tmp0_elvis_lhs = e.message;
-                this.rep_1(tmp0_elvis_lhs == null ? 'Chat failed with an unknown error' : tmp0_elvis_lhs);
+                this.sep_1(tmp0_elvis_lhs == null ? 'Chat failed with an unknown error' : tmp0_elvis_lhs);
                 this.b9_1 = 4;
                 continue $sm;
               } else {
@@ -139234,8 +139378,8 @@
      while (true);
   };
   protoOf(CognitiveEngineJs$chatWithContext$slambda).l1a = function ($this$launch, completion) {
-    var i = new CognitiveEngineJs$chatWithContext$slambda(this.lep_1, this.mep_1, this.nep_1, this.oep_1, this.pep_1, this.qep_1, this.rep_1, this.sep_1, this.tep_1, this.uep_1, completion);
-    i.vep_1 = $this$launch;
+    var i = new CognitiveEngineJs$chatWithContext$slambda(this.mep_1, this.nep_1, this.oep_1, this.pep_1, this.qep_1, this.rep_1, this.sep_1, this.tep_1, this.uep_1, this.vep_1, completion);
+    i.wep_1 = $this$launch;
     return i;
   };
   function CognitiveEngineJs$chatWithContext$slambda_0($engine, $moduleId, $userMessage, $history, $memoryContext, $longTermSummary, $onError, $onChunk, $onComplete, this$0, resultContinuation) {
@@ -139247,20 +139391,20 @@
     return l;
   }
   function CognitiveEngineJs$chatWithMemory$slambda($jsRetrieveMemory, $userMessage, this$0, $historyJson, $nsvJson, $globalSoulJson, $moduleContextJson, $identity, $currentEngine, $moduleId, $longTermSummary, $onError, $onChunk, $onComplete, resultContinuation) {
-    this.feq_1 = $jsRetrieveMemory;
-    this.geq_1 = $userMessage;
-    this.heq_1 = this$0;
-    this.ieq_1 = $historyJson;
-    this.jeq_1 = $nsvJson;
-    this.keq_1 = $globalSoulJson;
-    this.leq_1 = $moduleContextJson;
-    this.meq_1 = $identity;
-    this.neq_1 = $currentEngine;
-    this.oeq_1 = $moduleId;
-    this.peq_1 = $longTermSummary;
-    this.qeq_1 = $onError;
-    this.req_1 = $onChunk;
-    this.seq_1 = $onComplete;
+    this.geq_1 = $jsRetrieveMemory;
+    this.heq_1 = $userMessage;
+    this.ieq_1 = this$0;
+    this.jeq_1 = $historyJson;
+    this.keq_1 = $nsvJson;
+    this.leq_1 = $globalSoulJson;
+    this.meq_1 = $moduleContextJson;
+    this.neq_1 = $identity;
+    this.oeq_1 = $currentEngine;
+    this.peq_1 = $moduleId;
+    this.qeq_1 = $longTermSummary;
+    this.req_1 = $onError;
+    this.seq_1 = $onChunk;
+    this.teq_1 = $onComplete;
     CoroutineImpl.call(this, resultContinuation);
   }
   protoOf(CognitiveEngineJs$chatWithMemory$slambda).k1a = function ($this$launch, $completion) {
@@ -139286,7 +139430,7 @@
             var cancellable = new CancellableContinuationImpl(intercepted(this), 1);
             cancellable.et();
             var tmp_0 = CognitiveEngineJs$chatWithMemory$slambda$lambda(cancellable);
-            this.feq_1(this.geq_1, tmp_0, CognitiveEngineJs$chatWithMemory$slambda$lambda_0(cancellable));
+            this.geq_1(this.heq_1, tmp_0, CognitiveEngineJs$chatWithMemory$slambda$lambda_0(cancellable));
             suspendResult = returnIfSuspended(cancellable.mt(), this);
             if (suspendResult === get_COROUTINE_SUSPENDED()) {
               return suspendResult;
@@ -139294,7 +139438,7 @@
 
             continue $sm;
           case 1:
-            this.ueq_1 = suspendResult;
+            this.veq_1 = suspendResult;
             this.c9_1 = 6;
             this.b9_1 = 3;
             continue $sm;
@@ -139302,9 +139446,9 @@
             this.c9_1 = 6;
             var tmp_1 = this.e9_1;
             if (tmp_1 instanceof Error) {
-              this.veq_1 = this.e9_1;
+              this.weq_1 = this.e9_1;
               var tmp_2 = this;
-              tmp_2.ueq_1 = emptyList();
+              tmp_2.veq_1 = emptyList();
               this.b9_1 = 3;
               continue $sm;
             } else {
@@ -139313,24 +139457,24 @@
 
           case 3:
             this.c9_1 = 6;
-            this.weq_1 = this.ueq_1;
-            this.xeq_1 = parseHistoryJson(this.heq_1, this.ieq_1);
-            this.yeq_1 = (new NeuralStateVectorJs(this.jeq_1)).wep_1;
-            this.zeq_1 = parseGlobalSoulJson(this.heq_1, this.keq_1);
-            this.aer_1 = parseModuleContextJson(this.heq_1, this.leq_1);
-            this.ber_1 = this.meq_1.toUserIdentity();
+            this.xeq_1 = this.veq_1;
+            this.yeq_1 = parseHistoryJson(this.ieq_1, this.jeq_1);
+            this.zeq_1 = (new NeuralStateVectorJs(this.keq_1)).xep_1;
+            this.aer_1 = parseGlobalSoulJson(this.ieq_1, this.leq_1);
+            this.ber_1 = parseModuleContextJson(this.ieq_1, this.meq_1);
+            this.cer_1 = this.neq_1.toUserIdentity();
             this.b9_1 = 4;
-            suspendResult = this.neq_1.rdr(this.oeq_1, this.geq_1, this.xeq_1, this.yeq_1, this.ber_1, this.aer_1, this.peq_1, this.zeq_1, this.weq_1, this);
+            suspendResult = this.oeq_1.rdr(this.peq_1, this.heq_1, this.yeq_1, this.zeq_1, this.cer_1, this.ber_1, this.qeq_1, this.aer_1, this.xeq_1, this);
             if (suspendResult === get_COROUTINE_SUSPENDED()) {
               return suspendResult;
             }
 
             continue $sm;
           case 4:
-            this.cer_1 = suspendResult;
+            this.der_1 = suspendResult;
             this.b9_1 = 5;
-            var tmp_3 = CognitiveEngineJs$chatWithMemory$slambda$slambda_0(this.req_1, this.seq_1, this.heq_1, null);
-            suspendResult = this.cer_1.p14(new sam$kotlinx_coroutines_flow_FlowCollector$0_2(tmp_3), this);
+            var tmp_3 = CognitiveEngineJs$chatWithMemory$slambda$slambda_0(this.seq_1, this.teq_1, this.ieq_1, null);
+            suspendResult = this.der_1.p14(new sam$kotlinx_coroutines_flow_FlowCollector$0_2(tmp_3), this);
             if (suspendResult === get_COROUTINE_SUSPENDED()) {
               return suspendResult;
             }
@@ -139352,7 +139496,7 @@
               if (tmp_5 instanceof Error) {
                 var e = this.e9_1;
                 var tmp0_elvis_lhs = e.message;
-                this.qeq_1(tmp0_elvis_lhs == null ? 'chatWithMemory failed' : tmp0_elvis_lhs);
+                this.req_1(tmp0_elvis_lhs == null ? 'chatWithMemory failed' : tmp0_elvis_lhs);
                 this.b9_1 = 8;
                 continue $sm;
               } else {
@@ -139378,8 +139522,8 @@
      while (true);
   };
   protoOf(CognitiveEngineJs$chatWithMemory$slambda).l1a = function ($this$launch, completion) {
-    var i = new CognitiveEngineJs$chatWithMemory$slambda(this.feq_1, this.geq_1, this.heq_1, this.ieq_1, this.jeq_1, this.keq_1, this.leq_1, this.meq_1, this.neq_1, this.oeq_1, this.peq_1, this.qeq_1, this.req_1, this.seq_1, completion);
-    i.teq_1 = $this$launch;
+    var i = new CognitiveEngineJs$chatWithMemory$slambda(this.geq_1, this.heq_1, this.ieq_1, this.jeq_1, this.keq_1, this.leq_1, this.meq_1, this.neq_1, this.oeq_1, this.peq_1, this.qeq_1, this.req_1, this.seq_1, this.teq_1, completion);
+    i.ueq_1 = $this$launch;
     return i;
   };
   function CognitiveEngineJs$chatWithMemory$slambda_0($jsRetrieveMemory, $userMessage, this$0, $historyJson, $nsvJson, $globalSoulJson, $moduleContextJson, $identity, $currentEngine, $moduleId, $longTermSummary, $onError, $onChunk, $onComplete, resultContinuation) {
@@ -139406,14 +139550,14 @@
   }
   function CognitiveEngineJs() {
     Companion_getInstance_317();
-    this.zem_1 = null;
     this.aen_1 = null;
-    this.ben_1 = false;
-    this.cen_1 = null;
-    this.den_1 = CoroutineScope_0(SupervisorJob());
+    this.ben_1 = null;
+    this.cen_1 = false;
+    this.den_1 = null;
+    this.een_1 = CoroutineScope_0(SupervisorJob());
   }
-  protoOf(CognitiveEngineJs).der = function (openrouterKey, geminiKey, grokKey, preferredModel, isMockMode) {
-    this.ben_1 = isMockMode;
+  protoOf(CognitiveEngineJs).eer = function (openrouterKey, geminiKey, grokKey, preferredModel, isMockMode) {
+    this.cen_1 = isMockMode;
     var keyProvider = new JsApiKeyProvider(openrouterKey, geminiKey, grokKey);
     var httpClient = HttpClient(Js_instance);
     var transport = new KtorLlmTransport(httpClient);
@@ -139425,8 +139569,8 @@
       tmp = new LlmClient(keyProvider, transport);
     }
     var client = tmp;
-    this.aen_1 = client;
-    this.zem_1 = new CognitiveEngine(client, new DefaultPersonaFactory(), new LlmSanitizer());
+    this.ben_1 = client;
+    this.aen_1 = new CognitiveEngine(client, new DefaultPersonaFactory(), new LlmSanitizer());
   };
   protoOf(CognitiveEngineJs).init = function (openrouterKey, geminiKey, grokKey, preferredModel, isMockMode, $super) {
     openrouterKey = openrouterKey === VOID ? '' : openrouterKey;
@@ -139436,42 +139580,42 @@
     isMockMode = isMockMode === VOID ? false : isMockMode;
     var tmp;
     if ($super === VOID) {
-      this.der(openrouterKey, geminiKey, grokKey, preferredModel, isMockMode);
+      this.eer(openrouterKey, geminiKey, grokKey, preferredModel, isMockMode);
       tmp = Unit_instance;
     } else {
-      tmp = $super.der.call(this, openrouterKey, geminiKey, grokKey, preferredModel, isMockMode);
+      tmp = $super.eer.call(this, openrouterKey, geminiKey, grokKey, preferredModel, isMockMode);
     }
     return tmp;
   };
-  protoOf(CognitiveEngineJs).eer = function (store, preferredModel, isMockMode, onReady, onError) {
-    this.cen_1 = store;
-    this.ben_1 = isMockMode;
-    var tmp = this.den_1;
+  protoOf(CognitiveEngineJs).fer = function (store, preferredModel, isMockMode, onReady, onError) {
+    this.den_1 = store;
+    this.cen_1 = isMockMode;
+    var tmp = this.een_1;
     var job = launch(tmp, VOID, VOID, CognitiveEngineJs$initWithCredentialStore$slambda_0(store, isMockMode, this, preferredModel, onReady, onError, null));
     return new CancellableTask(job);
   };
   protoOf(CognitiveEngineJs).initWithCredentialStore = function (store, preferredModel, isMockMode, onReady, onError, $super) {
     preferredModel = preferredModel === VOID ? '' : preferredModel;
     isMockMode = isMockMode === VOID ? false : isMockMode;
-    return $super === VOID ? this.eer(store, preferredModel, isMockMode, onReady, onError) : $super.eer.call(this, store, preferredModel, isMockMode, onReady, onError);
+    return $super === VOID ? this.fer(store, preferredModel, isMockMode, onReady, onError) : $super.fer.call(this, store, preferredModel, isMockMode, onReady, onError);
   };
-  protoOf(CognitiveEngineJs).fer = function (preferredModel, onReady, onError) {
-    var store = this.cen_1;
+  protoOf(CognitiveEngineJs).ger = function (preferredModel, onReady, onError) {
+    var store = this.den_1;
     if (store == null) {
       onError('No credential store configured. Call initWithCredentialStore first.');
       return Unit_instance;
     }
     store.clearCredentials();
-    this.initWithCredentialStore(store, preferredModel, this.ben_1, onReady, onError);
+    this.initWithCredentialStore(store, preferredModel, this.cen_1, onReady, onError);
   };
   protoOf(CognitiveEngineJs).reinitFromCredentialStore = function (preferredModel, onReady, onError, $super) {
     preferredModel = preferredModel === VOID ? '' : preferredModel;
     var tmp;
     if ($super === VOID) {
-      this.fer(preferredModel, onReady, onError);
+      this.ger(preferredModel, onReady, onError);
       tmp = Unit_instance;
     } else {
-      tmp = $super.fer.call(this, preferredModel, onReady, onError);
+      tmp = $super.ger.call(this, preferredModel, onReady, onError);
     }
     return tmp;
   };
@@ -139479,79 +139623,79 @@
     return MemoryManager_instance.vdw();
   };
   protoOf(CognitiveEngineJs).clearCredentials = function () {
-    cancel(this.den_1);
-    this.den_1 = CoroutineScope_0(SupervisorJob());
-    var tmp0_safe_receiver = this.cen_1;
+    cancel(this.een_1);
+    this.een_1 = CoroutineScope_0(SupervisorJob());
+    var tmp0_safe_receiver = this.den_1;
     if (tmp0_safe_receiver == null)
       null;
     else {
       tmp0_safe_receiver.clearCredentials();
     }
-    this.cen_1 = null;
-    this.zem_1 = null;
+    this.den_1 = null;
     this.aen_1 = null;
-    this.ben_1 = true;
+    this.ben_1 = null;
+    this.cen_1 = true;
   };
-  protoOf(CognitiveEngineJs).ger = function (moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, onChunk, onComplete, onError) {
-    var currentEngine = this.zem_1;
-    if (this.ben_1 || currentEngine == null) {
-      onComplete(Companion_getInstance_317().zel_1);
+  protoOf(CognitiveEngineJs).her = function (moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, onChunk, onComplete, onError) {
+    var currentEngine = this.aen_1;
+    if (this.cen_1 || currentEngine == null) {
+      onComplete(Companion_getInstance_317().aem_1);
       // Inline function 'kotlin.apply' call
       var this_0 = SupervisorJob();
       this_0.kv();
       return new CancellableTask(this_0);
     }
     var history = parseHistoryJson(this, historyJson);
-    var nsv = (new NeuralStateVectorJs(nsvJson)).wep_1;
+    var nsv = (new NeuralStateVectorJs(nsvJson)).xep_1;
     var userIdentity = identity.toUserIdentity();
     var globalSoul = parseGlobalSoulJson(this, globalSoulJson);
-    var tmp = this.den_1;
+    var tmp = this.een_1;
     var job = launch(tmp, VOID, VOID, CognitiveEngineJs$chat$slambda_0(currentEngine, moduleId, userMessage, history, nsv, userIdentity, globalSoul, onError, onChunk, onComplete, this, null));
     return new CancellableTask(job);
   };
   protoOf(CognitiveEngineJs).chat = function (moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, onChunk, onComplete, onError, $super) {
     nsvJson = nsvJson === VOID ? '{}' : nsvJson;
     globalSoulJson = globalSoulJson === VOID ? '{}' : globalSoulJson;
-    return $super === VOID ? this.ger(moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, onChunk, onComplete, onError) : $super.ger.call(this, moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, onChunk, onComplete, onError);
+    return $super === VOID ? this.her(moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, onChunk, onComplete, onError) : $super.her.call(this, moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, onChunk, onComplete, onError);
   };
-  protoOf(CognitiveEngineJs).her = function (prompt, systemPrompt, onComplete, onError) {
-    var provider = this.aen_1;
-    if (this.ben_1 || provider == null) {
+  protoOf(CognitiveEngineJs).ier = function (prompt, systemPrompt, onComplete, onError) {
+    var provider = this.ben_1;
+    if (this.cen_1 || provider == null) {
       onComplete('{}');
       // Inline function 'kotlin.apply' call
       var this_0 = SupervisorJob();
       this_0.kv();
       return new CancellableTask(this_0);
     }
-    var tmp = this.den_1;
+    var tmp = this.een_1;
     var job = launch(tmp, VOID, VOID, CognitiveEngineJs$generateText$slambda_0(systemPrompt, provider, prompt, onComplete, onError, null));
     return new CancellableTask(job);
   };
   protoOf(CognitiveEngineJs).generateText = function (prompt, systemPrompt, onComplete, onError, $super) {
     systemPrompt = systemPrompt === VOID ? null : systemPrompt;
-    return $super === VOID ? this.her(prompt, systemPrompt, onComplete, onError) : $super.her.call(this, prompt, systemPrompt, onComplete, onError);
+    return $super === VOID ? this.ier(prompt, systemPrompt, onComplete, onError) : $super.ier.call(this, prompt, systemPrompt, onComplete, onError);
   };
-  protoOf(CognitiveEngineJs).ier = function (imageDataUrl, prompt, systemPrompt, onComplete, onError) {
-    var provider = this.aen_1;
-    if (this.ben_1 || provider == null) {
+  protoOf(CognitiveEngineJs).jer = function (imageDataUrl, prompt, systemPrompt, onComplete, onError) {
+    var provider = this.ben_1;
+    if (this.cen_1 || provider == null) {
       onComplete('');
       // Inline function 'kotlin.apply' call
       var this_0 = SupervisorJob();
       this_0.kv();
       return new CancellableTask(this_0);
     }
-    var tmp = this.den_1;
+    var tmp = this.een_1;
     var job = launch(tmp, VOID, VOID, CognitiveEngineJs$analyzeImage$slambda_0(provider, systemPrompt, prompt, imageDataUrl, onComplete, onError, null));
     return new CancellableTask(job);
   };
   protoOf(CognitiveEngineJs).analyzeImage = function (imageDataUrl, prompt, systemPrompt, onComplete, onError, $super) {
     systemPrompt = systemPrompt === VOID ? 'You are a helpful visual assistant.' : systemPrompt;
-    return $super === VOID ? this.ier(imageDataUrl, prompt, systemPrompt, onComplete, onError) : $super.ier.call(this, imageDataUrl, prompt, systemPrompt, onComplete, onError);
+    return $super === VOID ? this.jer(imageDataUrl, prompt, systemPrompt, onComplete, onError) : $super.jer.call(this, imageDataUrl, prompt, systemPrompt, onComplete, onError);
   };
-  protoOf(CognitiveEngineJs).jer = function (moduleId, userMessage, historyJson, systemPrompt, memoryContextJson, longTermSummary, onChunk, onComplete, onError) {
-    var provider = this.aen_1;
-    if (this.ben_1 || provider == null) {
-      onComplete(Companion_getInstance_317().zel_1);
+  protoOf(CognitiveEngineJs).ker = function (moduleId, userMessage, historyJson, systemPrompt, memoryContextJson, longTermSummary, onChunk, onComplete, onError) {
+    var provider = this.ben_1;
+    if (this.cen_1 || provider == null) {
+      onComplete(Companion_getInstance_317().aem_1);
       // Inline function 'kotlin.apply' call
       var this_0 = SupervisorJob();
       this_0.kv();
@@ -139560,25 +139704,25 @@
     var history = parseHistoryJson(this, historyJson);
     var memoryContext = parseStringArrayJson(this, memoryContextJson);
     var engine = new CognitiveEngine(provider, new PassthroughPersonaFactory(this, systemPrompt), new LlmSanitizer());
-    var tmp = this.den_1;
+    var tmp = this.een_1;
     var job = launch(tmp, VOID, VOID, CognitiveEngineJs$chatWithContext$slambda_0(engine, moduleId, userMessage, history, memoryContext, longTermSummary, onError, onChunk, onComplete, this, null));
     return new CancellableTask(job);
   };
   protoOf(CognitiveEngineJs).chatWithContext = function (moduleId, userMessage, historyJson, systemPrompt, memoryContextJson, longTermSummary, onChunk, onComplete, onError, $super) {
     memoryContextJson = memoryContextJson === VOID ? '[]' : memoryContextJson;
     longTermSummary = longTermSummary === VOID ? '' : longTermSummary;
-    return $super === VOID ? this.jer(moduleId, userMessage, historyJson, systemPrompt, memoryContextJson, longTermSummary, onChunk, onComplete, onError) : $super.jer.call(this, moduleId, userMessage, historyJson, systemPrompt, memoryContextJson, longTermSummary, onChunk, onComplete, onError);
+    return $super === VOID ? this.ker(moduleId, userMessage, historyJson, systemPrompt, memoryContextJson, longTermSummary, onChunk, onComplete, onError) : $super.ker.call(this, moduleId, userMessage, historyJson, systemPrompt, memoryContextJson, longTermSummary, onChunk, onComplete, onError);
   };
-  protoOf(CognitiveEngineJs).ker = function (moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, moduleContextJson, longTermSummary, jsRetrieveMemory, onChunk, onComplete, onError) {
-    var currentEngine = this.zem_1;
-    if (this.ben_1 || currentEngine == null) {
-      onComplete(Companion_getInstance_317().zel_1);
+  protoOf(CognitiveEngineJs).ler = function (moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, moduleContextJson, longTermSummary, jsRetrieveMemory, onChunk, onComplete, onError) {
+    var currentEngine = this.aen_1;
+    if (this.cen_1 || currentEngine == null) {
+      onComplete(Companion_getInstance_317().aem_1);
       // Inline function 'kotlin.apply' call
       var this_0 = SupervisorJob();
       this_0.kv();
       return new CancellableTask(this_0);
     }
-    var tmp = this.den_1;
+    var tmp = this.een_1;
     var job = launch(tmp, VOID, VOID, CognitiveEngineJs$chatWithMemory$slambda_0(jsRetrieveMemory, userMessage, this, historyJson, nsvJson, globalSoulJson, moduleContextJson, identity, currentEngine, moduleId, longTermSummary, onError, onChunk, onComplete, null));
     return new CancellableTask(job);
   };
@@ -139587,29 +139731,29 @@
     globalSoulJson = globalSoulJson === VOID ? '{}' : globalSoulJson;
     moduleContextJson = moduleContextJson === VOID ? '{}' : moduleContextJson;
     longTermSummary = longTermSummary === VOID ? '' : longTermSummary;
-    return $super === VOID ? this.ker(moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, moduleContextJson, longTermSummary, jsRetrieveMemory, onChunk, onComplete, onError) : $super.ker.call(this, moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, moduleContextJson, longTermSummary, jsRetrieveMemory, onChunk, onComplete, onError);
+    return $super === VOID ? this.ler(moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, moduleContextJson, longTermSummary, jsRetrieveMemory, onChunk, onComplete, onError) : $super.ler.call(this, moduleId, userMessage, historyJson, identity, nsvJson, globalSoulJson, moduleContextJson, longTermSummary, jsRetrieveMemory, onChunk, onComplete, onError);
   };
   function getKey($this, key, $completion) {
     var cancellable = new CancellableContinuationImpl(intercepted($completion), 1);
     cancellable.et();
     var tmp = CredentialStoreJs$getKey$lambda(cancellable);
-    $this.uem_1(key, tmp, CredentialStoreJs$getKey$lambda_0(cancellable));
+    $this.vem_1(key, tmp, CredentialStoreJs$getKey$lambda_0(cancellable));
     return cancellable.mt();
   }
   function Companion_311() {
-    this.ler_1 = 'nexus_credential_openrouter';
-    this.mer_1 = 'nexus_credential_gemini';
-    this.ner_1 = 'nexus_credential_grok';
+    this.mer_1 = 'nexus_credential_openrouter';
+    this.ner_1 = 'nexus_credential_gemini';
+    this.oer_1 = 'nexus_credential_grok';
   }
   var Companion_instance_314;
   function Companion_getInstance_318() {
     return Companion_instance_314;
   }
   function CredentialStoreJs$toApiKeyProvider$1(this$0) {
-    this.oer_1 = this$0;
+    this.per_1 = this$0;
   }
   protoOf(CredentialStoreJs$toApiKeyProvider$1).qdv = function ($completion) {
-    return this.oer_1.yem($completion);
+    return this.per_1.zem($completion);
   };
   function CredentialStoreJs$clearAll$lambda($remaining, $firstError, $onError, $onComplete) {
     return function () {
@@ -139663,7 +139807,7 @@
         $onComplete(true);
         return Unit_instance;
       }
-      this$0.uem_1('nexus_credential_grok', CredentialStoreJs$hasAnyKey$lambda$lambda$lambda($onComplete), $onError);
+      this$0.vem_1('nexus_credential_grok', CredentialStoreJs$hasAnyKey$lambda$lambda$lambda($onComplete), $onError);
       return Unit_instance;
     };
   }
@@ -139681,7 +139825,7 @@
         $onComplete(true);
         return Unit_instance;
       }
-      this$0.uem_1('nexus_credential_gemini', CredentialStoreJs$hasAnyKey$lambda$lambda($onComplete, this$0, $onError), $onError);
+      this$0.vem_1('nexus_credential_gemini', CredentialStoreJs$hasAnyKey$lambda$lambda($onComplete, this$0, $onError), $onError);
       return Unit_instance;
     };
   }
@@ -139708,7 +139852,7 @@
   }
   function $resolveKeysCOROUTINE$197(_this__u8e3s4, resultContinuation) {
     CoroutineImpl.call(this, resultContinuation);
-    this.xer_1 = _this__u8e3s4;
+    this.yer_1 = _this__u8e3s4;
   }
   protoOf($resolveKeysCOROUTINE$197).j9 = function () {
     var suspendResult = this.d9_1;
@@ -139718,7 +139862,7 @@
         switch (tmp) {
           case 0:
             this.c9_1 = 4;
-            var tmp0_safe_receiver = this.xer_1.xem_1;
+            var tmp0_safe_receiver = this.yer_1.yem_1;
             if (tmp0_safe_receiver == null)
               null;
             else {
@@ -139726,27 +139870,27 @@
             }
 
             this.b9_1 = 1;
-            suspendResult = getKey(this.xer_1, 'nexus_credential_openrouter', this);
+            suspendResult = getKey(this.yer_1, 'nexus_credential_openrouter', this);
             if (suspendResult === get_COROUTINE_SUSPENDED()) {
               return suspendResult;
             }
 
             continue $sm;
           case 1:
-            this.yer_1 = suspendResult;
-            this.zer_1 = this.yer_1 == null ? '' : this.yer_1;
+            this.zer_1 = suspendResult;
+            this.aes_1 = this.zer_1 == null ? '' : this.zer_1;
             this.b9_1 = 2;
-            suspendResult = getKey(this.xer_1, 'nexus_credential_gemini', this);
+            suspendResult = getKey(this.yer_1, 'nexus_credential_gemini', this);
             if (suspendResult === get_COROUTINE_SUSPENDED()) {
               return suspendResult;
             }
 
             continue $sm;
           case 2:
-            this.aes_1 = suspendResult;
-            this.bes_1 = this.aes_1 == null ? '' : this.aes_1;
+            this.bes_1 = suspendResult;
+            this.ces_1 = this.bes_1 == null ? '' : this.bes_1;
             this.b9_1 = 3;
-            suspendResult = getKey(this.xer_1, 'nexus_credential_grok', this);
+            suspendResult = getKey(this.yer_1, 'nexus_credential_grok', this);
             if (suspendResult === get_COROUTINE_SUSPENDED()) {
               return suspendResult;
             }
@@ -139755,8 +139899,8 @@
           case 3:
             var tmp3_elvis_lhs = suspendResult;
             var grok = tmp3_elvis_lhs == null ? '' : tmp3_elvis_lhs;
-            var keys = new ApiKeys(this.zer_1, this.bes_1, grok);
-            this.xer_1.xem_1 = keys;
+            var keys = new ApiKeys(this.aes_1, this.ces_1, grok);
+            this.yer_1.yem_1 = keys;
             return keys;
           case 4:
             throw this.e9_1;
@@ -139773,24 +139917,24 @@
      while (true);
   };
   function CredentialStoreJs(jsGetEncrypted, jsSetEncrypted, jsDeleteKey) {
-    this.uem_1 = jsGetEncrypted;
-    this.vem_1 = jsSetEncrypted;
-    this.wem_1 = jsDeleteKey;
-    this.xem_1 = null;
+    this.vem_1 = jsGetEncrypted;
+    this.wem_1 = jsSetEncrypted;
+    this.xem_1 = jsDeleteKey;
+    this.yem_1 = null;
   }
-  protoOf(CredentialStoreJs).ces = function (_set____db54di) {
-    this.xem_1 = _set____db54di;
+  protoOf(CredentialStoreJs).des = function (_set____db54di) {
+    this.yem_1 = _set____db54di;
   };
-  protoOf(CredentialStoreJs).des = function () {
-    return this.xem_1;
+  protoOf(CredentialStoreJs).ees = function () {
+    return this.yem_1;
   };
-  protoOf(CredentialStoreJs).yem = function ($completion) {
+  protoOf(CredentialStoreJs).zem = function ($completion) {
     var tmp = new $resolveKeysCOROUTINE$197(this, $completion);
     tmp.d9_1 = Unit_instance;
     tmp.e9_1 = null;
     return tmp.j9();
   };
-  protoOf(CredentialStoreJs).een = function () {
+  protoOf(CredentialStoreJs).fen = function () {
     return new CredentialStoreJs$toApiKeyProvider$1(this);
   };
   protoOf(CredentialStoreJs).storeKey = function (provider, key, onComplete, onError) {
@@ -139810,8 +139954,8 @@
         return Unit_instance;
     }
     var storageKey = tmp;
-    this.xem_1 = null;
-    this.vem_1(storageKey, key, onComplete, onError);
+    this.yem_1 = null;
+    this.wem_1(storageKey, key, onComplete, onError);
   };
   protoOf(CredentialStoreJs).deleteKey = function (provider, onComplete, onError) {
     var tmp;
@@ -139830,29 +139974,29 @@
         return Unit_instance;
     }
     var storageKey = tmp;
-    this.xem_1 = null;
-    this.wem_1(storageKey, onComplete, onError);
+    this.yem_1 = null;
+    this.xem_1(storageKey, onComplete, onError);
   };
   protoOf(CredentialStoreJs).clearCredentials = function () {
-    this.xem_1 = null;
+    this.yem_1 = null;
   };
   protoOf(CredentialStoreJs).clearAll = function (onComplete, onError) {
-    this.xem_1 = null;
+    this.yem_1 = null;
     var remaining = {_v: 3};
     var firstError = {_v: null};
     var onOne = CredentialStoreJs$clearAll$lambda(remaining, firstError, onError, onComplete);
     var onOneError = CredentialStoreJs$clearAll$lambda_0(firstError, remaining, onError);
-    this.wem_1('nexus_credential_openrouter', onOne, onOneError);
-    this.wem_1('nexus_credential_gemini', onOne, onOneError);
-    this.wem_1('nexus_credential_grok', onOne, onOneError);
+    this.xem_1('nexus_credential_openrouter', onOne, onOneError);
+    this.xem_1('nexus_credential_gemini', onOne, onOneError);
+    this.xem_1('nexus_credential_grok', onOne, onOneError);
   };
   protoOf(CredentialStoreJs).hasAnyKey = function (onComplete, onError) {
-    var cached = this.xem_1;
+    var cached = this.yem_1;
     if (!(cached == null)) {
       onComplete(cached.udo());
       return Unit_instance;
     }
-    this.uem_1('nexus_credential_openrouter', CredentialStoreJs$hasAnyKey$lambda(onComplete, this, onError), onError);
+    this.vem_1('nexus_credential_openrouter', CredentialStoreJs$hasAnyKey$lambda(onComplete, this, onError), onError);
   };
   function Companion_312() {
   }
@@ -139867,30 +140011,30 @@
     tmp0_serialDesc.c21('label', true);
     tmp0_serialDesc.c21('amount', true);
     tmp0_serialDesc.c21('taxCategory', true);
-    this.ees_1 = tmp0_serialDesc;
+    this.fes_1 = tmp0_serialDesc;
   }
-  protoOf($serializer_290).fes = function (encoder, value) {
-    var tmp0_desc = this.ees_1;
+  protoOf($serializer_290).ges = function (encoder, value) {
+    var tmp0_desc = this.fes_1;
     var tmp1_output = encoder.m1t(tmp0_desc);
-    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.ges_1 === '')) {
-      tmp1_output.b1v(tmp0_desc, 0, value.ges_1);
+    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.hes_1 === '')) {
+      tmp1_output.b1v(tmp0_desc, 0, value.hes_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !(value.hes_1 === '')) {
-      tmp1_output.b1v(tmp0_desc, 1, value.hes_1);
+    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !(value.ies_1 === '')) {
+      tmp1_output.b1v(tmp0_desc, 1, value.ies_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 2) ? true : !equals(value.ies_1, 0.0)) {
-      tmp1_output.z1u(tmp0_desc, 2, value.ies_1);
+    if (tmp1_output.j1v(tmp0_desc, 2) ? true : !equals(value.jes_1, 0.0)) {
+      tmp1_output.z1u(tmp0_desc, 2, value.jes_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 3) ? true : !(value.jes_1 == null)) {
-      tmp1_output.f1v(tmp0_desc, 3, StringSerializer_getInstance(), value.jes_1);
+    if (tmp1_output.j1v(tmp0_desc, 3) ? true : !(value.kes_1 == null)) {
+      tmp1_output.f1v(tmp0_desc, 3, StringSerializer_getInstance(), value.kes_1);
     }
     tmp1_output.n1t(tmp0_desc);
   };
   protoOf($serializer_290).e1q = function (encoder, value) {
-    return this.fes(encoder, value instanceof BudgetItemInput ? value : THROW_CCE());
+    return this.ges(encoder, value instanceof BudgetItemInput ? value : THROW_CCE());
   };
   protoOf($serializer_290).f1q = function (decoder) {
-    var tmp0_desc = this.ees_1;
+    var tmp0_desc = this.fes_1;
     var tmp1_flag = true;
     var tmp2_index = 0;
     var tmp3_bitMask0 = 0;
@@ -139939,7 +140083,7 @@
     return BudgetItemInput_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, tmp6_local2, tmp7_local3, null);
   };
   protoOf($serializer_290).d1q = function () {
-    return this.ees_1;
+    return this.fes_1;
   };
   protoOf($serializer_290).r21 = function () {
     // Inline function 'kotlin.arrayOf' call
@@ -139955,24 +140099,24 @@
   }
   function BudgetItemInput_init_$Init$(seen0, id, label, amount, taxCategory, serializationConstructorMarker, $this) {
     if (!(0 === (0 & seen0))) {
-      throwMissingFieldException(seen0, 0, $serializer_getInstance_291().ees_1);
+      throwMissingFieldException(seen0, 0, $serializer_getInstance_291().fes_1);
     }
     if (0 === (seen0 & 1))
-      $this.ges_1 = '';
-    else
-      $this.ges_1 = id;
-    if (0 === (seen0 & 2))
       $this.hes_1 = '';
     else
-      $this.hes_1 = label;
+      $this.hes_1 = id;
+    if (0 === (seen0 & 2))
+      $this.ies_1 = '';
+    else
+      $this.ies_1 = label;
     if (0 === (seen0 & 4))
-      $this.ies_1 = 0.0;
+      $this.jes_1 = 0.0;
     else
-      $this.ies_1 = amount;
+      $this.jes_1 = amount;
     if (0 === (seen0 & 8))
-      $this.jes_1 = null;
+      $this.kes_1 = null;
     else
-      $this.jes_1 = taxCategory;
+      $this.kes_1 = taxCategory;
     return $this;
   }
   function BudgetItemInput_init_$Create$(seen0, id, label, amount, taxCategory, serializationConstructorMarker) {
@@ -139991,30 +140135,30 @@
     tmp0_serialDesc.c21('balance', true);
     tmp0_serialDesc.c21('apr', true);
     tmp0_serialDesc.c21('minPayment', true);
-    this.kes_1 = tmp0_serialDesc;
+    this.les_1 = tmp0_serialDesc;
   }
-  protoOf($serializer_291).les = function (encoder, value) {
-    var tmp0_desc = this.kes_1;
+  protoOf($serializer_291).mes = function (encoder, value) {
+    var tmp0_desc = this.les_1;
     var tmp1_output = encoder.m1t(tmp0_desc);
-    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.mes_1 === '')) {
-      tmp1_output.b1v(tmp0_desc, 0, value.mes_1);
+    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.nes_1 === '')) {
+      tmp1_output.b1v(tmp0_desc, 0, value.nes_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !equals(value.nes_1, 0.0)) {
-      tmp1_output.z1u(tmp0_desc, 1, value.nes_1);
+    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !equals(value.oes_1, 0.0)) {
+      tmp1_output.z1u(tmp0_desc, 1, value.oes_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 2) ? true : !(value.oes_1 == null)) {
-      tmp1_output.f1v(tmp0_desc, 2, DoubleSerializer_getInstance(), value.oes_1);
+    if (tmp1_output.j1v(tmp0_desc, 2) ? true : !(value.pes_1 == null)) {
+      tmp1_output.f1v(tmp0_desc, 2, DoubleSerializer_getInstance(), value.pes_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 3) ? true : !equals(value.pes_1, 0.0)) {
-      tmp1_output.z1u(tmp0_desc, 3, value.pes_1);
+    if (tmp1_output.j1v(tmp0_desc, 3) ? true : !equals(value.qes_1, 0.0)) {
+      tmp1_output.z1u(tmp0_desc, 3, value.qes_1);
     }
     tmp1_output.n1t(tmp0_desc);
   };
   protoOf($serializer_291).e1q = function (encoder, value) {
-    return this.les(encoder, value instanceof DebtItemInput ? value : THROW_CCE());
+    return this.mes(encoder, value instanceof DebtItemInput ? value : THROW_CCE());
   };
   protoOf($serializer_291).f1q = function (decoder) {
-    var tmp0_desc = this.kes_1;
+    var tmp0_desc = this.les_1;
     var tmp1_flag = true;
     var tmp2_index = 0;
     var tmp3_bitMask0 = 0;
@@ -140063,7 +140207,7 @@
     return DebtItemInput_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, tmp6_local2, tmp7_local3, null);
   };
   protoOf($serializer_291).d1q = function () {
-    return this.kes_1;
+    return this.les_1;
   };
   protoOf($serializer_291).r21 = function () {
     // Inline function 'kotlin.arrayOf' call
@@ -140079,24 +140223,24 @@
   }
   function DebtItemInput_init_$Init$(seen0, name, balance, apr, minPayment, serializationConstructorMarker, $this) {
     if (!(0 === (0 & seen0))) {
-      throwMissingFieldException(seen0, 0, $serializer_getInstance_292().kes_1);
+      throwMissingFieldException(seen0, 0, $serializer_getInstance_292().les_1);
     }
     if (0 === (seen0 & 1))
-      $this.mes_1 = '';
+      $this.nes_1 = '';
     else
-      $this.mes_1 = name;
+      $this.nes_1 = name;
     if (0 === (seen0 & 2))
-      $this.nes_1 = 0.0;
+      $this.oes_1 = 0.0;
     else
-      $this.nes_1 = balance;
+      $this.oes_1 = balance;
     if (0 === (seen0 & 4))
-      $this.oes_1 = null;
+      $this.pes_1 = null;
     else
-      $this.oes_1 = apr;
+      $this.pes_1 = apr;
     if (0 === (seen0 & 8))
-      $this.pes_1 = 0.0;
+      $this.qes_1 = 0.0;
     else
-      $this.pes_1 = minPayment;
+      $this.qes_1 = minPayment;
     return $this;
   }
   function DebtItemInput_init_$Create$(seen0, name, balance, apr, minPayment, serializationConstructorMarker) {
@@ -140115,30 +140259,30 @@
     tmp0_serialDesc.c21('name', true);
     tmp0_serialDesc.c21('targetAmount', true);
     tmp0_serialDesc.c21('currentAmount', true);
-    this.qes_1 = tmp0_serialDesc;
+    this.res_1 = tmp0_serialDesc;
   }
-  protoOf($serializer_292).res = function (encoder, value) {
-    var tmp0_desc = this.qes_1;
+  protoOf($serializer_292).ses = function (encoder, value) {
+    var tmp0_desc = this.res_1;
     var tmp1_output = encoder.m1t(tmp0_desc);
-    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.ses_1 === '')) {
-      tmp1_output.b1v(tmp0_desc, 0, value.ses_1);
+    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.tes_1 === '')) {
+      tmp1_output.b1v(tmp0_desc, 0, value.tes_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !(value.tes_1 === '')) {
-      tmp1_output.b1v(tmp0_desc, 1, value.tes_1);
+    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !(value.ues_1 === '')) {
+      tmp1_output.b1v(tmp0_desc, 1, value.ues_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 2) ? true : !equals(value.ues_1, 0.0)) {
-      tmp1_output.z1u(tmp0_desc, 2, value.ues_1);
+    if (tmp1_output.j1v(tmp0_desc, 2) ? true : !equals(value.ves_1, 0.0)) {
+      tmp1_output.z1u(tmp0_desc, 2, value.ves_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 3) ? true : !(value.ves_1 == null)) {
-      tmp1_output.f1v(tmp0_desc, 3, DoubleSerializer_getInstance(), value.ves_1);
+    if (tmp1_output.j1v(tmp0_desc, 3) ? true : !(value.wes_1 == null)) {
+      tmp1_output.f1v(tmp0_desc, 3, DoubleSerializer_getInstance(), value.wes_1);
     }
     tmp1_output.n1t(tmp0_desc);
   };
   protoOf($serializer_292).e1q = function (encoder, value) {
-    return this.res(encoder, value instanceof SavingsGoalInput ? value : THROW_CCE());
+    return this.ses(encoder, value instanceof SavingsGoalInput ? value : THROW_CCE());
   };
   protoOf($serializer_292).f1q = function (decoder) {
-    var tmp0_desc = this.qes_1;
+    var tmp0_desc = this.res_1;
     var tmp1_flag = true;
     var tmp2_index = 0;
     var tmp3_bitMask0 = 0;
@@ -140187,7 +140331,7 @@
     return SavingsGoalInput_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, tmp6_local2, tmp7_local3, null);
   };
   protoOf($serializer_292).d1q = function () {
-    return this.qes_1;
+    return this.res_1;
   };
   protoOf($serializer_292).r21 = function () {
     // Inline function 'kotlin.arrayOf' call
@@ -140203,24 +140347,24 @@
   }
   function SavingsGoalInput_init_$Init$(seen0, id, name, targetAmount, currentAmount, serializationConstructorMarker, $this) {
     if (!(0 === (0 & seen0))) {
-      throwMissingFieldException(seen0, 0, $serializer_getInstance_293().qes_1);
+      throwMissingFieldException(seen0, 0, $serializer_getInstance_293().res_1);
     }
     if (0 === (seen0 & 1))
-      $this.ses_1 = '';
-    else
-      $this.ses_1 = id;
-    if (0 === (seen0 & 2))
       $this.tes_1 = '';
     else
-      $this.tes_1 = name;
+      $this.tes_1 = id;
+    if (0 === (seen0 & 2))
+      $this.ues_1 = '';
+    else
+      $this.ues_1 = name;
     if (0 === (seen0 & 4))
-      $this.ues_1 = 0.0;
+      $this.ves_1 = 0.0;
     else
-      $this.ues_1 = targetAmount;
+      $this.ves_1 = targetAmount;
     if (0 === (seen0 & 8))
-      $this.ves_1 = null;
+      $this.wes_1 = null;
     else
-      $this.ves_1 = currentAmount;
+      $this.wes_1 = currentAmount;
     return $this;
   }
   function SavingsGoalInput_init_$Create$(seen0, id, name, targetAmount, currentAmount, serializationConstructorMarker) {
@@ -140251,7 +140395,7 @@
     // Inline function 'kotlin.arrayOf' call
     // Inline function 'kotlin.js.unsafeCast' call
     // Inline function 'kotlin.js.asDynamic' call
-    tmp.wes_1 = [tmp_1, tmp_3, tmp_5, lazy(tmp_6, CrossVerificationServiceJs$LedgerProfileInput$Companion$$childSerializers$_anonymous__x2nj7j_2), null];
+    tmp.xes_1 = [tmp_1, tmp_3, tmp_5, lazy(tmp_6, CrossVerificationServiceJs$LedgerProfileInput$Companion$$childSerializers$_anonymous__x2nj7j_2), null];
   }
   var Companion_instance_318;
   function Companion_getInstance_322() {
@@ -140267,34 +140411,34 @@
     tmp0_serialDesc.c21('debtItems', true);
     tmp0_serialDesc.c21('savingsGoals', true);
     tmp0_serialDesc.c21('monthlyIncome', true);
-    this.xes_1 = tmp0_serialDesc;
+    this.yes_1 = tmp0_serialDesc;
   }
-  protoOf($serializer_293).yes = function (encoder, value) {
-    var tmp0_desc = this.xes_1;
+  protoOf($serializer_293).zes = function (encoder, value) {
+    var tmp0_desc = this.yes_1;
     var tmp1_output = encoder.m1t(tmp0_desc);
-    var tmp2_cached = Companion_getInstance_322().wes_1;
-    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !equals(value.zes_1, emptyList())) {
-      tmp1_output.d1v(tmp0_desc, 0, tmp2_cached[0].w(), value.zes_1);
+    var tmp2_cached = Companion_getInstance_322().xes_1;
+    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !equals(value.aet_1, emptyList())) {
+      tmp1_output.d1v(tmp0_desc, 0, tmp2_cached[0].w(), value.aet_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !equals(value.aet_1, emptyList())) {
-      tmp1_output.d1v(tmp0_desc, 1, tmp2_cached[1].w(), value.aet_1);
+    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !equals(value.bet_1, emptyList())) {
+      tmp1_output.d1v(tmp0_desc, 1, tmp2_cached[1].w(), value.bet_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 2) ? true : !equals(value.bet_1, emptyList())) {
-      tmp1_output.d1v(tmp0_desc, 2, tmp2_cached[2].w(), value.bet_1);
+    if (tmp1_output.j1v(tmp0_desc, 2) ? true : !equals(value.cet_1, emptyList())) {
+      tmp1_output.d1v(tmp0_desc, 2, tmp2_cached[2].w(), value.cet_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 3) ? true : !equals(value.cet_1, emptyList())) {
-      tmp1_output.d1v(tmp0_desc, 3, tmp2_cached[3].w(), value.cet_1);
+    if (tmp1_output.j1v(tmp0_desc, 3) ? true : !equals(value.det_1, emptyList())) {
+      tmp1_output.d1v(tmp0_desc, 3, tmp2_cached[3].w(), value.det_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 4) ? true : !equals(value.det_1, 0.0)) {
-      tmp1_output.z1u(tmp0_desc, 4, value.det_1);
+    if (tmp1_output.j1v(tmp0_desc, 4) ? true : !equals(value.eet_1, 0.0)) {
+      tmp1_output.z1u(tmp0_desc, 4, value.eet_1);
     }
     tmp1_output.n1t(tmp0_desc);
   };
   protoOf($serializer_293).e1q = function (encoder, value) {
-    return this.yes(encoder, value instanceof LedgerProfileInput ? value : THROW_CCE());
+    return this.zes(encoder, value instanceof LedgerProfileInput ? value : THROW_CCE());
   };
   protoOf($serializer_293).f1q = function (decoder) {
-    var tmp0_desc = this.xes_1;
+    var tmp0_desc = this.yes_1;
     var tmp1_flag = true;
     var tmp2_index = 0;
     var tmp3_bitMask0 = 0;
@@ -140304,7 +140448,7 @@
     var tmp7_local3 = null;
     var tmp8_local4 = 0.0;
     var tmp9_input = decoder.m1t(tmp0_desc);
-    var tmp10_cached = Companion_getInstance_322().wes_1;
+    var tmp10_cached = Companion_getInstance_322().xes_1;
     if (tmp9_input.c1u()) {
       tmp4_local0 = tmp9_input.y1t(tmp0_desc, 0, tmp10_cached[0].w(), tmp4_local0);
       tmp3_bitMask0 = tmp3_bitMask0 | 1;
@@ -140351,10 +140495,10 @@
     return LedgerProfileInput_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, tmp6_local2, tmp7_local3, tmp8_local4, null);
   };
   protoOf($serializer_293).d1q = function () {
-    return this.xes_1;
+    return this.yes_1;
   };
   protoOf($serializer_293).r21 = function () {
-    var tmp0_cached = Companion_getInstance_322().wes_1;
+    var tmp0_cached = Companion_getInstance_322().xes_1;
     // Inline function 'kotlin.arrayOf' call
     // Inline function 'kotlin.js.unsafeCast' call
     // Inline function 'kotlin.js.asDynamic' call
@@ -140368,28 +140512,28 @@
   }
   function LedgerProfileInput_init_$Init$(seen0, fixedExpenses, variableExpenses, debtItems, savingsGoals, monthlyIncome, serializationConstructorMarker, $this) {
     if (!(0 === (0 & seen0))) {
-      throwMissingFieldException(seen0, 0, $serializer_getInstance_294().xes_1);
+      throwMissingFieldException(seen0, 0, $serializer_getInstance_294().yes_1);
     }
     if (0 === (seen0 & 1))
-      $this.zes_1 = emptyList();
-    else
-      $this.zes_1 = fixedExpenses;
-    if (0 === (seen0 & 2))
       $this.aet_1 = emptyList();
     else
-      $this.aet_1 = variableExpenses;
-    if (0 === (seen0 & 4))
+      $this.aet_1 = fixedExpenses;
+    if (0 === (seen0 & 2))
       $this.bet_1 = emptyList();
     else
-      $this.bet_1 = debtItems;
-    if (0 === (seen0 & 8))
+      $this.bet_1 = variableExpenses;
+    if (0 === (seen0 & 4))
       $this.cet_1 = emptyList();
     else
-      $this.cet_1 = savingsGoals;
-    if (0 === (seen0 & 16))
-      $this.det_1 = 0.0;
+      $this.cet_1 = debtItems;
+    if (0 === (seen0 & 8))
+      $this.det_1 = emptyList();
     else
-      $this.det_1 = monthlyIncome;
+      $this.det_1 = savingsGoals;
+    if (0 === (seen0 & 16))
+      $this.eet_1 = 0.0;
+    else
+      $this.eet_1 = monthlyIncome;
     return $this;
   }
   function LedgerProfileInput_init_$Create$(seen0, fixedExpenses, variableExpenses, debtItems, savingsGoals, monthlyIncome, serializationConstructorMarker) {
@@ -140408,30 +140552,30 @@
     tmp0_serialDesc.c21('balance', true);
     tmp0_serialDesc.c21('rate', true);
     tmp0_serialDesc.c21('minPayment', true);
-    this.eet_1 = tmp0_serialDesc;
+    this.fet_1 = tmp0_serialDesc;
   }
-  protoOf(CrossVerificationServiceJs$planDebtSnowball$DebtIn$$serializer).fet = function (encoder, value) {
-    var tmp0_desc = this.eet_1;
+  protoOf(CrossVerificationServiceJs$planDebtSnowball$DebtIn$$serializer).get = function (encoder, value) {
+    var tmp0_desc = this.fet_1;
     var tmp1_output = encoder.m1t(tmp0_desc);
-    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.get_1 === '')) {
-      tmp1_output.b1v(tmp0_desc, 0, value.get_1);
+    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.het_1 === '')) {
+      tmp1_output.b1v(tmp0_desc, 0, value.het_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !equals(value.het_1, 0.0)) {
-      tmp1_output.z1u(tmp0_desc, 1, value.het_1);
+    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !equals(value.iet_1, 0.0)) {
+      tmp1_output.z1u(tmp0_desc, 1, value.iet_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 2) ? true : !equals(value.iet_1, 0.0)) {
-      tmp1_output.z1u(tmp0_desc, 2, value.iet_1);
+    if (tmp1_output.j1v(tmp0_desc, 2) ? true : !equals(value.jet_1, 0.0)) {
+      tmp1_output.z1u(tmp0_desc, 2, value.jet_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 3) ? true : !equals(value.jet_1, 0.0)) {
-      tmp1_output.z1u(tmp0_desc, 3, value.jet_1);
+    if (tmp1_output.j1v(tmp0_desc, 3) ? true : !equals(value.ket_1, 0.0)) {
+      tmp1_output.z1u(tmp0_desc, 3, value.ket_1);
     }
     tmp1_output.n1t(tmp0_desc);
   };
   protoOf(CrossVerificationServiceJs$planDebtSnowball$DebtIn$$serializer).e1q = function (encoder, value) {
-    return this.fet(encoder, value instanceof CrossVerificationServiceJs$planDebtSnowball$DebtIn ? value : THROW_CCE());
+    return this.get(encoder, value instanceof CrossVerificationServiceJs$planDebtSnowball$DebtIn ? value : THROW_CCE());
   };
   protoOf(CrossVerificationServiceJs$planDebtSnowball$DebtIn$$serializer).f1q = function (decoder) {
-    var tmp0_desc = this.eet_1;
+    var tmp0_desc = this.fet_1;
     var tmp1_flag = true;
     var tmp2_index = 0;
     var tmp3_bitMask0 = 0;
@@ -140480,7 +140624,7 @@
     return DebtIn_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, tmp6_local2, tmp7_local3, null);
   };
   protoOf(CrossVerificationServiceJs$planDebtSnowball$DebtIn$$serializer).d1q = function () {
-    return this.eet_1;
+    return this.fet_1;
   };
   protoOf(CrossVerificationServiceJs$planDebtSnowball$DebtIn$$serializer).r21 = function () {
     // Inline function 'kotlin.arrayOf' call
@@ -140496,24 +140640,24 @@
   }
   function DebtIn_init_$Init$(seen0, name, balance, rate, minPayment, serializationConstructorMarker, $this) {
     if (!(0 === (0 & seen0))) {
-      throwMissingFieldException(seen0, 0, $serializer_getInstance_295().eet_1);
+      throwMissingFieldException(seen0, 0, $serializer_getInstance_295().fet_1);
     }
     if (0 === (seen0 & 1))
-      $this.get_1 = '';
+      $this.het_1 = '';
     else
-      $this.get_1 = name;
+      $this.het_1 = name;
     if (0 === (seen0 & 2))
-      $this.het_1 = 0.0;
-    else
-      $this.het_1 = balance;
-    if (0 === (seen0 & 4))
       $this.iet_1 = 0.0;
     else
-      $this.iet_1 = rate;
-    if (0 === (seen0 & 8))
+      $this.iet_1 = balance;
+    if (0 === (seen0 & 4))
       $this.jet_1 = 0.0;
     else
-      $this.jet_1 = minPayment;
+      $this.jet_1 = rate;
+    if (0 === (seen0 & 8))
+      $this.ket_1 = 0.0;
+    else
+      $this.ket_1 = minPayment;
     return $this;
   }
   function DebtIn_init_$Create$(seen0, name, balance, rate, minPayment, serializationConstructorMarker) {
@@ -140533,33 +140677,33 @@
     tmp0_serialDesc.c21('targetAmount', true);
     tmp0_serialDesc.c21('currentBalance', true);
     tmp0_serialDesc.c21('monthlyContribution', true);
-    this.ket_1 = tmp0_serialDesc;
+    this.let_1 = tmp0_serialDesc;
   }
-  protoOf(CrossVerificationServiceJs$projectSavingsGoal$GoalIn$$serializer).let = function (encoder, value) {
-    var tmp0_desc = this.ket_1;
+  protoOf(CrossVerificationServiceJs$projectSavingsGoal$GoalIn$$serializer).met = function (encoder, value) {
+    var tmp0_desc = this.let_1;
     var tmp1_output = encoder.m1t(tmp0_desc);
-    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.met_1 === '')) {
-      tmp1_output.b1v(tmp0_desc, 0, value.met_1);
+    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.net_1 === '')) {
+      tmp1_output.b1v(tmp0_desc, 0, value.net_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !(value.net_1 === '')) {
-      tmp1_output.b1v(tmp0_desc, 1, value.net_1);
+    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !(value.oet_1 === '')) {
+      tmp1_output.b1v(tmp0_desc, 1, value.oet_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 2) ? true : !equals(value.oet_1, 0.0)) {
-      tmp1_output.z1u(tmp0_desc, 2, value.oet_1);
+    if (tmp1_output.j1v(tmp0_desc, 2) ? true : !equals(value.pet_1, 0.0)) {
+      tmp1_output.z1u(tmp0_desc, 2, value.pet_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 3) ? true : !equals(value.pet_1, 0.0)) {
-      tmp1_output.z1u(tmp0_desc, 3, value.pet_1);
+    if (tmp1_output.j1v(tmp0_desc, 3) ? true : !equals(value.qet_1, 0.0)) {
+      tmp1_output.z1u(tmp0_desc, 3, value.qet_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 4) ? true : !equals(value.qet_1, 0.0)) {
-      tmp1_output.z1u(tmp0_desc, 4, value.qet_1);
+    if (tmp1_output.j1v(tmp0_desc, 4) ? true : !equals(value.ret_1, 0.0)) {
+      tmp1_output.z1u(tmp0_desc, 4, value.ret_1);
     }
     tmp1_output.n1t(tmp0_desc);
   };
   protoOf(CrossVerificationServiceJs$projectSavingsGoal$GoalIn$$serializer).e1q = function (encoder, value) {
-    return this.let(encoder, value instanceof CrossVerificationServiceJs$projectSavingsGoal$GoalIn ? value : THROW_CCE());
+    return this.met(encoder, value instanceof CrossVerificationServiceJs$projectSavingsGoal$GoalIn ? value : THROW_CCE());
   };
   protoOf(CrossVerificationServiceJs$projectSavingsGoal$GoalIn$$serializer).f1q = function (decoder) {
-    var tmp0_desc = this.ket_1;
+    var tmp0_desc = this.let_1;
     var tmp1_flag = true;
     var tmp2_index = 0;
     var tmp3_bitMask0 = 0;
@@ -140615,7 +140759,7 @@
     return GoalIn_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, tmp6_local2, tmp7_local3, tmp8_local4, null);
   };
   protoOf(CrossVerificationServiceJs$projectSavingsGoal$GoalIn$$serializer).d1q = function () {
-    return this.ket_1;
+    return this.let_1;
   };
   protoOf(CrossVerificationServiceJs$projectSavingsGoal$GoalIn$$serializer).r21 = function () {
     // Inline function 'kotlin.arrayOf' call
@@ -140631,28 +140775,28 @@
   }
   function GoalIn_init_$Init$(seen0, id, name, targetAmount, currentBalance, monthlyContribution, serializationConstructorMarker, $this) {
     if (!(0 === (0 & seen0))) {
-      throwMissingFieldException(seen0, 0, $serializer_getInstance_296().ket_1);
+      throwMissingFieldException(seen0, 0, $serializer_getInstance_296().let_1);
     }
     if (0 === (seen0 & 1))
-      $this.met_1 = '';
-    else
-      $this.met_1 = id;
-    if (0 === (seen0 & 2))
       $this.net_1 = '';
     else
-      $this.net_1 = name;
-    if (0 === (seen0 & 4))
-      $this.oet_1 = 0.0;
+      $this.net_1 = id;
+    if (0 === (seen0 & 2))
+      $this.oet_1 = '';
     else
-      $this.oet_1 = targetAmount;
-    if (0 === (seen0 & 8))
+      $this.oet_1 = name;
+    if (0 === (seen0 & 4))
       $this.pet_1 = 0.0;
     else
-      $this.pet_1 = currentBalance;
-    if (0 === (seen0 & 16))
+      $this.pet_1 = targetAmount;
+    if (0 === (seen0 & 8))
       $this.qet_1 = 0.0;
     else
-      $this.qet_1 = monthlyContribution;
+      $this.qet_1 = currentBalance;
+    if (0 === (seen0 & 16))
+      $this.ret_1 = 0.0;
+    else
+      $this.ret_1 = monthlyContribution;
     return $this;
   }
   function GoalIn_init_$Create$(seen0, id, name, targetAmount, currentBalance, monthlyContribution, serializationConstructorMarker) {
@@ -140671,22 +140815,22 @@
     tmp0_serialDesc.c21('balance', false);
     tmp0_serialDesc.c21('rate', false);
     tmp0_serialDesc.c21('minPayment', false);
-    this.ret_1 = tmp0_serialDesc;
+    this.set_1 = tmp0_serialDesc;
   }
-  protoOf(CrossVerificationServiceJs$analyzeProfile$DebtWork$$serializer).set = function (encoder, value) {
-    var tmp0_desc = this.ret_1;
+  protoOf(CrossVerificationServiceJs$analyzeProfile$DebtWork$$serializer).tet = function (encoder, value) {
+    var tmp0_desc = this.set_1;
     var tmp1_output = encoder.m1t(tmp0_desc);
-    tmp1_output.b1v(tmp0_desc, 0, value.tet_1);
-    tmp1_output.z1u(tmp0_desc, 1, value.uet_1);
-    tmp1_output.z1u(tmp0_desc, 2, value.vet_1);
-    tmp1_output.z1u(tmp0_desc, 3, value.wet_1);
+    tmp1_output.b1v(tmp0_desc, 0, value.uet_1);
+    tmp1_output.z1u(tmp0_desc, 1, value.vet_1);
+    tmp1_output.z1u(tmp0_desc, 2, value.wet_1);
+    tmp1_output.z1u(tmp0_desc, 3, value.xet_1);
     tmp1_output.n1t(tmp0_desc);
   };
   protoOf(CrossVerificationServiceJs$analyzeProfile$DebtWork$$serializer).e1q = function (encoder, value) {
-    return this.set(encoder, value instanceof CrossVerificationServiceJs$analyzeProfile$DebtWork ? value : THROW_CCE());
+    return this.tet(encoder, value instanceof CrossVerificationServiceJs$analyzeProfile$DebtWork ? value : THROW_CCE());
   };
   protoOf(CrossVerificationServiceJs$analyzeProfile$DebtWork$$serializer).f1q = function (decoder) {
-    var tmp0_desc = this.ret_1;
+    var tmp0_desc = this.set_1;
     var tmp1_flag = true;
     var tmp2_index = 0;
     var tmp3_bitMask0 = 0;
@@ -140735,7 +140879,7 @@
     return DebtWork_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, tmp6_local2, tmp7_local3, null);
   };
   protoOf(CrossVerificationServiceJs$analyzeProfile$DebtWork$$serializer).d1q = function () {
-    return this.ret_1;
+    return this.set_1;
   };
   protoOf(CrossVerificationServiceJs$analyzeProfile$DebtWork$$serializer).r21 = function () {
     // Inline function 'kotlin.arrayOf' call
@@ -140751,12 +140895,12 @@
   }
   function DebtWork_init_$Init$(seen0, name, balance, rate, minPayment, serializationConstructorMarker, $this) {
     if (!(15 === (15 & seen0))) {
-      throwMissingFieldException(seen0, 15, $serializer_getInstance_297().ret_1);
+      throwMissingFieldException(seen0, 15, $serializer_getInstance_297().set_1);
     }
-    $this.tet_1 = name;
-    $this.uet_1 = balance;
-    $this.vet_1 = rate;
-    $this.wet_1 = minPayment;
+    $this.uet_1 = name;
+    $this.vet_1 = balance;
+    $this.wet_1 = rate;
+    $this.xet_1 = minPayment;
     return $this;
   }
   function DebtWork_init_$Create$(seen0, name, balance, rate, minPayment, serializationConstructorMarker) {
@@ -140767,19 +140911,19 @@
     label = label === VOID ? '' : label;
     amount = amount === VOID ? 0.0 : amount;
     taxCategory = taxCategory === VOID ? null : taxCategory;
-    this.ges_1 = id;
-    this.hes_1 = label;
-    this.ies_1 = amount;
-    this.jes_1 = taxCategory;
+    this.hes_1 = id;
+    this.ies_1 = label;
+    this.jes_1 = amount;
+    this.kes_1 = taxCategory;
   }
   protoOf(BudgetItemInput).toString = function () {
-    return 'BudgetItemInput(id=' + this.ges_1 + ', label=' + this.hes_1 + ', amount=' + this.ies_1 + ', taxCategory=' + this.jes_1 + ')';
+    return 'BudgetItemInput(id=' + this.hes_1 + ', label=' + this.ies_1 + ', amount=' + this.jes_1 + ', taxCategory=' + this.kes_1 + ')';
   };
   protoOf(BudgetItemInput).hashCode = function () {
-    var result = getStringHashCode(this.ges_1);
-    result = imul(result, 31) + getStringHashCode(this.hes_1) | 0;
-    result = imul(result, 31) + getNumberHashCode(this.ies_1) | 0;
-    result = imul(result, 31) + (this.jes_1 == null ? 0 : getStringHashCode(this.jes_1)) | 0;
+    var result = getStringHashCode(this.hes_1);
+    result = imul(result, 31) + getStringHashCode(this.ies_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.jes_1) | 0;
+    result = imul(result, 31) + (this.kes_1 == null ? 0 : getStringHashCode(this.kes_1)) | 0;
     return result;
   };
   protoOf(BudgetItemInput).equals = function (other) {
@@ -140788,13 +140932,13 @@
     if (!(other instanceof BudgetItemInput))
       return false;
     var tmp0_other_with_cast = other instanceof BudgetItemInput ? other : THROW_CCE();
-    if (!(this.ges_1 === tmp0_other_with_cast.ges_1))
-      return false;
     if (!(this.hes_1 === tmp0_other_with_cast.hes_1))
       return false;
-    if (!equals(this.ies_1, tmp0_other_with_cast.ies_1))
+    if (!(this.ies_1 === tmp0_other_with_cast.ies_1))
       return false;
-    if (!(this.jes_1 == tmp0_other_with_cast.jes_1))
+    if (!equals(this.jes_1, tmp0_other_with_cast.jes_1))
+      return false;
+    if (!(this.kes_1 == tmp0_other_with_cast.kes_1))
       return false;
     return true;
   };
@@ -140803,19 +140947,19 @@
     balance = balance === VOID ? 0.0 : balance;
     apr = apr === VOID ? null : apr;
     minPayment = minPayment === VOID ? 0.0 : minPayment;
-    this.mes_1 = name;
-    this.nes_1 = balance;
-    this.oes_1 = apr;
-    this.pes_1 = minPayment;
+    this.nes_1 = name;
+    this.oes_1 = balance;
+    this.pes_1 = apr;
+    this.qes_1 = minPayment;
   }
   protoOf(DebtItemInput).toString = function () {
-    return 'DebtItemInput(name=' + this.mes_1 + ', balance=' + this.nes_1 + ', apr=' + this.oes_1 + ', minPayment=' + this.pes_1 + ')';
+    return 'DebtItemInput(name=' + this.nes_1 + ', balance=' + this.oes_1 + ', apr=' + this.pes_1 + ', minPayment=' + this.qes_1 + ')';
   };
   protoOf(DebtItemInput).hashCode = function () {
-    var result = getStringHashCode(this.mes_1);
-    result = imul(result, 31) + getNumberHashCode(this.nes_1) | 0;
-    result = imul(result, 31) + (this.oes_1 == null ? 0 : getNumberHashCode(this.oes_1)) | 0;
-    result = imul(result, 31) + getNumberHashCode(this.pes_1) | 0;
+    var result = getStringHashCode(this.nes_1);
+    result = imul(result, 31) + getNumberHashCode(this.oes_1) | 0;
+    result = imul(result, 31) + (this.pes_1 == null ? 0 : getNumberHashCode(this.pes_1)) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.qes_1) | 0;
     return result;
   };
   protoOf(DebtItemInput).equals = function (other) {
@@ -140824,13 +140968,13 @@
     if (!(other instanceof DebtItemInput))
       return false;
     var tmp0_other_with_cast = other instanceof DebtItemInput ? other : THROW_CCE();
-    if (!(this.mes_1 === tmp0_other_with_cast.mes_1))
-      return false;
-    if (!equals(this.nes_1, tmp0_other_with_cast.nes_1))
+    if (!(this.nes_1 === tmp0_other_with_cast.nes_1))
       return false;
     if (!equals(this.oes_1, tmp0_other_with_cast.oes_1))
       return false;
     if (!equals(this.pes_1, tmp0_other_with_cast.pes_1))
+      return false;
+    if (!equals(this.qes_1, tmp0_other_with_cast.qes_1))
       return false;
     return true;
   };
@@ -140839,19 +140983,19 @@
     name = name === VOID ? '' : name;
     targetAmount = targetAmount === VOID ? 0.0 : targetAmount;
     currentAmount = currentAmount === VOID ? null : currentAmount;
-    this.ses_1 = id;
-    this.tes_1 = name;
-    this.ues_1 = targetAmount;
-    this.ves_1 = currentAmount;
+    this.tes_1 = id;
+    this.ues_1 = name;
+    this.ves_1 = targetAmount;
+    this.wes_1 = currentAmount;
   }
   protoOf(SavingsGoalInput).toString = function () {
-    return 'SavingsGoalInput(id=' + this.ses_1 + ', name=' + this.tes_1 + ', targetAmount=' + this.ues_1 + ', currentAmount=' + this.ves_1 + ')';
+    return 'SavingsGoalInput(id=' + this.tes_1 + ', name=' + this.ues_1 + ', targetAmount=' + this.ves_1 + ', currentAmount=' + this.wes_1 + ')';
   };
   protoOf(SavingsGoalInput).hashCode = function () {
-    var result = getStringHashCode(this.ses_1);
-    result = imul(result, 31) + getStringHashCode(this.tes_1) | 0;
-    result = imul(result, 31) + getNumberHashCode(this.ues_1) | 0;
-    result = imul(result, 31) + (this.ves_1 == null ? 0 : getNumberHashCode(this.ves_1)) | 0;
+    var result = getStringHashCode(this.tes_1);
+    result = imul(result, 31) + getStringHashCode(this.ues_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.ves_1) | 0;
+    result = imul(result, 31) + (this.wes_1 == null ? 0 : getNumberHashCode(this.wes_1)) | 0;
     return result;
   };
   protoOf(SavingsGoalInput).equals = function (other) {
@@ -140860,13 +141004,13 @@
     if (!(other instanceof SavingsGoalInput))
       return false;
     var tmp0_other_with_cast = other instanceof SavingsGoalInput ? other : THROW_CCE();
-    if (!(this.ses_1 === tmp0_other_with_cast.ses_1))
-      return false;
     if (!(this.tes_1 === tmp0_other_with_cast.tes_1))
       return false;
-    if (!equals(this.ues_1, tmp0_other_with_cast.ues_1))
+    if (!(this.ues_1 === tmp0_other_with_cast.ues_1))
       return false;
     if (!equals(this.ves_1, tmp0_other_with_cast.ves_1))
+      return false;
+    if (!equals(this.wes_1, tmp0_other_with_cast.wes_1))
       return false;
     return true;
   };
@@ -140877,21 +141021,21 @@
     debtItems = debtItems === VOID ? emptyList() : debtItems;
     savingsGoals = savingsGoals === VOID ? emptyList() : savingsGoals;
     monthlyIncome = monthlyIncome === VOID ? 0.0 : monthlyIncome;
-    this.zes_1 = fixedExpenses;
-    this.aet_1 = variableExpenses;
-    this.bet_1 = debtItems;
-    this.cet_1 = savingsGoals;
-    this.det_1 = monthlyIncome;
+    this.aet_1 = fixedExpenses;
+    this.bet_1 = variableExpenses;
+    this.cet_1 = debtItems;
+    this.det_1 = savingsGoals;
+    this.eet_1 = monthlyIncome;
   }
   protoOf(LedgerProfileInput).toString = function () {
-    return 'LedgerProfileInput(fixedExpenses=' + toString(this.zes_1) + ', variableExpenses=' + toString(this.aet_1) + ', debtItems=' + toString(this.bet_1) + ', savingsGoals=' + toString(this.cet_1) + ', monthlyIncome=' + this.det_1 + ')';
+    return 'LedgerProfileInput(fixedExpenses=' + toString(this.aet_1) + ', variableExpenses=' + toString(this.bet_1) + ', debtItems=' + toString(this.cet_1) + ', savingsGoals=' + toString(this.det_1) + ', monthlyIncome=' + this.eet_1 + ')';
   };
   protoOf(LedgerProfileInput).hashCode = function () {
-    var result = hashCode(this.zes_1);
-    result = imul(result, 31) + hashCode(this.aet_1) | 0;
+    var result = hashCode(this.aet_1);
     result = imul(result, 31) + hashCode(this.bet_1) | 0;
     result = imul(result, 31) + hashCode(this.cet_1) | 0;
-    result = imul(result, 31) + getNumberHashCode(this.det_1) | 0;
+    result = imul(result, 31) + hashCode(this.det_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.eet_1) | 0;
     return result;
   };
   protoOf(LedgerProfileInput).equals = function (other) {
@@ -140900,8 +141044,6 @@
     if (!(other instanceof LedgerProfileInput))
       return false;
     var tmp0_other_with_cast = other instanceof LedgerProfileInput ? other : THROW_CCE();
-    if (!equals(this.zes_1, tmp0_other_with_cast.zes_1))
-      return false;
     if (!equals(this.aet_1, tmp0_other_with_cast.aet_1))
       return false;
     if (!equals(this.bet_1, tmp0_other_with_cast.bet_1))
@@ -140910,19 +141052,21 @@
       return false;
     if (!equals(this.det_1, tmp0_other_with_cast.det_1))
       return false;
+    if (!equals(this.eet_1, tmp0_other_with_cast.eet_1))
+      return false;
     return true;
   };
   function sam$kotlin_Comparator$0_27(function_0) {
-    this.xet_1 = function_0;
+    this.yet_1 = function_0;
   }
   protoOf(sam$kotlin_Comparator$0_27).qe = function (a, b) {
-    return this.xet_1(a, b);
+    return this.yet_1(a, b);
   };
   protoOf(sam$kotlin_Comparator$0_27).compare = function (a, b) {
     return this.qe(a, b);
   };
   protoOf(sam$kotlin_Comparator$0_27).o3 = function () {
-    return this.xet_1;
+    return this.yet_1;
   };
   protoOf(sam$kotlin_Comparator$0_27).equals = function (other) {
     var tmp;
@@ -140943,16 +141087,16 @@
     return hashCode(this.o3());
   };
   function sam$kotlin_Comparator$0_28(function_0) {
-    this.yet_1 = function_0;
+    this.zet_1 = function_0;
   }
   protoOf(sam$kotlin_Comparator$0_28).qe = function (a, b) {
-    return this.yet_1(a, b);
+    return this.zet_1(a, b);
   };
   protoOf(sam$kotlin_Comparator$0_28).compare = function (a, b) {
     return this.qe(a, b);
   };
   protoOf(sam$kotlin_Comparator$0_28).o3 = function () {
-    return this.yet_1;
+    return this.zet_1;
   };
   protoOf(sam$kotlin_Comparator$0_28).equals = function (other) {
     var tmp;
@@ -140993,19 +141137,19 @@
     balance = balance === VOID ? 0.0 : balance;
     rate = rate === VOID ? 0.0 : rate;
     minPayment = minPayment === VOID ? 0.0 : minPayment;
-    this.get_1 = name;
-    this.het_1 = balance;
-    this.iet_1 = rate;
-    this.jet_1 = minPayment;
+    this.het_1 = name;
+    this.iet_1 = balance;
+    this.jet_1 = rate;
+    this.ket_1 = minPayment;
   }
   protoOf(CrossVerificationServiceJs$planDebtSnowball$DebtIn).toString = function () {
-    return 'DebtIn(name=' + this.get_1 + ', balance=' + this.het_1 + ', rate=' + this.iet_1 + ', minPayment=' + this.jet_1 + ')';
+    return 'DebtIn(name=' + this.het_1 + ', balance=' + this.iet_1 + ', rate=' + this.jet_1 + ', minPayment=' + this.ket_1 + ')';
   };
   protoOf(CrossVerificationServiceJs$planDebtSnowball$DebtIn).hashCode = function () {
-    var result = getStringHashCode(this.get_1);
-    result = imul(result, 31) + getNumberHashCode(this.het_1) | 0;
+    var result = getStringHashCode(this.het_1);
     result = imul(result, 31) + getNumberHashCode(this.iet_1) | 0;
     result = imul(result, 31) + getNumberHashCode(this.jet_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.ket_1) | 0;
     return result;
   };
   protoOf(CrossVerificationServiceJs$planDebtSnowball$DebtIn).equals = function (other) {
@@ -141014,20 +141158,20 @@
     if (!(other instanceof CrossVerificationServiceJs$planDebtSnowball$DebtIn))
       return false;
     var tmp0_other_with_cast = other instanceof CrossVerificationServiceJs$planDebtSnowball$DebtIn ? other : THROW_CCE();
-    if (!(this.get_1 === tmp0_other_with_cast.get_1))
-      return false;
-    if (!equals(this.het_1, tmp0_other_with_cast.het_1))
+    if (!(this.het_1 === tmp0_other_with_cast.het_1))
       return false;
     if (!equals(this.iet_1, tmp0_other_with_cast.iet_1))
       return false;
     if (!equals(this.jet_1, tmp0_other_with_cast.jet_1))
       return false;
+    if (!equals(this.ket_1, tmp0_other_with_cast.ket_1))
+      return false;
     return true;
   };
   function CrossVerificationServiceJs$planDebtSnowball$lambda(a, b) {
     // Inline function 'kotlin.comparisons.compareValuesBy' call
-    var tmp = a.het_1;
-    var tmp$ret$1 = b.het_1;
+    var tmp = a.iet_1;
+    var tmp$ret$1 = b.iet_1;
     return compareValues(tmp, tmp$ret$1);
   }
   function CrossVerificationServiceJs$planDebtSnowball$lambda_0(a, b) {
@@ -141044,21 +141188,21 @@
     targetAmount = targetAmount === VOID ? 0.0 : targetAmount;
     currentBalance = currentBalance === VOID ? 0.0 : currentBalance;
     monthlyContribution = monthlyContribution === VOID ? 0.0 : monthlyContribution;
-    this.met_1 = id;
-    this.net_1 = name;
-    this.oet_1 = targetAmount;
-    this.pet_1 = currentBalance;
-    this.qet_1 = monthlyContribution;
+    this.net_1 = id;
+    this.oet_1 = name;
+    this.pet_1 = targetAmount;
+    this.qet_1 = currentBalance;
+    this.ret_1 = monthlyContribution;
   }
   protoOf(CrossVerificationServiceJs$projectSavingsGoal$GoalIn).toString = function () {
-    return 'GoalIn(id=' + this.met_1 + ', name=' + this.net_1 + ', targetAmount=' + this.oet_1 + ', currentBalance=' + this.pet_1 + ', monthlyContribution=' + this.qet_1 + ')';
+    return 'GoalIn(id=' + this.net_1 + ', name=' + this.oet_1 + ', targetAmount=' + this.pet_1 + ', currentBalance=' + this.qet_1 + ', monthlyContribution=' + this.ret_1 + ')';
   };
   protoOf(CrossVerificationServiceJs$projectSavingsGoal$GoalIn).hashCode = function () {
-    var result = getStringHashCode(this.met_1);
-    result = imul(result, 31) + getStringHashCode(this.net_1) | 0;
-    result = imul(result, 31) + getNumberHashCode(this.oet_1) | 0;
+    var result = getStringHashCode(this.net_1);
+    result = imul(result, 31) + getStringHashCode(this.oet_1) | 0;
     result = imul(result, 31) + getNumberHashCode(this.pet_1) | 0;
     result = imul(result, 31) + getNumberHashCode(this.qet_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.ret_1) | 0;
     return result;
   };
   protoOf(CrossVerificationServiceJs$projectSavingsGoal$GoalIn).equals = function (other) {
@@ -141067,32 +141211,32 @@
     if (!(other instanceof CrossVerificationServiceJs$projectSavingsGoal$GoalIn))
       return false;
     var tmp0_other_with_cast = other instanceof CrossVerificationServiceJs$projectSavingsGoal$GoalIn ? other : THROW_CCE();
-    if (!(this.met_1 === tmp0_other_with_cast.met_1))
-      return false;
     if (!(this.net_1 === tmp0_other_with_cast.net_1))
       return false;
-    if (!equals(this.oet_1, tmp0_other_with_cast.oet_1))
+    if (!(this.oet_1 === tmp0_other_with_cast.oet_1))
       return false;
     if (!equals(this.pet_1, tmp0_other_with_cast.pet_1))
       return false;
     if (!equals(this.qet_1, tmp0_other_with_cast.qet_1))
       return false;
+    if (!equals(this.ret_1, tmp0_other_with_cast.ret_1))
+      return false;
     return true;
   };
   function CrossVerificationServiceJs$analyzeProfile$DebtWork(name, balance, rate, minPayment) {
-    this.tet_1 = name;
-    this.uet_1 = balance;
-    this.vet_1 = rate;
-    this.wet_1 = minPayment;
+    this.uet_1 = name;
+    this.vet_1 = balance;
+    this.wet_1 = rate;
+    this.xet_1 = minPayment;
   }
   protoOf(CrossVerificationServiceJs$analyzeProfile$DebtWork).toString = function () {
-    return 'DebtWork(name=' + this.tet_1 + ', balance=' + this.uet_1 + ', rate=' + this.vet_1 + ', minPayment=' + this.wet_1 + ')';
+    return 'DebtWork(name=' + this.uet_1 + ', balance=' + this.vet_1 + ', rate=' + this.wet_1 + ', minPayment=' + this.xet_1 + ')';
   };
   protoOf(CrossVerificationServiceJs$analyzeProfile$DebtWork).hashCode = function () {
-    var result = getStringHashCode(this.tet_1);
-    result = imul(result, 31) + getNumberHashCode(this.uet_1) | 0;
+    var result = getStringHashCode(this.uet_1);
     result = imul(result, 31) + getNumberHashCode(this.vet_1) | 0;
     result = imul(result, 31) + getNumberHashCode(this.wet_1) | 0;
+    result = imul(result, 31) + getNumberHashCode(this.xet_1) | 0;
     return result;
   };
   protoOf(CrossVerificationServiceJs$analyzeProfile$DebtWork).equals = function (other) {
@@ -141101,20 +141245,20 @@
     if (!(other instanceof CrossVerificationServiceJs$analyzeProfile$DebtWork))
       return false;
     var tmp0_other_with_cast = other instanceof CrossVerificationServiceJs$analyzeProfile$DebtWork ? other : THROW_CCE();
-    if (!(this.tet_1 === tmp0_other_with_cast.tet_1))
-      return false;
-    if (!equals(this.uet_1, tmp0_other_with_cast.uet_1))
+    if (!(this.uet_1 === tmp0_other_with_cast.uet_1))
       return false;
     if (!equals(this.vet_1, tmp0_other_with_cast.vet_1))
       return false;
     if (!equals(this.wet_1, tmp0_other_with_cast.wet_1))
       return false;
+    if (!equals(this.xet_1, tmp0_other_with_cast.xet_1))
+      return false;
     return true;
   };
   function CrossVerificationServiceJs$analyzeProfile$lambda(a, b) {
     // Inline function 'kotlin.comparisons.compareValuesBy' call
-    var tmp = a.uet_1;
-    var tmp$ret$1 = b.uet_1;
+    var tmp = a.vet_1;
+    var tmp$ret$1 = b.vet_1;
     return compareValues(tmp, tmp$ret$1);
   }
   function CrossVerificationServiceJs$analyzeProfile$lambda_0(a, b) {
@@ -141127,10 +141271,10 @@
   }
   function CrossVerificationServiceJs() {
     var tmp = this;
-    tmp.zet_1 = Json(VOID, CrossVerificationServiceJs$json$lambda);
-    this.aeu_1 = listOf_0(['medical', 'dental', 'vision', 'pharmacy', 'doctor', 'health', 'fsa', 'hsa', 'laptop', 'equipment', 'hardware', 'monitor', 'computer', 'camera', 'keyboard', 'course', 'udemy', 'conference', 'book', 'training', 'certification', 'education', 'coursera', 'pluralsight', 'linkedin learning', 'donation', 'charity', 'nonprofit', 'tithe', 'ira', '401k', 'retirement', 'pension', 'business', 'office supply', 'professional']);
-    this.beu_1 = listOf_0(['grocery', 'groceries', 'supermarket', 'food', 'restaurant', 'coffee', 'dining', 'takeout', 'takeaway', 'clothing', 'clothes', 'shoes', 'fashion', 'apparel', 'haircut', 'beauty', 'spa', 'salon', 'pet', 'hobby', 'toy', 'game', 'mortgage']);
-    this.ceu_1 = listOf_0(['entertainment', 'netflix', 'spotify', 'hulu', 'streaming', 'amazon prime', 'travel', 'flight', 'hotel', 'airbnb', 'uber', 'lyft', 'phone', 'mobile', 'cell', 'internet', 'wifi', 'electricity', 'utilities', 'utility', 'rent', 'software', 'saas', 'subscription']);
+    tmp.aeu_1 = Json(VOID, CrossVerificationServiceJs$json$lambda);
+    this.beu_1 = listOf_0(['medical', 'dental', 'vision', 'pharmacy', 'doctor', 'health', 'fsa', 'hsa', 'laptop', 'equipment', 'hardware', 'monitor', 'computer', 'camera', 'keyboard', 'course', 'udemy', 'conference', 'book', 'training', 'certification', 'education', 'coursera', 'pluralsight', 'linkedin learning', 'donation', 'charity', 'nonprofit', 'tithe', 'ira', '401k', 'retirement', 'pension', 'business', 'office supply', 'professional']);
+    this.ceu_1 = listOf_0(['grocery', 'groceries', 'supermarket', 'food', 'restaurant', 'coffee', 'dining', 'takeout', 'takeaway', 'clothing', 'clothes', 'shoes', 'fashion', 'apparel', 'haircut', 'beauty', 'spa', 'salon', 'pet', 'hobby', 'toy', 'game', 'mortgage']);
+    this.deu_1 = listOf_0(['entertainment', 'netflix', 'spotify', 'hulu', 'streaming', 'amazon prime', 'travel', 'flight', 'hotel', 'airbnb', 'uber', 'lyft', 'phone', 'mobile', 'cell', 'internet', 'wifi', 'electricity', 'utilities', 'utility', 'rent', 'software', 'saas', 'subscription']);
   }
   protoOf(CrossVerificationServiceJs).computeFinancialFriction = function (profileJson) {
     return CrossVerificationService_getInstance().cc6(profileJson);
@@ -141143,7 +141287,7 @@
   };
   protoOf(CrossVerificationServiceJs).computeResonanceROI = function (profileJson) {
     // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-    var this_0 = this.zet_1;
+    var this_0 = this.aeu_1;
     // Inline function 'kotlinx.serialization.serializer' call
     var this_1 = this_0.b1u();
     // Inline function 'kotlinx.serialization.internal.cast' call
@@ -141161,7 +141305,7 @@
   };
   protoOf(CrossVerificationServiceJs).categorizeTax = function (expenseJson) {
     // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-    var this_0 = this.zet_1;
+    var this_0 = this.aeu_1;
     // Inline function 'kotlinx.serialization.serializer' call
     var this_1 = this_0.b1u();
     // Inline function 'kotlinx.serialization.internal.cast' call
@@ -141170,20 +141314,20 @@
     var expense = this_0.z3y(tmp$ret$1, expenseJson);
     // Inline function 'kotlin.text.lowercase' call
     // Inline function 'kotlin.js.asDynamic' call
-    var label = expense.hes_1.toLowerCase();
-    var _iterator__ex2g4s = this.aeu_1.j();
+    var label = expense.ies_1.toLowerCase();
+    var _iterator__ex2g4s = this.beu_1.j();
     while (_iterator__ex2g4s.k()) {
       var kw = _iterator__ex2g4s.l();
       if (contains_0(label, kw))
         return 'deductible';
     }
-    var _iterator__ex2g4s_0 = this.beu_1.j();
+    var _iterator__ex2g4s_0 = this.ceu_1.j();
     while (_iterator__ex2g4s_0.k()) {
       var kw_0 = _iterator__ex2g4s_0.l();
       if (contains_0(label, kw_0))
         return 'non-deductible';
     }
-    var _iterator__ex2g4s_1 = this.ceu_1.j();
+    var _iterator__ex2g4s_1 = this.deu_1.j();
     while (_iterator__ex2g4s_1.k()) {
       var kw_1 = _iterator__ex2g4s_1.l();
       if (contains_0(label, kw_1))
@@ -141193,16 +141337,16 @@
   };
   protoOf(CrossVerificationServiceJs).calculateBehavioralROI = function (itemJson, usageFrequency) {
     // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-    var this_0 = this.zet_1;
+    var this_0 = this.aeu_1;
     // Inline function 'kotlinx.serialization.serializer' call
     var this_1 = this_0.b1u();
     // Inline function 'kotlinx.serialization.internal.cast' call
     var this_2 = serializer(this_1, createKType(getKClass(BudgetItemInput), arrayOf([]), false));
     var tmp$ret$1 = isInterface(this_2, KSerializer) ? this_2 : THROW_CCE();
     var item = this_0.z3y(tmp$ret$1, itemJson);
-    if (usageFrequency <= 0.0 || item.ies_1 <= 0.0)
+    if (usageFrequency <= 0.0 || item.jes_1 <= 0.0)
       return 0.0;
-    var costPerUse = item.ies_1 / usageFrequency;
+    var costPerUse = item.jes_1 / usageFrequency;
     // Inline function 'kotlin.math.min' call
     var b = 10.0 * (1.0 - costPerUse / 100.0);
     // Inline function 'kotlin.math.max' call
@@ -141212,7 +141356,7 @@
   };
   protoOf(CrossVerificationServiceJs).estimateUsageFrequency = function (itemJson) {
     // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-    var this_0 = this.zet_1;
+    var this_0 = this.aeu_1;
     // Inline function 'kotlinx.serialization.serializer' call
     var this_1 = this_0.b1u();
     // Inline function 'kotlinx.serialization.internal.cast' call
@@ -141221,7 +141365,7 @@
     var item = this_0.z3y(tmp$ret$1, itemJson);
     // Inline function 'kotlin.text.lowercase' call
     // Inline function 'kotlin.js.asDynamic' call
-    var label = item.hes_1.toLowerCase();
+    var label = item.ies_1.toLowerCase();
     var daily = listOf_0(['netflix', 'spotify', 'hulu', 'streaming', 'gym', 'fitness', 'phone', 'mobile', 'internet', 'wifi']);
     var weekly = listOf_0(['restaurant', 'dining', 'coffee', 'grocery', 'groceries', 'transport', 'transit']);
     var monthly = listOf_0(['rent', 'mortgage', 'insurance', 'utilities', 'electricity', 'subscription', 'saas', 'software', 'course', 'membership']);
@@ -141247,7 +141391,7 @@
   };
   protoOf(CrossVerificationServiceJs).planDebtSnowball = function (debtsJson, extraBudget) {
     // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-    var this_0 = this.zet_1;
+    var this_0 = this.aeu_1;
     // Inline function 'kotlinx.serialization.serializer' call
     var this_1 = this_0.b1u();
     // Inline function 'kotlinx.serialization.internal.cast' call
@@ -141267,7 +141411,7 @@
     var _iterator__ex2g4s = sorted.j();
     while (_iterator__ex2g4s.k()) {
       var item = _iterator__ex2g4s.l();
-      var tmp$ret$5 = item.het_1;
+      var tmp$ret$5 = item.iet_1;
       destination.e(tmp$ret$5);
     }
     var balances = toMutableList(destination);
@@ -141324,10 +141468,10 @@
           inductionVariable_2 = inductionVariable_2 + 1 | 0;
           if (cleared.o(i))
             continue $l$loop;
-          var monthlyInterest = balances.o(i) * (sorted.o(i).iet_1 / 12.0);
+          var monthlyInterest = balances.o(i) * (sorted.o(i).jet_1 / 12.0);
           balances.e2(i, balances.o(i) + monthlyInterest);
           interest.e2(i, interest.o(i) + monthlyInterest);
-          var tmp15 = sorted.o(i).jet_1;
+          var tmp15 = sorted.o(i).ket_1;
           // Inline function 'kotlin.math.min' call
           var b = balances.o(i);
           var pay = Math.min(tmp15, b);
@@ -141363,7 +141507,7 @@
             cleared.e2(i_1, true);
             monthsPaid.e2(i_1, month);
             interest.e2(i_1, round(interest.o(i_1) * 100.0) / 100.0);
-            snowball = snowball + sorted.o(i_1).jet_1;
+            snowball = snowball + sorted.o(i_1).ket_1;
           }
         }
          while (inductionVariable_4 <= last_1);
@@ -141403,7 +141547,7 @@
       var _unary__edvuaz = index_2;
       index_2 = _unary__edvuaz + 1 | 0;
       var i_2 = checkIndexOverflow(_unary__edvuaz);
-      var tmp$ret$25 = mapOf([to('name', item_0.get_1), to('originalBalance', item_0.het_1), to('payoffOrder', i_2 + 1 | 0), to('monthsToPayoff', monthsPaid.o(i_2) > 0 ? monthsPaid.o(i_2) : MAX_MONTHS), to('totalInterestPaid', interest.o(i_2)), to('effectiveRate', item_0.iet_1)]);
+      var tmp$ret$25 = mapOf([to('name', item_0.het_1), to('originalBalance', item_0.iet_1), to('payoffOrder', i_2 + 1 | 0), to('monthsToPayoff', monthsPaid.o(i_2) > 0 ? monthsPaid.o(i_2) : MAX_MONTHS), to('totalInterestPaid', interest.o(i_2)), to('effectiveRate', item_0.jet_1)]);
       destination_0.e(tmp$ret$25);
     }
     // Inline function 'kotlin.collections.sortedBy' call
@@ -141456,7 +141600,7 @@
   };
   protoOf(CrossVerificationServiceJs).projectSavingsGoal = function (goalJson) {
     // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-    var this_0 = this.zet_1;
+    var this_0 = this.aeu_1;
     // Inline function 'kotlinx.serialization.serializer' call
     var this_1 = this_0.b1u();
     // Inline function 'kotlinx.serialization.internal.cast' call
@@ -141464,20 +141608,20 @@
     var tmp$ret$1 = isInterface(this_2, KSerializer) ? this_2 : THROW_CCE();
     var goal = this_0.z3y(tmp$ret$1, goalJson);
     // Inline function 'kotlin.math.max' call
-    var b = goal.oet_1 - goal.pet_1;
+    var b = goal.pet_1 - goal.qet_1;
     var remaining = Math.max(0.0, b);
     var tmp;
-    if (goal.oet_1 > 0) {
+    if (goal.pet_1 > 0) {
       // Inline function 'kotlin.math.min' call
-      var b_0 = round(goal.pet_1 / goal.oet_1 * 100.0);
+      var b_0 = round(goal.qet_1 / goal.pet_1 * 100.0);
       tmp = Math.min(100.0, b_0);
     } else {
       tmp = 0.0;
     }
     var percentComplete = tmp;
-    var baseMonths = projectSavingsGoal$calcMonths(remaining, goal.qet_1);
-    var optimisticMonths = projectSavingsGoal$calcMonths(remaining, goal.qet_1 * 1.1);
-    var pessimisticMonths = projectSavingsGoal$calcMonths(remaining, goal.qet_1 * 0.9);
+    var baseMonths = projectSavingsGoal$calcMonths(remaining, goal.ret_1);
+    var optimisticMonths = projectSavingsGoal$calcMonths(remaining, goal.ret_1 * 1.1);
+    var pessimisticMonths = projectSavingsGoal$calcMonths(remaining, goal.ret_1 * 0.9);
     var tmp_0;
     if (baseMonths === 2147483647) {
       tmp_0 = 'Unknown';
@@ -141503,11 +141647,11 @@
     var achieveByDate = tmp_0;
     // Inline function 'kotlinx.serialization.json.buildJsonObject' call
     var builder = new JsonObjectBuilder();
-    put_0(builder, 'goalId', goal.met_1);
-    put_0(builder, 'label', goal.net_1);
-    put(builder, 'targetAmount', goal.oet_1);
-    put(builder, 'currentBalance', goal.pet_1);
-    put(builder, 'monthlyContribution', goal.qet_1);
+    put_0(builder, 'goalId', goal.net_1);
+    put_0(builder, 'label', goal.oet_1);
+    put(builder, 'targetAmount', goal.pet_1);
+    put(builder, 'currentBalance', goal.qet_1);
+    put(builder, 'monthlyContribution', goal.ret_1);
     put(builder, 'monthsToGoal', baseMonths === 2147483647 ? Infinity : baseMonths);
     put_0(builder, 'achieveByDate', achieveByDate);
     // Inline function 'kotlinx.serialization.json.buildJsonObject' call
@@ -141555,7 +141699,7 @@
   };
   protoOf(CrossVerificationServiceJs).suggestTaxOptimizations = function (expensesJson) {
     // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-    var this_0 = this.zet_1;
+    var this_0 = this.aeu_1;
     // Inline function 'kotlinx.serialization.serializer' call
     var this_1 = this_0.b1u();
     // Inline function 'kotlinx.serialization.internal.cast' call
@@ -141569,13 +141713,13 @@
     var _iterator__ex2g4s = expenses.j();
     $l$loop: while (_iterator__ex2g4s.k()) {
       var exp = _iterator__ex2g4s.l();
-      var tmp0_elvis_lhs = exp.jes_1;
+      var tmp0_elvis_lhs = exp.kes_1;
       var cat = tmp0_elvis_lhs == null ? 'unknown' : tmp0_elvis_lhs;
       if (!(cat === 'non-deductible') && !(cat === 'unknown'))
         continue $l$loop;
       // Inline function 'kotlin.text.lowercase' call
       // Inline function 'kotlin.js.asDynamic' call
-      var label = exp.hes_1.toLowerCase();
+      var label = exp.ies_1.toLowerCase();
       var tmp$ret$5;
       $l$block_0: {
         // Inline function 'kotlin.collections.any' call
@@ -141602,7 +141746,7 @@
       if (tmp$ret$5) {
         // Inline function 'kotlinx.serialization.json.buildJsonObject' call
         var builder_0 = new JsonObjectBuilder();
-        put_0(builder_0, 'fieldId', exp.ges_1);
+        put_0(builder_0, 'fieldId', exp.hes_1);
         put_0(builder_0, 'current', cat);
         put_0(builder_0, 'suggested', 'deductible');
         put_0(builder_0, 'reason', 'Label indicates professional development or business tool usage.');
@@ -141635,7 +141779,7 @@
         if (tmp$ret$9) {
           // Inline function 'kotlinx.serialization.json.buildJsonObject' call
           var builder_1 = new JsonObjectBuilder();
-          put_0(builder_1, 'fieldId', exp.ges_1);
+          put_0(builder_1, 'fieldId', exp.hes_1);
           put_0(builder_1, 'current', cat);
           put_0(builder_1, 'suggested', 'deductible');
           put_0(builder_1, 'reason', 'Label indicates potential medical or HSA-eligible expense.');
@@ -141648,7 +141792,7 @@
   };
   protoOf(CrossVerificationServiceJs).analyzeProfile = function (profileJson, savingsContributionsJson) {
     // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-    var this_0 = this.zet_1;
+    var this_0 = this.aeu_1;
     // Inline function 'kotlinx.serialization.serializer' call
     var this_1 = this_0.b1u();
     // Inline function 'kotlinx.serialization.internal.cast' call
@@ -141658,7 +141802,7 @@
     var tmp;
     try {
       // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-      var this_3 = this.zet_1;
+      var this_3 = this.aeu_1;
       // Inline function 'kotlinx.serialization.serializer' call
       var this_4 = this_3.b1u();
       // Inline function 'kotlinx.serialization.internal.cast' call
@@ -141676,14 +141820,14 @@
       tmp = tmp_0;
     }
     var savingsContributions = tmp;
-    var allExpenses = plus(profile.zes_1, profile.aet_1);
+    var allExpenses = plus(profile.aet_1, profile.bet_1);
     // Inline function 'kotlin.collections.map' call
     // Inline function 'kotlin.collections.mapTo' call
     var destination = ArrayList_init_$Create$(collectionSizeOrDefault(allExpenses, 10));
     var _iterator__ex2g4s = allExpenses.j();
     while (_iterator__ex2g4s.k()) {
       var item = _iterator__ex2g4s.l();
-      var tmp0_elvis_lhs = item.jes_1;
+      var tmp0_elvis_lhs = item.kes_1;
       var tmp_1;
       if (tmp0_elvis_lhs == null) {
         // Inline function 'kotlin.run' call
@@ -141691,8 +141835,8 @@
         $l$block_1: {
           // Inline function 'kotlin.text.lowercase' call
           // Inline function 'kotlin.js.asDynamic' call
-          var label = item.hes_1.toLowerCase();
-          var _iterator__ex2g4s_0 = this.aeu_1.j();
+          var label = item.ies_1.toLowerCase();
+          var _iterator__ex2g4s_0 = this.beu_1.j();
           while (_iterator__ex2g4s_0.k()) {
             var kw = _iterator__ex2g4s_0.l();
             if (contains_0(label, kw)) {
@@ -141700,7 +141844,7 @@
               break $l$block_1;
             }
           }
-          var _iterator__ex2g4s_1 = this.beu_1.j();
+          var _iterator__ex2g4s_1 = this.ceu_1.j();
           while (_iterator__ex2g4s_1.k()) {
             var kw_0 = _iterator__ex2g4s_1.l();
             if (contains_0(label, kw_0)) {
@@ -141708,7 +141852,7 @@
               break $l$block_1;
             }
           }
-          var _iterator__ex2g4s_2 = this.ceu_1.j();
+          var _iterator__ex2g4s_2 = this.deu_1.j();
           while (_iterator__ex2g4s_2.k()) {
             var kw_1 = _iterator__ex2g4s_2.l();
             if (contains_0(label, kw_1)) {
@@ -141743,7 +141887,7 @@
     while (_iterator__ex2g4s_4.k()) {
       var element_0 = _iterator__ex2g4s_4.l();
       var tmp_2 = sum;
-      sum = tmp_2 + element_0.rg_1.ies_1;
+      sum = tmp_2 + element_0.rg_1.jes_1;
     }
     var monthlyDeductible = sum;
     var ytdDeductibleTotal = monthlyDeductible * 12.0;
@@ -141756,7 +141900,7 @@
       var item_0 = _iterator__ex2g4s_5.l();
       // Inline function 'kotlin.text.lowercase' call
       // Inline function 'kotlin.js.asDynamic' call
-      var label_0 = item_0.hes_1.toLowerCase();
+      var label_0 = item_0.ies_1.toLowerCase();
       var tmp_3;
       var tmp1 = listOf_0(['netflix', 'spotify', 'hulu', 'streaming', 'gym', 'fitness', 'phone', 'mobile', 'internet', 'wifi']);
       var tmp$ret$20;
@@ -141845,11 +141989,11 @@
       }
       var freq = tmp_3;
       var tmp_7;
-      if (freq <= 0.0 || item_0.ies_1 <= 0.0) {
+      if (freq <= 0.0 || item_0.jes_1 <= 0.0) {
         tmp_7 = 0.0;
       } else {
         // Inline function 'kotlin.math.min' call
-        var b = 10.0 * (1.0 - item_0.ies_1 / freq / 100.0);
+        var b = 10.0 * (1.0 - item_0.jes_1 / freq / 100.0);
         // Inline function 'kotlin.math.max' call
         var b_0 = Math.min(10.0, b);
         var raw = Math.max(0.0, b_0);
@@ -141862,53 +142006,53 @@
     var roiScores = destination_1;
     // Inline function 'kotlin.collections.sumOf' call
     var sum_0 = 0;
-    var _iterator__ex2g4s_9 = profile.zes_1.j();
+    var _iterator__ex2g4s_9 = profile.aet_1.j();
     while (_iterator__ex2g4s_9.k()) {
       var element_4 = _iterator__ex2g4s_9.l();
       var tmp_8 = sum_0;
-      sum_0 = tmp_8 + element_4.ies_1;
+      sum_0 = tmp_8 + element_4.jes_1;
     }
     var totalFixed = sum_0;
     // Inline function 'kotlin.collections.sumOf' call
     var sum_1 = 0;
-    var _iterator__ex2g4s_10 = profile.aet_1.j();
+    var _iterator__ex2g4s_10 = profile.bet_1.j();
     while (_iterator__ex2g4s_10.k()) {
       var element_5 = _iterator__ex2g4s_10.l();
       var tmp_9 = sum_1;
-      sum_1 = tmp_9 + element_5.ies_1;
+      sum_1 = tmp_9 + element_5.jes_1;
     }
     var totalVariable = sum_1;
     // Inline function 'kotlin.collections.sumOf' call
     var sum_2 = 0;
-    var _iterator__ex2g4s_11 = profile.bet_1.j();
+    var _iterator__ex2g4s_11 = profile.cet_1.j();
     while (_iterator__ex2g4s_11.k()) {
       var element_6 = _iterator__ex2g4s_11.l();
       var tmp_10 = sum_2;
-      sum_2 = tmp_10 + element_6.pes_1;
+      sum_2 = tmp_10 + element_6.qes_1;
     }
     var totalMinPayments = sum_2;
     // Inline function 'kotlin.math.max' call
-    var b_1 = profile.det_1 - totalFixed - totalVariable - totalMinPayments;
+    var b_1 = profile.eet_1 - totalFixed - totalVariable - totalMinPayments;
     var extraBudget = Math.max(0.0, b_1);
     // Inline function 'kotlin.collections.map' call
-    var this_6 = profile.bet_1;
+    var this_6 = profile.cet_1;
     // Inline function 'kotlin.collections.mapTo' call
     var destination_2 = ArrayList_init_$Create$(collectionSizeOrDefault(this_6, 10));
     var _iterator__ex2g4s_12 = this_6.j();
     while (_iterator__ex2g4s_12.k()) {
       var item_1 = _iterator__ex2g4s_12.l();
-      var tmp$ret$38 = item_1.mes_1 + '|' + item_1.nes_1 + '|' + (!(item_1.oes_1 == null) ? item_1.oes_1 / 100.0 : 0.18) + '|' + item_1.pes_1;
+      var tmp$ret$38 = item_1.nes_1 + '|' + item_1.oes_1 + '|' + (!(item_1.pes_1 == null) ? item_1.pes_1 / 100.0 : 0.18) + '|' + item_1.qes_1;
       destination_2.e(tmp$ret$38);
     }
     var debtDebts = destination_2;
     // Inline function 'kotlin.collections.map' call
-    var this_7 = profile.bet_1;
+    var this_7 = profile.cet_1;
     // Inline function 'kotlin.collections.mapTo' call
     var destination_3 = ArrayList_init_$Create$(collectionSizeOrDefault(this_7, 10));
     var _iterator__ex2g4s_13 = this_7.j();
     while (_iterator__ex2g4s_13.k()) {
       var item_2 = _iterator__ex2g4s_13.l();
-      var tmp$ret$41 = new CrossVerificationServiceJs$analyzeProfile$DebtWork(item_2.mes_1, item_2.nes_1, !(item_2.oes_1 == null) ? item_2.oes_1 / 100.0 : 0.18, item_2.pes_1);
+      var tmp$ret$41 = new CrossVerificationServiceJs$analyzeProfile$DebtWork(item_2.nes_1, item_2.oes_1, !(item_2.pes_1 == null) ? item_2.pes_1 / 100.0 : 0.18, item_2.qes_1);
       destination_3.e(tmp$ret$41);
     }
     // Inline function 'kotlin.collections.sortedBy' call
@@ -141922,7 +142066,7 @@
     var _iterator__ex2g4s_14 = sortedDebts.j();
     while (_iterator__ex2g4s_14.k()) {
       var item_3 = _iterator__ex2g4s_14.l();
-      var tmp$ret$46 = item_3.uet_1;
+      var tmp$ret$46 = item_3.vet_1;
       destination_4.e(tmp$ret$46);
     }
     var balances = toMutableList(destination_4);
@@ -141978,11 +142122,11 @@
           inductionVariable_2 = inductionVariable_2 + 1 | 0;
           if (cleared.o(i))
             continue $l$loop;
-          var mi = balances.o(i) * (sortedDebts.o(i).vet_1 / 12.0);
+          var mi = balances.o(i) * (sortedDebts.o(i).wet_1 / 12.0);
           balances.e2(i, balances.o(i) + mi);
           interest.e2(i, interest.o(i) + mi);
           var tmp_12 = balances.o(i);
-          var tmp37 = sortedDebts.o(i).wet_1;
+          var tmp37 = sortedDebts.o(i).xet_1;
           // Inline function 'kotlin.math.min' call
           var b_2 = balances.o(i);
           var tmp$ret$62 = Math.min(tmp37, b_2);
@@ -142016,7 +142160,7 @@
             cleared.e2(i_1, true);
             monthsPaid.e2(i_1, month);
             interest.e2(i_1, round(interest.o(i_1) * 100.0) / 100.0);
-            snowball = snowball + sortedDebts.o(i_1).wet_1;
+            snowball = snowball + sortedDebts.o(i_1).xet_1;
           }
         }
          while (inductionVariable_4 <= last_1);
@@ -142056,7 +142200,7 @@
       var _unary__edvuaz = index_2;
       index_2 = _unary__edvuaz + 1 | 0;
       var i_2 = checkIndexOverflow(_unary__edvuaz);
-      var tmp$ret$66 = mapOf([to('name', item_4.tet_1), to('originalBalance', item_4.uet_1), to('payoffOrder', i_2 + 1 | 0), to('monthsToPayoff', monthsPaid.o(i_2) > 0 ? monthsPaid.o(i_2) : 600), to('totalInterestPaid', interest.o(i_2)), to('effectiveRate', item_4.vet_1)]);
+      var tmp$ret$66 = mapOf([to('name', item_4.uet_1), to('originalBalance', item_4.vet_1), to('payoffOrder', i_2 + 1 | 0), to('monthsToPayoff', monthsPaid.o(i_2) > 0 ? monthsPaid.o(i_2) : 600), to('totalInterestPaid', interest.o(i_2)), to('effectiveRate', item_4.wet_1)]);
       destination_5.e(tmp$ret$66);
     }
     // Inline function 'kotlin.collections.sortedBy' call
@@ -142084,10 +142228,10 @@
     }
     var debtPlan = destination_6;
     // Inline function 'kotlin.math.max' call
-    var b_4 = profile.det_1 - totalFixed - totalVariable;
+    var b_4 = profile.eet_1 - totalFixed - totalVariable;
     var monthlyBuffer = Math.max(0.0, b_4);
     // Inline function 'kotlin.math.max' call
-    var b_5 = profile.cet_1.m();
+    var b_5 = profile.det_1.m();
     var goalCount = Math.max(1, b_5);
     var defaultContrib = monthlyBuffer / goalCount;
     var tmp_16 = (new Date()).toISOString().slice(0, 10);
@@ -142101,23 +142245,23 @@
     var tmp$ret$82 = today.substring(5, 7);
     var todayMonth = toInt(tmp$ret$82);
     // Inline function 'kotlin.collections.map' call
-    var this_10 = profile.cet_1;
+    var this_10 = profile.det_1;
     // Inline function 'kotlin.collections.mapTo' call
     var destination_7 = ArrayList_init_$Create$(collectionSizeOrDefault(this_10, 10));
     var _iterator__ex2g4s_18 = this_10.j();
     while (_iterator__ex2g4s_18.k()) {
       var item_6 = _iterator__ex2g4s_18.l();
-      var tmp0_elvis_lhs_0 = savingsContributions.j2(item_6.ses_1);
+      var tmp0_elvis_lhs_0 = savingsContributions.j2(item_6.tes_1);
       var contribution = tmp0_elvis_lhs_0 == null ? defaultContrib : tmp0_elvis_lhs_0;
-      var tmp1_elvis_lhs = item_6.ves_1;
+      var tmp1_elvis_lhs = item_6.wes_1;
       // Inline function 'kotlin.math.max' call
-      var b_6 = item_6.ues_1 - (tmp1_elvis_lhs == null ? 0.0 : tmp1_elvis_lhs);
+      var b_6 = item_6.ves_1 - (tmp1_elvis_lhs == null ? 0.0 : tmp1_elvis_lhs);
       var remaining = Math.max(0.0, b_6);
       var tmp_17;
-      if (item_6.ues_1 > 0) {
-        var tmp2_elvis_lhs = item_6.ves_1;
+      if (item_6.ves_1 > 0) {
+        var tmp2_elvis_lhs = item_6.wes_1;
         // Inline function 'kotlin.math.min' call
-        var b_7 = round((tmp2_elvis_lhs == null ? 0.0 : tmp2_elvis_lhs) / item_6.ues_1 * 100.0);
+        var b_7 = round((tmp2_elvis_lhs == null ? 0.0 : tmp2_elvis_lhs) / item_6.ves_1 * 100.0);
         tmp_17 = Math.min(100.0, b_7);
       } else {
         tmp_17 = 0.0;
@@ -142147,10 +142291,10 @@
         tmp_19 = tmp_20 + '-' + tmp_21 + '-' + today.substring(8, 10);
       }
       var achieveBy = tmp_19;
-      var tmp_22 = to('goalId', item_6.ses_1);
-      var tmp_23 = to('label', item_6.tes_1);
-      var tmp_24 = to('targetAmount', item_6.ues_1);
-      var tmp3_elvis_lhs = item_6.ves_1;
+      var tmp_22 = to('goalId', item_6.tes_1);
+      var tmp_23 = to('label', item_6.ues_1);
+      var tmp_24 = to('targetAmount', item_6.ves_1);
+      var tmp3_elvis_lhs = item_6.wes_1;
       var tmp$ret$88 = mapOf([tmp_22, tmp_23, tmp_24, to('currentBalance', tmp3_elvis_lhs == null ? 0.0 : tmp3_elvis_lhs), to('monthlyContribution', contribution), to('monthsToGoal', baseMonths), to('achieveByDate', achieveBy), to('percentComplete', percentComplete)]);
       destination_7.e(tmp$ret$88);
     }
@@ -142167,9 +142311,9 @@
       var cat = element_8.mg();
       // Inline function 'kotlinx.serialization.json.buildJsonObject' call
       var builder_1 = new JsonObjectBuilder();
-      put_0(builder_1, 'id', exp.ges_1);
-      put_0(builder_1, 'label', exp.hes_1);
-      put(builder_1, 'amount', exp.ies_1);
+      put_0(builder_1, 'id', exp.hes_1);
+      put_0(builder_1, 'label', exp.ies_1);
+      put(builder_1, 'amount', exp.jes_1);
       put_0(builder_1, 'taxCategory', cat);
       var tmp$ret$92 = builder_1.k40();
       builder_0.u41(tmp$ret$92);
@@ -142191,9 +142335,9 @@
       var builder_3 = new JsonObjectBuilder();
       // Inline function 'kotlinx.serialization.json.buildJsonObject' call
       var builder_4 = new JsonObjectBuilder();
-      put_0(builder_4, 'id', item_7.ges_1);
-      put_0(builder_4, 'label', item_7.hes_1);
-      put(builder_4, 'amount', item_7.ies_1);
+      put_0(builder_4, 'id', item_7.hes_1);
+      put_0(builder_4, 'label', item_7.ies_1);
+      put(builder_4, 'amount', item_7.jes_1);
       var tmp$ret$98 = builder_4.k40();
       builder_3.s41('item', tmp$ret$98);
       put(builder_3, 'usageFrequency', freq_0);
@@ -142594,16 +142738,16 @@
     return GlobalProjectionService_getInstance().bbw(patchJson, timestamp);
   };
   function buildQuotaJson($this, turnsUsed, isLocked) {
-    return $this.eeu_1.y3y(Companion_instance_0.g41(), new JsonObject(mapOf([to('totalTurnsUsed', JsonPrimitive_1(turnsUsed)), to('maxTurnsAllowed', JsonPrimitive_1($this.deu_1)), to('isHardLocked', JsonPrimitive_2(isLocked))])));
+    return $this.feu_1.y3y(Companion_instance_0.g41(), new JsonObject(mapOf([to('totalTurnsUsed', JsonPrimitive_1(turnsUsed)), to('maxTurnsAllowed', JsonPrimitive_1($this.eeu_1)), to('isHardLocked', JsonPrimitive_2(isLocked))])));
   }
   function GuestQuotaServiceJs$json$lambda($this$Json) {
     $this$Json.u3z_1 = true;
     return Unit_instance;
   }
   function GuestQuotaServiceJs() {
-    this.deu_1 = 10;
+    this.eeu_1 = 10;
     var tmp = this;
-    tmp.eeu_1 = Json(VOID, GuestQuotaServiceJs$json$lambda);
+    tmp.feu_1 = Json(VOID, GuestQuotaServiceJs$json$lambda);
   }
   protoOf(GuestQuotaServiceJs).getDefault = function () {
     return buildQuotaJson(this, 0, false);
@@ -142611,7 +142755,7 @@
   protoOf(GuestQuotaServiceJs).computeNext = function (currentJson) {
     var tmp;
     try {
-      tmp = get_jsonObject(this.eeu_1.c3z(currentJson));
+      tmp = get_jsonObject(this.feu_1.c3z(currentJson));
     } catch ($p) {
       var tmp_0;
       if ($p instanceof Exception) {
@@ -142628,12 +142772,12 @@
     var tmp3_elvis_lhs = tmp2_safe_receiver == null ? null : get_intOrNull(tmp2_safe_receiver);
     var turns = tmp3_elvis_lhs == null ? 0 : tmp3_elvis_lhs;
     var next = turns + 1 | 0;
-    return buildQuotaJson(this, next, next >= this.deu_1);
+    return buildQuotaJson(this, next, next >= this.eeu_1);
   };
   protoOf(GuestQuotaServiceJs).canProceed = function (currentJson) {
     var tmp;
     try {
-      tmp = get_jsonObject(this.eeu_1.c3z(currentJson));
+      tmp = get_jsonObject(this.feu_1.c3z(currentJson));
     } catch ($p) {
       var tmp_0;
       if ($p instanceof Exception) {
@@ -142649,10 +142793,10 @@
     var tmp2_safe_receiver = tmp1_safe_receiver == null ? null : get_jsonPrimitive(tmp1_safe_receiver);
     var tmp3_elvis_lhs = tmp2_safe_receiver == null ? null : get_intOrNull(tmp2_safe_receiver);
     var turns = tmp3_elvis_lhs == null ? 0 : tmp3_elvis_lhs;
-    return turns < this.deu_1;
+    return turns < this.eeu_1;
   };
   protoOf(GuestQuotaServiceJs).getMaxTurns = function () {
-    return this.deu_1;
+    return this.eeu_1;
   };
   function HabitEnergyMatcherJs() {
   }
@@ -142672,25 +142816,25 @@
   protoOf(InteractionDecisionJs).q1r = function () {
     return this.kind;
   };
-  protoOf(InteractionDecisionJs).feu = function () {
+  protoOf(InteractionDecisionJs).geu = function () {
     return this.mode;
   };
-  protoOf(InteractionDecisionJs).geu = function () {
+  protoOf(InteractionDecisionJs).heu = function () {
     return this.reason;
   };
-  protoOf(InteractionDecisionJs).heu = function () {
+  protoOf(InteractionDecisionJs).ieu = function () {
     return this.confidence;
   };
-  protoOf(InteractionDecisionJs).ieu = function () {
+  protoOf(InteractionDecisionJs).jeu = function () {
     return this.historyMode;
   };
-  protoOf(InteractionDecisionJs).jeu = function () {
+  protoOf(InteractionDecisionJs).keu = function () {
     return this.shouldPersistDraft;
   };
-  protoOf(InteractionDecisionJs).keu = function () {
+  protoOf(InteractionDecisionJs).leu = function () {
     return this.shouldNotifyUser;
   };
-  protoOf(InteractionDecisionJs).leu = function () {
+  protoOf(InteractionDecisionJs).meu = function () {
     return this.shouldRenderHudSignal;
   };
   function InteractionGateJs() {
@@ -142730,12 +142874,12 @@
     openrouterKey = openrouterKey === VOID ? '' : openrouterKey;
     geminiKey = geminiKey === VOID ? '' : geminiKey;
     grokKey = grokKey === VOID ? '' : grokKey;
-    this.meu_1 = openrouterKey;
-    this.neu_1 = geminiKey;
-    this.oeu_1 = grokKey;
+    this.neu_1 = openrouterKey;
+    this.oeu_1 = geminiKey;
+    this.peu_1 = grokKey;
   }
   protoOf(JsApiKeyProvider).qdv = function ($completion) {
-    return new ApiKeys(this.meu_1, this.neu_1, this.oeu_1);
+    return new ApiKeys(this.neu_1, this.oeu_1, this.peu_1);
   };
   function LedgerAggregationUtilsJs() {
   }
@@ -142914,10 +143058,10 @@
     return DashboardAggregation_getInstance().xci(goalJson, numberToLong(nowMs));
   };
   function LlmSanitizerJs() {
-    this.peu_1 = new LlmSanitizer();
+    this.qeu_1 = new LlmSanitizer();
   }
   protoOf(LlmSanitizerJs).qdp = function (content, retainSpacings) {
-    return this.peu_1.qdp(content, retainSpacings);
+    return this.qeu_1.qdp(content, retainSpacings);
   };
   protoOf(LlmSanitizerJs).sanitize = function (content, retainSpacings, $super) {
     retainSpacings = retainSpacings === VOID ? false : retainSpacings;
@@ -142925,26 +143069,26 @@
   };
   protoOf(LlmSanitizerJs).parseMutations = function (content) {
     // Inline function 'kotlin.collections.toTypedArray' call
-    var this_0 = this.peu_1.kdr(content);
+    var this_0 = this.qeu_1.kdr(content);
     return copyToArray(this_0);
   };
   protoOf(LlmSanitizerJs).sanitizeJsonPayload = function (content) {
-    return this.peu_1.sdd(content);
+    return this.qeu_1.sdd(content);
   };
   protoOf(LlmSanitizerJs).stripPartialLeadingTag = function (text) {
-    return this.peu_1.ndw(text);
+    return this.qeu_1.ndw(text);
   };
   protoOf(LlmSanitizerJs).stripMutationTags = function (content) {
-    return this.peu_1.odr(content);
+    return this.qeu_1.odr(content);
   };
   protoOf(LlmSanitizerJs).stripProviderControlTokens = function (content) {
-    return this.peu_1.kdw(content);
+    return this.qeu_1.kdw(content);
   };
   protoOf(LlmSanitizerJs).isProviderControlOnly = function (content) {
-    return this.peu_1.ldw(content);
+    return this.qeu_1.ldw(content);
   };
   protoOf(LlmSanitizerJs).stripTechnicalFiller = function (text) {
-    return this.peu_1.mdw(text);
+    return this.qeu_1.mdw(text);
   };
   function normalizeActivity($this, activity) {
     // Inline function 'kotlin.text.lowercase' call
@@ -142969,7 +143113,7 @@
     }
     var allTerms = destination;
     // Inline function 'kotlin.collections.iterator' call
-    var _iterator__ex2g4s_0 = $this.qeu_1.u().j();
+    var _iterator__ex2g4s_0 = $this.reu_1.u().j();
     $l$loop: while (_iterator__ex2g4s_0.k()) {
       var _destruct__k2r9zo = _iterator__ex2g4s_0.l();
       // Inline function 'kotlin.collections.component1' call
@@ -143017,7 +143161,7 @@
     return builder.k40().toString();
   }
   function MedicalClearanceEvaluatorJs() {
-    this.qeu_1 = mapOf([to('high intensity', listOf_0(['cardiac', 'heart', 'hypertension', 'seizure', 'fracture'])), to('heavy lifting', listOf_0(['hernia', 'spinal', 'disc', 'fracture', 'pregnancy'])), to('endurance', listOf_0(['asthma', 'copd', 'cardiac', 'anemia'])), to('flexibility', listOf_0(['hypermobility', 'joint instability']))]);
+    this.reu_1 = mapOf([to('high intensity', listOf_0(['cardiac', 'heart', 'hypertension', 'seizure', 'fracture'])), to('heavy lifting', listOf_0(['hernia', 'spinal', 'disc', 'fracture', 'pregnancy'])), to('endurance', listOf_0(['asthma', 'copd', 'cardiac', 'anemia'])), to('flexibility', listOf_0(['hypermobility', 'joint instability']))]);
   }
   protoOf(MedicalClearanceEvaluatorJs).evaluate = function (profileJson, activity) {
     var profile = get_jsonObject(Default_getInstance_0().c3z(profileJson));
@@ -143167,15 +143311,15 @@
   function Companion_316() {
     Companion_instance_322 = this;
     var tmp = this;
-    tmp.reu_1 = Json(VOID, NeuralStateVectorJs$Companion$lenientJson$lambda);
+    tmp.seu_1 = Json(VOID, NeuralStateVectorJs$Companion$lenientJson$lambda);
   }
-  protoOf(Companion_316).seu = function (json) {
+  protoOf(Companion_316).teu = function (json) {
     if (isBlank(json) || json === '{}')
       return new NeuralStateVector();
     var tmp;
     try {
       // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-      var this_0 = this.reu_1;
+      var this_0 = this.seu_1;
       // Inline function 'kotlinx.serialization.serializer' call
       var this_1 = this_0.b1u();
       // Inline function 'kotlinx.serialization.internal.cast' call
@@ -143203,10 +143347,10 @@
   function NeuralStateVectorJs(nsvJson) {
     Companion_getInstance_326();
     nsvJson = nsvJson === VOID ? '{}' : nsvJson;
-    this.wep_1 = Companion_getInstance_326().seu(nsvJson);
+    this.xep_1 = Companion_getInstance_326().teu(nsvJson);
   }
-  protoOf(NeuralStateVectorJs).teu = function () {
-    return this.wep_1;
+  protoOf(NeuralStateVectorJs).ueu = function () {
+    return this.xep_1;
   };
   function NexusActionPlannerServiceJs() {
   }
@@ -143225,11 +143369,11 @@
   }
   function NexusRoutingServiceJs() {
     var tmp = this;
-    tmp.ueu_1 = Json(VOID, NexusRoutingServiceJs$json$lambda);
-    this.veu_1 = new NexusRoutingService();
+    tmp.veu_1 = Json(VOID, NexusRoutingServiceJs$json$lambda);
+    this.weu_1 = new NexusRoutingService();
   }
   protoOf(NexusRoutingServiceJs).classifyIntent = function (message) {
-    var decision = this.veu_1.ldd(message);
+    var decision = this.weu_1.ldd(message);
     // Inline function 'kotlinx.serialization.json.buildJsonObject' call
     var builder = new JsonObjectBuilder();
     put_0(builder, 'moduleId', decision.zdc_1);
@@ -143244,14 +143388,14 @@
     var tmp;
     try {
       // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-      var this_0 = this.ueu_1;
+      var this_0 = this.veu_1;
       // Inline function 'kotlinx.serialization.serializer' call
       var this_1 = this_0.b1u();
       // Inline function 'kotlinx.serialization.internal.cast' call
       var this_2 = serializer(this_1, createKType(getKClass(ParsedCommandEnvelope), arrayOf([]), false));
       var tmp$ret$2 = isInterface(this_2, KSerializer) ? this_2 : THROW_CCE();
       var parsed = this_0.z3y(tmp$ret$2, parsedCommandJson);
-      var tmp0_elvis_lhs = this.veu_1.kdd(parsed);
+      var tmp0_elvis_lhs = this.weu_1.kdd(parsed);
       var tmp_0;
       if (tmp0_elvis_lhs == null) {
         return '';
@@ -143301,7 +143445,7 @@
       var tmp_2;
       try {
         // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-        var this_0 = this.ueu_1;
+        var this_0 = this.veu_1;
         // Inline function 'kotlinx.serialization.serializer' call
         var this_1 = this_0.b1u();
         // Inline function 'kotlinx.serialization.internal.cast' call
@@ -143321,7 +143465,7 @@
       tmp_1 = tmp_2;
     }
     var parsed = tmp_1;
-    var decision = this.veu_1.ldd(message, VOID, parsed);
+    var decision = this.weu_1.ldd(message, VOID, parsed);
     // Inline function 'kotlinx.serialization.json.buildJsonObject' call
     var builder = new JsonObjectBuilder();
     put_0(builder, 'moduleId', decision.zdc_1);
@@ -143330,10 +143474,10 @@
     return builder.k40().toString();
   };
   protoOf(NexusRoutingServiceJs).buildRouterPrompt = function () {
-    return this.veu_1.ndd();
+    return this.weu_1.ndd();
   };
   protoOf(NexusRoutingServiceJs).parseRoutingResponse = function (raw) {
-    var tmp0_elvis_lhs = this.veu_1.odd(raw);
+    var tmp0_elvis_lhs = this.weu_1.odd(raw);
     var tmp;
     if (tmp0_elvis_lhs == null) {
       return '';
@@ -143349,7 +143493,7 @@
     return builder.k40().toString();
   };
   protoOf(NexusRoutingServiceJs).getRoute = function (moduleId) {
-    return this.veu_1.mdd(moduleId);
+    return this.weu_1.mdd(moduleId);
   };
   function NotificationContentResolverJs() {
   }
@@ -143650,7 +143794,7 @@
   };
   function OrchestrationExecutionUtilsJs() {
   }
-  protoOf(OrchestrationExecutionUtilsJs).weu = function () {
+  protoOf(OrchestrationExecutionUtilsJs).xeu = function () {
     return OrchestrationExecutionUtils_getInstance().dct_1;
   };
   protoOf(OrchestrationExecutionUtilsJs).classifyFailureCode = function (errorMessage) {
@@ -143782,28 +143926,28 @@
     return Unit_instance;
   }
   function PersonaFactoryJs$Companion$profileDeserializers$lambda(obj) {
-    return Companion_getInstance_327().xeu_1.b3z(Companion_getInstance_76().g41(), obj);
+    return Companion_getInstance_327().yeu_1.b3z(Companion_getInstance_76().g41(), obj);
   }
   function PersonaFactoryJs$Companion$profileDeserializers$lambda_0(obj) {
-    return Companion_getInstance_327().xeu_1.b3z(Companion_getInstance_118().g41(), obj);
+    return Companion_getInstance_327().yeu_1.b3z(Companion_getInstance_118().g41(), obj);
   }
   function PersonaFactoryJs$Companion$profileDeserializers$lambda_1(obj) {
-    return Companion_getInstance_327().xeu_1.b3z(Companion_getInstance_165().g41(), obj);
+    return Companion_getInstance_327().yeu_1.b3z(Companion_getInstance_165().g41(), obj);
   }
   function PersonaFactoryJs$Companion$profileDeserializers$lambda_2(obj) {
-    return Companion_getInstance_327().xeu_1.b3z(Companion_getInstance_113().g41(), obj);
+    return Companion_getInstance_327().yeu_1.b3z(Companion_getInstance_113().g41(), obj);
   }
   function Companion_317() {
     Companion_instance_323 = this;
     var tmp = this;
-    tmp.xeu_1 = Json(VOID, PersonaFactoryJs$Companion$lenientJson$lambda);
+    tmp.yeu_1 = Json(VOID, PersonaFactoryJs$Companion$lenientJson$lambda);
     var tmp_0 = this;
     var tmp_1 = to('titan_profile', PersonaFactoryJs$Companion$profileDeserializers$lambda);
     var tmp_2 = to('atlas_profile', PersonaFactoryJs$Companion$profileDeserializers$lambda_0);
     var tmp_3 = to('ledger_profile', PersonaFactoryJs$Companion$profileDeserializers$lambda_1);
-    tmp_0.yeu_1 = mapOf([tmp_1, tmp_2, tmp_3, to('soma_profile', PersonaFactoryJs$Companion$profileDeserializers$lambda_2)]);
+    tmp_0.zeu_1 = mapOf([tmp_1, tmp_2, tmp_3, to('soma_profile', PersonaFactoryJs$Companion$profileDeserializers$lambda_2)]);
   }
-  protoOf(Companion_317).zeu = function (key, element) {
+  protoOf(Companion_317).aev = function (key, element) {
     var tmp;
     if (element instanceof JsonNull) {
       tmp = null;
@@ -143822,7 +143966,7 @@
         tmp = tmp_0;
       } else {
         if (element instanceof JsonObject) {
-          var deserializer = this.yeu_1.j2(key);
+          var deserializer = this.zeu_1.j2(key);
           var tmp_1;
           if (!(deserializer == null)) {
             var tmp_2;
@@ -143845,7 +143989,7 @@
                   // Inline function 'kotlin.collections.component2' call
                   var v = element_0.w();
                   // Inline function 'kotlin.collections.plusAssign' call
-                  var pair = to(k, Companion_getInstance_327().zeu(k, v));
+                  var pair = to(k, Companion_getInstance_327().aev(k, v));
                   destination.m2(pair.rg_1, pair.sg_1);
                 }
                 tmp_3 = destination;
@@ -143869,7 +144013,7 @@
               // Inline function 'kotlin.collections.component2' call
               var v_0 = element_1.w();
               // Inline function 'kotlin.collections.plusAssign' call
-              var pair_0 = to(k_0, Companion_getInstance_327().zeu(k_0, v_0));
+              var pair_0 = to(k_0, Companion_getInstance_327().aev(k_0, v_0));
               destination_0.m2(pair_0.rg_1, pair_0.sg_1);
             }
             tmp_1 = destination_0;
@@ -143883,7 +144027,7 @@
             var _iterator__ex2g4s_1 = element.j();
             while (_iterator__ex2g4s_1.k()) {
               var item = _iterator__ex2g4s_1.l();
-              var tmp$ret$12 = Companion_getInstance_327().zeu('', item);
+              var tmp$ret$12 = Companion_getInstance_327().aev('', item);
               destination_1.e(tmp$ret$12);
             }
             tmp = destination_1;
@@ -143903,24 +144047,24 @@
   }
   function PersonaFactoryJs() {
     Companion_getInstance_327();
-    this.aev_1 = new DefaultPersonaFactory();
+    this.bev_1 = new DefaultPersonaFactory();
   }
-  protoOf(PersonaFactoryJs).bev = function (moduleId, identity, nsv, longTermSummary) {
+  protoOf(PersonaFactoryJs).cev = function (moduleId, identity, nsv, longTermSummary) {
     if (nsv == null)
       return identity.name;
-    return this.aev_1.mdy(moduleId, identity.toUserIdentity(), nsv.wep_1, emptyMap(), longTermSummary);
+    return this.bev_1.mdy(moduleId, identity.toUserIdentity(), nsv.xep_1, emptyMap(), longTermSummary);
   };
   protoOf(PersonaFactoryJs).assemble = function (moduleId, identity, nsv, longTermSummary, $super) {
     longTermSummary = longTermSummary === VOID ? null : longTermSummary;
-    return $super === VOID ? this.bev(moduleId, identity, nsv, longTermSummary) : $super.bev.call(this, moduleId, identity, nsv, longTermSummary);
+    return $super === VOID ? this.cev(moduleId, identity, nsv, longTermSummary) : $super.cev.call(this, moduleId, identity, nsv, longTermSummary);
   };
-  protoOf(PersonaFactoryJs).cev = function (moduleId, identity, nsv, moduleContextJson, longTermSummary) {
+  protoOf(PersonaFactoryJs).dev = function (moduleId, identity, nsv, moduleContextJson, longTermSummary) {
     if (nsv == null)
       return identity.name;
     var tmp;
     try {
       // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-      var this_0 = Companion_getInstance_327().xeu_1;
+      var this_0 = Companion_getInstance_327().yeu_1;
       // Inline function 'kotlinx.serialization.serializer' call
       var this_1 = this_0.b1u();
       // Inline function 'kotlinx.serialization.internal.cast' call
@@ -143940,7 +144084,7 @@
         // Inline function 'kotlin.collections.component2' call
         var v = element.w();
         // Inline function 'kotlin.collections.plusAssign' call
-        var pair = to(k, Companion_getInstance_327().zeu(k, v));
+        var pair = to(k, Companion_getInstance_327().aev(k, v));
         destination.m2(pair.rg_1, pair.sg_1);
       }
       tmp = destination;
@@ -143955,11 +144099,11 @@
       tmp = tmp_0;
     }
     var context = tmp;
-    return this.aev_1.mdy(moduleId, identity.toUserIdentity(), nsv.wep_1, context, longTermSummary);
+    return this.bev_1.mdy(moduleId, identity.toUserIdentity(), nsv.xep_1, context, longTermSummary);
   };
   protoOf(PersonaFactoryJs).assembleWithContext = function (moduleId, identity, nsv, moduleContextJson, longTermSummary, $super) {
     longTermSummary = longTermSummary === VOID ? null : longTermSummary;
-    return $super === VOID ? this.cev(moduleId, identity, nsv, moduleContextJson, longTermSummary) : $super.cev.call(this, moduleId, identity, nsv, moduleContextJson, longTermSummary);
+    return $super === VOID ? this.dev(moduleId, identity, nsv, moduleContextJson, longTermSummary) : $super.dev.call(this, moduleId, identity, nsv, moduleContextJson, longTermSummary);
   };
   function PersonaPromptCatalogJs() {
   }
@@ -143971,17 +144115,17 @@
     return OrchestratorPersonaPrompts_getInstance().ve3(name);
   };
   function PendingMutation(vector, sourcePrecedence, registeredAt) {
-    this.dev_1 = vector;
-    this.eev_1 = sourcePrecedence;
-    this.fev_1 = registeredAt;
+    this.eev_1 = vector;
+    this.fev_1 = sourcePrecedence;
+    this.gev_1 = registeredAt;
   }
   protoOf(PendingMutation).toString = function () {
-    return 'PendingMutation(vector=' + this.dev_1 + ', sourcePrecedence=' + this.eev_1 + ', registeredAt=' + this.fev_1.toString() + ')';
+    return 'PendingMutation(vector=' + this.eev_1 + ', sourcePrecedence=' + this.fev_1 + ', registeredAt=' + this.gev_1.toString() + ')';
   };
   protoOf(PendingMutation).hashCode = function () {
-    var result = getStringHashCode(this.dev_1);
-    result = imul(result, 31) + this.eev_1 | 0;
-    result = imul(result, 31) + this.fev_1.hashCode() | 0;
+    var result = getStringHashCode(this.eev_1);
+    result = imul(result, 31) + this.fev_1 | 0;
+    result = imul(result, 31) + this.gev_1.hashCode() | 0;
     return result;
   };
   protoOf(PendingMutation).equals = function (other) {
@@ -143990,38 +144134,38 @@
     if (!(other instanceof PendingMutation))
       return false;
     var tmp0_other_with_cast = other instanceof PendingMutation ? other : THROW_CCE();
-    if (!(this.dev_1 === tmp0_other_with_cast.dev_1))
-      return false;
     if (!(this.eev_1 === tmp0_other_with_cast.eev_1))
       return false;
-    if (!this.fev_1.equals(tmp0_other_with_cast.fev_1))
+    if (!(this.fev_1 === tmp0_other_with_cast.fev_1))
+      return false;
+    if (!this.gev_1.equals(tmp0_other_with_cast.gev_1))
       return false;
     return true;
   };
   function PrecedenceResolverJs$evaluate$lambda($now, this$0) {
     return function (it) {
-      return $now.x2(it.fev_1).b1(this$0.hev_1) > 0;
+      return $now.x2(it.gev_1).b1(this$0.iev_1) > 0;
     };
   }
   function PrecedenceResolverJs$evaluate$lambda_0($vector) {
     return function (it) {
-      return it.dev_1 === $vector;
+      return it.eev_1 === $vector;
     };
   }
   function PrecedenceResolverJs() {
     var tmp = this;
     // Inline function 'kotlin.collections.mutableListOf' call
-    tmp.gev_1 = ArrayList_init_$Create$_0();
-    this.hev_1 = new Long(500, 0);
-    this.iev_1 = mapOf([to('system', 0), to('agnes', 1), to('atlas', 2), to('soma', 3), to('titan', 4), to('ledger', 5), to('scout', 6), to('forge', 7), to('nexus', 99)]);
+    tmp.hev_1 = ArrayList_init_$Create$_0();
+    this.iev_1 = new Long(500, 0);
+    this.jev_1 = mapOf([to('system', 0), to('agnes', 1), to('atlas', 2), to('soma', 3), to('titan', 4), to('ledger', 5), to('scout', 6), to('forge', 7), to('nexus', 99)]);
   }
   protoOf(PrecedenceResolverJs).evaluate = function (source, mutationVectorsJson, currentlyRequiresApproval) {
     var now = System_instance.s4c().d4u();
-    removeAll(this.gev_1, PrecedenceResolverJs$evaluate$lambda(now, this));
+    removeAll(this.hev_1, PrecedenceResolverJs$evaluate$lambda(now, this));
     // Inline function 'kotlin.text.lowercase' call
     // Inline function 'kotlin.js.asDynamic' call
     var tmp$ret$1 = source.toLowerCase();
-    var tmp0_elvis_lhs = this.iev_1.j2(tmp$ret$1);
+    var tmp0_elvis_lhs = this.jev_1.j2(tmp$ret$1);
     var incomingPrecedence = tmp0_elvis_lhs == null ? 99 : tmp0_elvis_lhs;
     var tmp;
     try {
@@ -144047,14 +144191,14 @@
     var _iterator__ex2g4s = vectors.j();
     while (_iterator__ex2g4s.k()) {
       var vector = _iterator__ex2g4s.l();
-      var tmp3 = this.gev_1;
+      var tmp3 = this.hev_1;
       var tmp$ret$6;
       $l$block: {
         // Inline function 'kotlin.collections.firstOrNull' call
         var _iterator__ex2g4s_0 = tmp3.j();
         while (_iterator__ex2g4s_0.k()) {
           var element = _iterator__ex2g4s_0.l();
-          if (element.dev_1 === vector) {
+          if (element.eev_1 === vector) {
             tmp$ret$6 = element;
             break $l$block;
           }
@@ -144063,35 +144207,35 @@
       }
       var collision = tmp$ret$6;
       if (!(collision == null)) {
-        if (collision.eev_1 < incomingPrecedence) {
+        if (collision.fev_1 < incomingPrecedence) {
           requiresApproval = true;
         } else {
-          removeAll(this.gev_1, PrecedenceResolverJs$evaluate$lambda_0(vector));
+          removeAll(this.hev_1, PrecedenceResolverJs$evaluate$lambda_0(vector));
         }
       }
     }
     var _iterator__ex2g4s_1 = vectors.j();
     while (_iterator__ex2g4s_1.k()) {
       var vector_0 = _iterator__ex2g4s_1.l();
-      this.gev_1.e(new PendingMutation(vector_0, incomingPrecedence, now));
+      this.hev_1.e(new PendingMutation(vector_0, incomingPrecedence, now));
     }
     return requiresApproval;
   };
   protoOf(PrecedenceResolverJs).clear = function () {
-    return this.gev_1.d2();
+    return this.hev_1.d2();
   };
   function VolumeLandmarksJs(mev, mav, mrv) {
     this.mev = mev;
     this.mav = mav;
     this.mrv = mrv;
   }
-  protoOf(VolumeLandmarksJs).jev = function () {
+  protoOf(VolumeLandmarksJs).kev = function () {
     return this.mev;
   };
-  protoOf(VolumeLandmarksJs).kev = function () {
+  protoOf(VolumeLandmarksJs).lev = function () {
     return this.mav;
   };
-  protoOf(VolumeLandmarksJs).lev = function () {
+  protoOf(VolumeLandmarksJs).nev = function () {
     return this.mrv;
   };
   function AcwrResultJs(acuteLoad, chronicLoad, ratio, riskZone) {
@@ -144100,16 +144244,16 @@
     this.ratio = ratio;
     this.riskZone = riskZone;
   }
-  protoOf(AcwrResultJs).nev = function () {
+  protoOf(AcwrResultJs).oev = function () {
     return this.acuteLoad;
   };
-  protoOf(AcwrResultJs).oev = function () {
+  protoOf(AcwrResultJs).pev = function () {
     return this.chronicLoad;
   };
-  protoOf(AcwrResultJs).pev = function () {
+  protoOf(AcwrResultJs).qev = function () {
     return this.ratio;
   };
-  protoOf(AcwrResultJs).qev = function () {
+  protoOf(AcwrResultJs).rev = function () {
     return this.riskZone;
   };
   function ProgressionRecommendationJs(tier, reason, suggestedWeight, suggestedReps, weightIncrement, currentE1rm) {
@@ -144120,22 +144264,22 @@
     this.weightIncrement = weightIncrement;
     this.currentE1rm = currentE1rm;
   }
-  protoOf(ProgressionRecommendationJs).rev = function () {
+  protoOf(ProgressionRecommendationJs).sev = function () {
     return this.tier;
   };
-  protoOf(ProgressionRecommendationJs).geu = function () {
+  protoOf(ProgressionRecommendationJs).heu = function () {
     return this.reason;
   };
-  protoOf(ProgressionRecommendationJs).sev = function () {
+  protoOf(ProgressionRecommendationJs).tev = function () {
     return this.suggestedWeight;
   };
-  protoOf(ProgressionRecommendationJs).tev = function () {
+  protoOf(ProgressionRecommendationJs).uev = function () {
     return this.suggestedReps;
   };
-  protoOf(ProgressionRecommendationJs).uev = function () {
+  protoOf(ProgressionRecommendationJs).vev = function () {
     return this.weightIncrement;
   };
-  protoOf(ProgressionRecommendationJs).vev = function () {
+  protoOf(ProgressionRecommendationJs).wev = function () {
     return this.currentE1rm;
   };
   function ProgressiveOverloadEngineJs$json$lambda($this$Json) {
@@ -144144,7 +144288,7 @@
   }
   function ProgressiveOverloadEngineJs() {
     var tmp = this;
-    tmp.wev_1 = Json(VOID, ProgressiveOverloadEngineJs$json$lambda);
+    tmp.xev_1 = Json(VOID, ProgressiveOverloadEngineJs$json$lambda);
   }
   protoOf(ProgressiveOverloadEngineJs).epley = function (weight, reps) {
     return ProgressiveOverloadEngine_getInstance().pd1(weight, reps);
@@ -144172,7 +144316,7 @@
     }
     var map = destination;
     // Inline function 'kotlinx.serialization.encodeToString' call
-    var this_0 = this.wev_1;
+    var this_0 = this.xev_1;
     // Inline function 'kotlinx.serialization.serializer' call
     var this_1 = this_0.b1u();
     // Inline function 'kotlinx.serialization.internal.cast' call
@@ -144182,7 +144326,7 @@
   };
   protoOf(ProgressiveOverloadEngineJs).computeAcwr = function (sessionLoadsJson) {
     // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-    var this_0 = this.wev_1;
+    var this_0 = this.xev_1;
     // Inline function 'kotlinx.serialization.serializer' call
     var this_1 = this_0.b1u();
     // Inline function 'kotlinx.serialization.internal.cast' call
@@ -144192,9 +144336,9 @@
     var r = ProgressiveOverloadEngine_getInstance().sd1(loads);
     return new AcwrResultJs(r.ed1_1, r.fd1_1, r.gd1_1, r.hd1_1.p2_1);
   };
-  protoOf(ProgressiveOverloadEngineJs).xev = function (avgRpe, e1rmTrendJson, completedSets, targetSets, currentWeight, currentReps, acwr, unit) {
+  protoOf(ProgressiveOverloadEngineJs).yev = function (avgRpe, e1rmTrendJson, completedSets, targetSets, currentWeight, currentReps, acwr, unit) {
     // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-    var this_0 = this.wev_1;
+    var this_0 = this.xev_1;
     // Inline function 'kotlinx.serialization.serializer' call
     var this_1 = this_0.b1u();
     // Inline function 'kotlinx.serialization.internal.cast' call
@@ -144207,11 +144351,11 @@
   protoOf(ProgressiveOverloadEngineJs).recommend = function (avgRpe, e1rmTrendJson, completedSets, targetSets, currentWeight, currentReps, acwr, unit, $super) {
     acwr = acwr === VOID ? 1.0 : acwr;
     unit = unit === VOID ? 'kg' : unit;
-    return $super === VOID ? this.xev(avgRpe, e1rmTrendJson, completedSets, targetSets, currentWeight, currentReps, acwr, unit) : $super.xev.call(this, avgRpe, e1rmTrendJson, completedSets, targetSets, currentWeight, currentReps, acwr, unit);
+    return $super === VOID ? this.yev(avgRpe, e1rmTrendJson, completedSets, targetSets, currentWeight, currentReps, acwr, unit) : $super.yev.call(this, avgRpe, e1rmTrendJson, completedSets, targetSets, currentWeight, currentReps, acwr, unit);
   };
   function RagChunkingServiceJs() {
   }
-  protoOf(RagChunkingServiceJs).yev = function (text, chunkSize, chunkOverlap, minChunkSize) {
+  protoOf(RagChunkingServiceJs).zev = function (text, chunkSize, chunkOverlap, minChunkSize) {
     var config = new ChunkingConfig(chunkSize, chunkOverlap, minChunkSize);
     var chunks = RagChunkingService_instance.xe4(text, config);
     // Inline function 'kotlinx.serialization.encodeToString' call
@@ -144227,7 +144371,7 @@
     chunkSize = chunkSize === VOID ? 2000 : chunkSize;
     chunkOverlap = chunkOverlap === VOID ? 400 : chunkOverlap;
     minChunkSize = minChunkSize === VOID ? 200 : minChunkSize;
-    return $super === VOID ? this.yev(text, chunkSize, chunkOverlap, minChunkSize) : $super.yev.call(this, text, chunkSize, chunkOverlap, minChunkSize);
+    return $super === VOID ? this.zev(text, chunkSize, chunkOverlap, minChunkSize) : $super.zev.call(this, text, chunkSize, chunkOverlap, minChunkSize);
   };
   function RecurringBillEngineJs$postDueTransactions$lambda() {
     var tmp = crypto.randomUUID();
@@ -144282,22 +144426,22 @@
     this.willPersistHistory = willPersistHistory;
     this.shouldNotifyUser = shouldNotifyUser;
   }
-  protoOf(RuntimeSemanticsJs).zev = function () {
+  protoOf(RuntimeSemanticsJs).aew = function () {
     return this.autopilotLevel;
   };
-  protoOf(RuntimeSemanticsJs).aew = function () {
+  protoOf(RuntimeSemanticsJs).bew = function () {
     return this.autonomy;
   };
-  protoOf(RuntimeSemanticsJs).bew = function () {
+  protoOf(RuntimeSemanticsJs).cew = function () {
     return this.disposition;
   };
-  protoOf(RuntimeSemanticsJs).cew = function () {
+  protoOf(RuntimeSemanticsJs).dew = function () {
     return this.historyDestination;
   };
-  protoOf(RuntimeSemanticsJs).dew = function () {
+  protoOf(RuntimeSemanticsJs).eew = function () {
     return this.willPersistHistory;
   };
-  protoOf(RuntimeSemanticsJs).keu = function () {
+  protoOf(RuntimeSemanticsJs).leu = function () {
     return this.shouldNotifyUser;
   };
   function RuntimeSemanticsBuilderJs() {
@@ -144336,16 +144480,16 @@
     return RuntimeSemanticsBuilder_instance.rdz(disposition);
   };
   function ScoutSessionContextAssemblerJs() {
-    this.eew_1 = new ScoutSessionContextAssembler();
+    this.few_1 = new ScoutSessionContextAssembler();
   }
   protoOf(ScoutSessionContextAssemblerJs).assembleFusedContext = function (nodesJson, webResultsJson, sessionTopic, userQuery) {
-    return this.eew_1.he4(nodesJson, webResultsJson, sessionTopic, userQuery);
+    return this.few_1.he4(nodesJson, webResultsJson, sessionTopic, userQuery);
   };
   protoOf(ScoutSessionContextAssemblerJs).computeCoverageScore = function (nodesJson) {
-    return this.eew_1.ie4(nodesJson);
+    return this.few_1.ie4(nodesJson);
   };
   protoOf(ScoutSessionContextAssemblerJs).isOffTopic = function (userQuery, sessionTopic) {
-    return this.eew_1.je4(userQuery, sessionTopic);
+    return this.few_1.je4(userQuery, sessionTopic);
   };
   function SessionArcJs$json$lambda($this$Json) {
     $this$Json.u3z_1 = true;
@@ -144353,7 +144497,7 @@
   }
   function SessionArcJs() {
     var tmp = this;
-    tmp.few_1 = Json(VOID, SessionArcJs$json$lambda);
+    tmp.gew_1 = Json(VOID, SessionArcJs$json$lambda);
   }
   protoOf(SessionArcJs).computeSessionProgressJson = function (exchangeCount, sessionStartedAtMs, mode, nowMs) {
     // Inline function 'kotlin.text.lowercase' call
@@ -144377,11 +144521,11 @@
         break;
     }
     var progress = AgnesSessionArc_getInstance().zby(exchangeCount, numberToLong(sessionStartedAtMs), normalizedMode);
-    return this.few_1.y3y(Companion_getInstance_199().g41(), progress);
+    return this.gew_1.y3y(Companion_getInstance_199().g41(), progress);
   };
   protoOf(SessionArcJs).buildSessionProgressBlock = function (progressJson, mode) {
     var tmp = AgnesSessionArc_getInstance();
-    var tmp_0 = this.few_1.z3y(Companion_getInstance_199().g41(), progressJson);
+    var tmp_0 = this.gew_1.z3y(Companion_getInstance_199().g41(), progressJson);
     // Inline function 'kotlin.text.lowercase' call
     // Inline function 'kotlin.js.asDynamic' call
     var tmp0_subject = mode.toLowerCase();
@@ -144410,19 +144554,19 @@
     this.output = output;
     this.friction = friction;
   }
-  protoOf(SpecVectorSnapshotJs).gew = function () {
+  protoOf(SpecVectorSnapshotJs).hew = function () {
     return this.resilience;
   };
-  protoOf(SpecVectorSnapshotJs).hew = function () {
+  protoOf(SpecVectorSnapshotJs).iew = function () {
     return this.bandwidth;
   };
-  protoOf(SpecVectorSnapshotJs).iew = function () {
+  protoOf(SpecVectorSnapshotJs).jew = function () {
     return this.vitality;
   };
-  protoOf(SpecVectorSnapshotJs).jew = function () {
+  protoOf(SpecVectorSnapshotJs).kew = function () {
     return this.output;
   };
-  protoOf(SpecVectorSnapshotJs).kew = function () {
+  protoOf(SpecVectorSnapshotJs).lew = function () {
     return this.friction;
   };
   function SpecVectorBreakdownEntryJs(key, value) {
@@ -144447,21 +144591,21 @@
   protoOf(SpecVectorBreakdownJs).w = function () {
     return this.value;
   };
-  protoOf(SpecVectorBreakdownJs).lew = function () {
+  protoOf(SpecVectorBreakdownJs).mew = function () {
     return this.inputs;
   };
-  protoOf(SpecVectorBreakdownJs).mew = function () {
+  protoOf(SpecVectorBreakdownJs).new = function () {
     return this.notes;
   };
   function SpecVectorCalculatorJs() {
   }
   protoOf(SpecVectorCalculatorJs).getSnapshot = function (nsv) {
-    var snap = SpecVectorCalculator_instance.kdz(nsv.wep_1);
+    var snap = SpecVectorCalculator_instance.kdz(nsv.xep_1);
     return new SpecVectorSnapshotJs(snap.pdy_1, snap.qdy_1, snap.rdy_1, snap.sdy_1, snap.tdy_1);
   };
   protoOf(SpecVectorCalculatorJs).getBreakdown = function (nsv) {
     // Inline function 'kotlin.collections.map' call
-    var this_0 = SpecVectorCalculator_instance.ldz(nsv.wep_1);
+    var this_0 = SpecVectorCalculator_instance.ldz(nsv.xep_1);
     // Inline function 'kotlin.collections.mapTo' call
     var destination = ArrayList_init_$Create$(collectionSizeOrDefault(this_0, 10));
     var _iterator__ex2g4s = this_0.j();
@@ -144489,19 +144633,19 @@
     return copyToArray(destination);
   };
   protoOf(SpecVectorCalculatorJs).selectResilience = function (nsv) {
-    return SpecVectorCalculator_instance.fdz(nsv.wep_1);
+    return SpecVectorCalculator_instance.fdz(nsv.xep_1);
   };
   protoOf(SpecVectorCalculatorJs).selectBandwidth = function (nsv) {
-    return SpecVectorCalculator_instance.gdz(nsv.wep_1);
+    return SpecVectorCalculator_instance.gdz(nsv.xep_1);
   };
   protoOf(SpecVectorCalculatorJs).selectVitality = function (nsv) {
-    return SpecVectorCalculator_instance.hdz(nsv.wep_1);
+    return SpecVectorCalculator_instance.hdz(nsv.xep_1);
   };
   protoOf(SpecVectorCalculatorJs).selectOutput = function (nsv) {
-    return SpecVectorCalculator_instance.idz(nsv.wep_1);
+    return SpecVectorCalculator_instance.idz(nsv.xep_1);
   };
   protoOf(SpecVectorCalculatorJs).selectFriction = function (nsv) {
-    return SpecVectorCalculator_instance.jdz(nsv.wep_1);
+    return SpecVectorCalculator_instance.jdz(nsv.xep_1);
   };
   function FlowContractsJs() {
   }
@@ -144558,7 +144702,7 @@
   protoOf(StreamChunkJs).edw = function () {
     return this.currentActionType;
   };
-  protoOf(StreamChunkJs).new = function (delta, isThinking, isActing, currentActionType) {
+  protoOf(StreamChunkJs).oew = function (delta, isThinking, isActing, currentActionType) {
     return new StreamChunkJs(delta, isThinking, isActing, currentActionType);
   };
   protoOf(StreamChunkJs).copy = function (delta, isThinking, isActing, currentActionType, $super) {
@@ -144566,7 +144710,7 @@
     isThinking = isThinking === VOID ? this.isThinking : isThinking;
     isActing = isActing === VOID ? this.isActing : isActing;
     currentActionType = currentActionType === VOID ? this.currentActionType : currentActionType;
-    return $super === VOID ? this.new(delta, isThinking, isActing, currentActionType) : $super.new.call(this, delta, isThinking, isActing, currentActionType);
+    return $super === VOID ? this.oew(delta, isThinking, isActing, currentActionType) : $super.oew.call(this, delta, isThinking, isActing, currentActionType);
   };
   protoOf(StreamChunkJs).toString = function () {
     return 'StreamChunkJs(delta=' + this.delta + ', isThinking=' + this.isThinking + ', isActing=' + this.isActing + ', currentActionType=' + this.currentActionType + ')';
@@ -144606,13 +144750,13 @@
   protoOf(FinalResponseJs).f41 = function () {
     return this.content;
   };
-  protoOf(FinalResponseJs).oew = function () {
+  protoOf(FinalResponseJs).pew = function () {
     return this.thoughts;
   };
-  protoOf(FinalResponseJs).pew = function () {
+  protoOf(FinalResponseJs).qew = function () {
     return this.actionsJson;
   };
-  protoOf(FinalResponseJs).qew = function () {
+  protoOf(FinalResponseJs).rew = function () {
     return this.mutationsJson;
   };
   protoOf(FinalResponseJs).lg = function () {
@@ -144627,7 +144771,7 @@
   protoOf(FinalResponseJs).edw = function () {
     return this.mutationsJson;
   };
-  protoOf(FinalResponseJs).rew = function (content, thoughts, actionsJson, mutationsJson) {
+  protoOf(FinalResponseJs).sew = function (content, thoughts, actionsJson, mutationsJson) {
     return new FinalResponseJs(content, thoughts, actionsJson, mutationsJson);
   };
   protoOf(FinalResponseJs).copy = function (content, thoughts, actionsJson, mutationsJson, $super) {
@@ -144635,7 +144779,7 @@
     thoughts = thoughts === VOID ? this.thoughts : thoughts;
     actionsJson = actionsJson === VOID ? this.actionsJson : actionsJson;
     mutationsJson = mutationsJson === VOID ? this.mutationsJson : mutationsJson;
-    return $super === VOID ? this.rew(content, thoughts, actionsJson, mutationsJson) : $super.rew.call(this, content, thoughts, actionsJson, mutationsJson);
+    return $super === VOID ? this.sew(content, thoughts, actionsJson, mutationsJson) : $super.sew.call(this, content, thoughts, actionsJson, mutationsJson);
   };
   protoOf(FinalResponseJs).toString = function () {
     return 'FinalResponseJs(content=' + this.content + ', thoughts=' + this.thoughts + ', actionsJson=' + this.actionsJson + ', mutationsJson=' + this.mutationsJson + ')';
@@ -144674,24 +144818,24 @@
     var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('com.agnes.nexus.core.engine.TitanClearanceEngineJs.BiologicalState', this, 2);
     tmp0_serialDesc.c21('recoveryScore', true);
     tmp0_serialDesc.c21('cnsFatigue', true);
-    this.sew_1 = tmp0_serialDesc;
+    this.tew_1 = tmp0_serialDesc;
   }
-  protoOf($serializer_294).tew = function (encoder, value) {
-    var tmp0_desc = this.sew_1;
+  protoOf($serializer_294).uew = function (encoder, value) {
+    var tmp0_desc = this.tew_1;
     var tmp1_output = encoder.m1t(tmp0_desc);
-    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.uew_1 == null)) {
-      tmp1_output.f1v(tmp0_desc, 0, DoubleSerializer_getInstance(), value.uew_1);
+    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.vew_1 == null)) {
+      tmp1_output.f1v(tmp0_desc, 0, DoubleSerializer_getInstance(), value.vew_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !(value.vew_1 == null)) {
-      tmp1_output.f1v(tmp0_desc, 1, DoubleSerializer_getInstance(), value.vew_1);
+    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !(value.wew_1 == null)) {
+      tmp1_output.f1v(tmp0_desc, 1, DoubleSerializer_getInstance(), value.wew_1);
     }
     tmp1_output.n1t(tmp0_desc);
   };
   protoOf($serializer_294).e1q = function (encoder, value) {
-    return this.tew(encoder, value instanceof BiologicalState_0 ? value : THROW_CCE());
+    return this.uew(encoder, value instanceof BiologicalState_0 ? value : THROW_CCE());
   };
   protoOf($serializer_294).f1q = function (decoder) {
-    var tmp0_desc = this.sew_1;
+    var tmp0_desc = this.tew_1;
     var tmp1_flag = true;
     var tmp2_index = 0;
     var tmp3_bitMask0 = 0;
@@ -144726,7 +144870,7 @@
     return BiologicalState_init_$Create$_0(tmp3_bitMask0, tmp4_local0, tmp5_local1, null);
   };
   protoOf($serializer_294).d1q = function () {
-    return this.sew_1;
+    return this.tew_1;
   };
   protoOf($serializer_294).r21 = function () {
     // Inline function 'kotlin.arrayOf' call
@@ -144742,16 +144886,16 @@
   }
   function BiologicalState_init_$Init$_0(seen0, recoveryScore, cnsFatigue, serializationConstructorMarker, $this) {
     if (!(0 === (0 & seen0))) {
-      throwMissingFieldException(seen0, 0, $serializer_getInstance_298().sew_1);
+      throwMissingFieldException(seen0, 0, $serializer_getInstance_298().tew_1);
     }
     if (0 === (seen0 & 1))
-      $this.uew_1 = null;
-    else
-      $this.uew_1 = recoveryScore;
-    if (0 === (seen0 & 2))
       $this.vew_1 = null;
     else
-      $this.vew_1 = cnsFatigue;
+      $this.vew_1 = recoveryScore;
+    if (0 === (seen0 & 2))
+      $this.wew_1 = null;
+    else
+      $this.wew_1 = cnsFatigue;
     return $this;
   }
   function BiologicalState_init_$Create$_0(seen0, recoveryScore, cnsFatigue, serializationConstructorMarker) {
@@ -144767,21 +144911,21 @@
     $serializer_instance_299 = this;
     var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('com.agnes.nexus.core.engine.TitanClearanceEngineJs.EmotionalState', this, 1);
     tmp0_serialDesc.c21('emotionalResilience', true);
-    this.wew_1 = tmp0_serialDesc;
+    this.xew_1 = tmp0_serialDesc;
   }
-  protoOf($serializer_295).xew = function (encoder, value) {
-    var tmp0_desc = this.wew_1;
+  protoOf($serializer_295).yew = function (encoder, value) {
+    var tmp0_desc = this.xew_1;
     var tmp1_output = encoder.m1t(tmp0_desc);
-    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.yew_1 == null)) {
-      tmp1_output.f1v(tmp0_desc, 0, DoubleSerializer_getInstance(), value.yew_1);
+    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.zew_1 == null)) {
+      tmp1_output.f1v(tmp0_desc, 0, DoubleSerializer_getInstance(), value.zew_1);
     }
     tmp1_output.n1t(tmp0_desc);
   };
   protoOf($serializer_295).e1q = function (encoder, value) {
-    return this.xew(encoder, value instanceof EmotionalState_0 ? value : THROW_CCE());
+    return this.yew(encoder, value instanceof EmotionalState_0 ? value : THROW_CCE());
   };
   protoOf($serializer_295).f1q = function (decoder) {
-    var tmp0_desc = this.wew_1;
+    var tmp0_desc = this.xew_1;
     var tmp1_flag = true;
     var tmp2_index = 0;
     var tmp3_bitMask0 = 0;
@@ -144809,7 +144953,7 @@
     return EmotionalState_init_$Create$_0(tmp3_bitMask0, tmp4_local0, null);
   };
   protoOf($serializer_295).d1q = function () {
-    return this.wew_1;
+    return this.xew_1;
   };
   protoOf($serializer_295).r21 = function () {
     // Inline function 'kotlin.arrayOf' call
@@ -144825,12 +144969,12 @@
   }
   function EmotionalState_init_$Init$_0(seen0, emotionalResilience, serializationConstructorMarker, $this) {
     if (!(0 === (0 & seen0))) {
-      throwMissingFieldException(seen0, 0, $serializer_getInstance_299().wew_1);
+      throwMissingFieldException(seen0, 0, $serializer_getInstance_299().xew_1);
     }
     if (0 === (seen0 & 1))
-      $this.yew_1 = null;
+      $this.zew_1 = null;
     else
-      $this.yew_1 = emotionalResilience;
+      $this.zew_1 = emotionalResilience;
     return $this;
   }
   function EmotionalState_init_$Create$_0(seen0, emotionalResilience, serializationConstructorMarker) {
@@ -144847,24 +144991,24 @@
     var tmp0_serialDesc = new PluginGeneratedSerialDescriptor('com.agnes.nexus.core.engine.TitanClearanceEngineJs.NsvInput', this, 2);
     tmp0_serialDesc.c21('biological', true);
     tmp0_serialDesc.c21('emotional', true);
-    this.zew_1 = tmp0_serialDesc;
+    this.aex_1 = tmp0_serialDesc;
   }
-  protoOf($serializer_296).aex = function (encoder, value) {
-    var tmp0_desc = this.zew_1;
+  protoOf($serializer_296).bex = function (encoder, value) {
+    var tmp0_desc = this.aex_1;
     var tmp1_output = encoder.m1t(tmp0_desc);
-    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.bex_1 == null)) {
-      tmp1_output.f1v(tmp0_desc, 0, $serializer_getInstance_298(), value.bex_1);
+    if (tmp1_output.j1v(tmp0_desc, 0) ? true : !(value.cex_1 == null)) {
+      tmp1_output.f1v(tmp0_desc, 0, $serializer_getInstance_298(), value.cex_1);
     }
-    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !(value.cex_1 == null)) {
-      tmp1_output.f1v(tmp0_desc, 1, $serializer_getInstance_299(), value.cex_1);
+    if (tmp1_output.j1v(tmp0_desc, 1) ? true : !(value.dex_1 == null)) {
+      tmp1_output.f1v(tmp0_desc, 1, $serializer_getInstance_299(), value.dex_1);
     }
     tmp1_output.n1t(tmp0_desc);
   };
   protoOf($serializer_296).e1q = function (encoder, value) {
-    return this.aex(encoder, value instanceof NsvInput ? value : THROW_CCE());
+    return this.bex(encoder, value instanceof NsvInput ? value : THROW_CCE());
   };
   protoOf($serializer_296).f1q = function (decoder) {
-    var tmp0_desc = this.zew_1;
+    var tmp0_desc = this.aex_1;
     var tmp1_flag = true;
     var tmp2_index = 0;
     var tmp3_bitMask0 = 0;
@@ -144899,7 +145043,7 @@
     return NsvInput_init_$Create$(tmp3_bitMask0, tmp4_local0, tmp5_local1, null);
   };
   protoOf($serializer_296).d1q = function () {
-    return this.zew_1;
+    return this.aex_1;
   };
   protoOf($serializer_296).r21 = function () {
     // Inline function 'kotlin.arrayOf' call
@@ -144915,16 +145059,16 @@
   }
   function NsvInput_init_$Init$(seen0, biological, emotional, serializationConstructorMarker, $this) {
     if (!(0 === (0 & seen0))) {
-      throwMissingFieldException(seen0, 0, $serializer_getInstance_300().zew_1);
+      throwMissingFieldException(seen0, 0, $serializer_getInstance_300().aex_1);
     }
     if (0 === (seen0 & 1))
-      $this.bex_1 = null;
-    else
-      $this.bex_1 = biological;
-    if (0 === (seen0 & 2))
       $this.cex_1 = null;
     else
-      $this.cex_1 = emotional;
+      $this.cex_1 = biological;
+    if (0 === (seen0 & 2))
+      $this.dex_1 = null;
+    else
+      $this.dex_1 = emotional;
     return $this;
   }
   function NsvInput_init_$Create$(seen0, biological, emotional, serializationConstructorMarker) {
@@ -144933,15 +145077,15 @@
   function BiologicalState_0(recoveryScore, cnsFatigue) {
     recoveryScore = recoveryScore === VOID ? null : recoveryScore;
     cnsFatigue = cnsFatigue === VOID ? null : cnsFatigue;
-    this.uew_1 = recoveryScore;
-    this.vew_1 = cnsFatigue;
+    this.vew_1 = recoveryScore;
+    this.wew_1 = cnsFatigue;
   }
   protoOf(BiologicalState_0).toString = function () {
-    return 'BiologicalState(recoveryScore=' + this.uew_1 + ', cnsFatigue=' + this.vew_1 + ')';
+    return 'BiologicalState(recoveryScore=' + this.vew_1 + ', cnsFatigue=' + this.wew_1 + ')';
   };
   protoOf(BiologicalState_0).hashCode = function () {
-    var result = this.uew_1 == null ? 0 : getNumberHashCode(this.uew_1);
-    result = imul(result, 31) + (this.vew_1 == null ? 0 : getNumberHashCode(this.vew_1)) | 0;
+    var result = this.vew_1 == null ? 0 : getNumberHashCode(this.vew_1);
+    result = imul(result, 31) + (this.wew_1 == null ? 0 : getNumberHashCode(this.wew_1)) | 0;
     return result;
   };
   protoOf(BiologicalState_0).equals = function (other) {
@@ -144950,21 +145094,21 @@
     if (!(other instanceof BiologicalState_0))
       return false;
     var tmp0_other_with_cast = other instanceof BiologicalState_0 ? other : THROW_CCE();
-    if (!equals(this.uew_1, tmp0_other_with_cast.uew_1))
-      return false;
     if (!equals(this.vew_1, tmp0_other_with_cast.vew_1))
+      return false;
+    if (!equals(this.wew_1, tmp0_other_with_cast.wew_1))
       return false;
     return true;
   };
   function EmotionalState_0(emotionalResilience) {
     emotionalResilience = emotionalResilience === VOID ? null : emotionalResilience;
-    this.yew_1 = emotionalResilience;
+    this.zew_1 = emotionalResilience;
   }
   protoOf(EmotionalState_0).toString = function () {
-    return 'EmotionalState(emotionalResilience=' + this.yew_1 + ')';
+    return 'EmotionalState(emotionalResilience=' + this.zew_1 + ')';
   };
   protoOf(EmotionalState_0).hashCode = function () {
-    return this.yew_1 == null ? 0 : getNumberHashCode(this.yew_1);
+    return this.zew_1 == null ? 0 : getNumberHashCode(this.zew_1);
   };
   protoOf(EmotionalState_0).equals = function (other) {
     if (this === other)
@@ -144972,22 +145116,22 @@
     if (!(other instanceof EmotionalState_0))
       return false;
     var tmp0_other_with_cast = other instanceof EmotionalState_0 ? other : THROW_CCE();
-    if (!equals(this.yew_1, tmp0_other_with_cast.yew_1))
+    if (!equals(this.zew_1, tmp0_other_with_cast.zew_1))
       return false;
     return true;
   };
   function NsvInput(biological, emotional) {
     biological = biological === VOID ? null : biological;
     emotional = emotional === VOID ? null : emotional;
-    this.bex_1 = biological;
-    this.cex_1 = emotional;
+    this.cex_1 = biological;
+    this.dex_1 = emotional;
   }
   protoOf(NsvInput).toString = function () {
-    return 'NsvInput(biological=' + toString_0(this.bex_1) + ', emotional=' + toString_0(this.cex_1) + ')';
+    return 'NsvInput(biological=' + toString_0(this.cex_1) + ', emotional=' + toString_0(this.dex_1) + ')';
   };
   protoOf(NsvInput).hashCode = function () {
-    var result = this.bex_1 == null ? 0 : this.bex_1.hashCode();
-    result = imul(result, 31) + (this.cex_1 == null ? 0 : this.cex_1.hashCode()) | 0;
+    var result = this.cex_1 == null ? 0 : this.cex_1.hashCode();
+    result = imul(result, 31) + (this.dex_1 == null ? 0 : this.dex_1.hashCode()) | 0;
     return result;
   };
   protoOf(NsvInput).equals = function (other) {
@@ -144996,9 +145140,9 @@
     if (!(other instanceof NsvInput))
       return false;
     var tmp0_other_with_cast = other instanceof NsvInput ? other : THROW_CCE();
-    if (!equals(this.bex_1, tmp0_other_with_cast.bex_1))
-      return false;
     if (!equals(this.cex_1, tmp0_other_with_cast.cex_1))
+      return false;
+    if (!equals(this.dex_1, tmp0_other_with_cast.dex_1))
       return false;
     return true;
   };
@@ -145008,11 +145152,11 @@
   }
   function TitanClearanceEngineJs() {
     var tmp = this;
-    tmp.dex_1 = Json(VOID, TitanClearanceEngineJs$json$lambda);
+    tmp.eex_1 = Json(VOID, TitanClearanceEngineJs$json$lambda);
   }
   protoOf(TitanClearanceEngineJs).evaluate = function (nsvJson) {
     // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-    var this_0 = this.dex_1;
+    var this_0 = this.eex_1;
     // Inline function 'kotlinx.serialization.serializer' call
     var this_1 = this_0.b1u();
     // Inline function 'kotlinx.serialization.internal.cast' call
@@ -145020,14 +145164,14 @@
     var tmp$ret$1 = isInterface(this_2, KSerializer) ? this_2 : THROW_CCE();
     var nsv = this_0.z3y(tmp$ret$1, nsvJson);
     var tmp;
-    var tmp0_safe_receiver = nsv.bex_1;
-    if (!((tmp0_safe_receiver == null ? null : tmp0_safe_receiver.uew_1) == null)) {
-      tmp = nsv.bex_1.uew_1 / 10.0;
+    var tmp0_safe_receiver = nsv.cex_1;
+    if (!((tmp0_safe_receiver == null ? null : tmp0_safe_receiver.vew_1) == null)) {
+      tmp = nsv.cex_1.vew_1 / 10.0;
     } else {
-      var tmp1_safe_receiver = nsv.bex_1;
-      if (!((tmp1_safe_receiver == null ? null : tmp1_safe_receiver.vew_1) == null)) {
+      var tmp1_safe_receiver = nsv.cex_1;
+      if (!((tmp1_safe_receiver == null ? null : tmp1_safe_receiver.wew_1) == null)) {
         // Inline function 'kotlin.math.min' call
-        var b = (10.0 - nsv.bex_1.vew_1) / 10.0;
+        var b = (10.0 - nsv.cex_1.wew_1) / 10.0;
         // Inline function 'kotlin.math.max' call
         var b_0 = Math.min(1.0, b);
         tmp = Math.max(0.0, b_0);
@@ -145037,10 +145181,10 @@
     }
     var vitality = tmp;
     var tmp_0;
-    var tmp2_safe_receiver = nsv.cex_1;
-    if (!((tmp2_safe_receiver == null ? null : tmp2_safe_receiver.yew_1) == null)) {
+    var tmp2_safe_receiver = nsv.dex_1;
+    if (!((tmp2_safe_receiver == null ? null : tmp2_safe_receiver.zew_1) == null)) {
       // Inline function 'kotlin.math.min' call
-      var b_1 = nsv.cex_1.yew_1 / 10.0;
+      var b_1 = nsv.dex_1.zew_1 / 10.0;
       // Inline function 'kotlin.math.max' call
       var b_2 = Math.min(1.0, b_1);
       tmp_0 = Math.max(0.0, b_2);
@@ -145139,16 +145283,16 @@
     this.energyBudget = energyBudget;
     this.focusScore = focusScore;
   }
-  protoOf(WorkoutNSVPatchJs).eex = function () {
+  protoOf(WorkoutNSVPatchJs).fex = function () {
     return this.cnsFatigue;
   };
-  protoOf(WorkoutNSVPatchJs).fex = function () {
+  protoOf(WorkoutNSVPatchJs).gex = function () {
     return this.recoveryScore;
   };
-  protoOf(WorkoutNSVPatchJs).gex = function () {
+  protoOf(WorkoutNSVPatchJs).hex = function () {
     return this.energyBudget;
   };
-  protoOf(WorkoutNSVPatchJs).hex = function () {
+  protoOf(WorkoutNSVPatchJs).iex = function () {
     return this.focusScore;
   };
   function SleepNSVPatchJs(sleepQuality, energyBudget, focusScore) {
@@ -145156,13 +145300,13 @@
     this.energyBudget = energyBudget;
     this.focusScore = focusScore;
   }
-  protoOf(SleepNSVPatchJs).iex = function () {
+  protoOf(SleepNSVPatchJs).jex = function () {
     return this.sleepQuality;
   };
-  protoOf(SleepNSVPatchJs).gex = function () {
+  protoOf(SleepNSVPatchJs).hex = function () {
     return this.energyBudget;
   };
-  protoOf(SleepNSVPatchJs).hex = function () {
+  protoOf(SleepNSVPatchJs).iex = function () {
     return this.focusScore;
   };
   function TitanNsvUpdaterJs() {
@@ -145183,7 +145327,7 @@
   function Companion_321() {
     Companion_instance_327 = this;
     var tmp = this;
-    tmp.jex_1 = Json(VOID, TitanPromptBuilderJs$Companion$lenientJson$lambda);
+    tmp.kex_1 = Json(VOID, TitanPromptBuilderJs$Companion$lenientJson$lambda);
   }
   var Companion_instance_327;
   function Companion_getInstance_331() {
@@ -145194,7 +145338,7 @@
   function TitanPromptBuilderJs() {
     Companion_getInstance_331();
   }
-  protoOf(TitanPromptBuilderJs).kex = function (profileJson, contextPolicy) {
+  protoOf(TitanPromptBuilderJs).lex = function (profileJson, contextPolicy) {
     var tmp;
     if (profileJson == null) {
       tmp = null;
@@ -145217,7 +145361,7 @@
       // Inline function 'kotlin.let' call
       var tmp_2;
       try {
-        tmp_2 = Companion_getInstance_331().jex_1.z3y(Companion_getInstance_76().g41(), tmp1_safe_receiver);
+        tmp_2 = Companion_getInstance_331().kex_1.z3y(Companion_getInstance_76().g41(), tmp1_safe_receiver);
       } catch ($p) {
         var tmp_3;
         if ($p instanceof Exception) {
@@ -145237,9 +145381,9 @@
   protoOf(TitanPromptBuilderJs).buildDiagnosisPrompt = function (profileJson, contextPolicy, $super) {
     profileJson = profileJson === VOID ? null : profileJson;
     contextPolicy = contextPolicy === VOID ? 'isolated' : contextPolicy;
-    return $super === VOID ? this.kex(profileJson, contextPolicy) : $super.kex.call(this, profileJson, contextPolicy);
+    return $super === VOID ? this.lex(profileJson, contextPolicy) : $super.lex.call(this, profileJson, contextPolicy);
   };
-  protoOf(TitanPromptBuilderJs).lex = function (privacyLevel, userName, pronouns, occupation, typicalSleepHours) {
+  protoOf(TitanPromptBuilderJs).mex = function (privacyLevel, userName, pronouns, occupation, typicalSleepHours) {
     return TitanPromptBuilder_getInstance().qdo(privacyLevel, userName, pronouns, occupation, typicalSleepHours);
   };
   protoOf(TitanPromptBuilderJs).buildOnboardingPrompt = function (privacyLevel, userName, pronouns, occupation, typicalSleepHours, $super) {
@@ -145248,7 +145392,7 @@
     pronouns = pronouns === VOID ? null : pronouns;
     occupation = occupation === VOID ? null : occupation;
     typicalSleepHours = typicalSleepHours === VOID ? null : typicalSleepHours;
-    return $super === VOID ? this.lex(privacyLevel, userName, pronouns, occupation, typicalSleepHours) : $super.lex.call(this, privacyLevel, userName, pronouns, occupation, typicalSleepHours);
+    return $super === VOID ? this.mex(privacyLevel, userName, pronouns, occupation, typicalSleepHours) : $super.mex.call(this, privacyLevel, userName, pronouns, occupation, typicalSleepHours);
   };
   function UserIdentityJs$Companion$lenientJson$lambda($this$Json) {
     $this$Json.u3z_1 = true;
@@ -145258,15 +145402,15 @@
   function Companion_322() {
     Companion_instance_328 = this;
     var tmp = this;
-    tmp.mex_1 = Json(VOID, UserIdentityJs$Companion$lenientJson$lambda);
+    tmp.nex_1 = Json(VOID, UserIdentityJs$Companion$lenientJson$lambda);
   }
-  protoOf(Companion_322).nex = function (json) {
+  protoOf(Companion_322).oex = function (json) {
     if (isBlank(json) || json === '{}')
       return emptyMap();
     var tmp;
     try {
       // Inline function 'kotlinx.serialization.json.Json.decodeFromString' call
-      var this_0 = this.mex_1;
+      var this_0 = this.nex_1;
       // Inline function 'kotlinx.serialization.serializer' call
       var this_1 = this_0.b1u();
       // Inline function 'kotlinx.serialization.internal.cast' call
@@ -145328,30 +145472,30 @@
   protoOf(UserIdentityJs).h4o = function () {
     return this.name;
   };
-  protoOf(UserIdentityJs).oex = function () {
+  protoOf(UserIdentityJs).pex = function () {
     return this.pronouns;
   };
-  protoOf(UserIdentityJs).pex = function () {
+  protoOf(UserIdentityJs).qex = function () {
     return this.bio;
   };
-  protoOf(UserIdentityJs).qex = function () {
+  protoOf(UserIdentityJs).rex = function () {
     return this.assignedSexAtBirth;
   };
-  protoOf(UserIdentityJs).rex = function () {
+  protoOf(UserIdentityJs).sex = function () {
     return this.orchestratorAlias;
   };
-  protoOf(UserIdentityJs).sex = function () {
+  protoOf(UserIdentityJs).tex = function () {
     return this.agentGender;
   };
-  protoOf(UserIdentityJs).tex = function () {
+  protoOf(UserIdentityJs).uex = function () {
     return this.displayNamesJson;
   };
-  protoOf(UserIdentityJs).uex = function () {
+  protoOf(UserIdentityJs).vex = function () {
     return this.agentGendersJson;
   };
   protoOf(UserIdentityJs).toUserIdentity = function () {
-    var displayNames = Companion_getInstance_332().nex(this.displayNamesJson);
-    var agentGenders = toMutableMap(Companion_getInstance_332().nex(this.agentGendersJson));
+    var displayNames = Companion_getInstance_332().oex(this.displayNamesJson);
+    var agentGenders = toMutableMap(Companion_getInstance_332().oex(this.agentGendersJson));
     // Inline function 'kotlin.collections.contains' call
     // Inline function 'kotlin.collections.containsKey' call
     var key = 'orchestrator';
@@ -145676,7 +145820,7 @@
   protoOf(CrossVerificationServiceJs$planDebtSnowball$DebtIn$$serializer).s21 = typeParametersSerializers;
   protoOf(CrossVerificationServiceJs$projectSavingsGoal$GoalIn$$serializer).s21 = typeParametersSerializers;
   protoOf(CrossVerificationServiceJs$analyzeProfile$DebtWork$$serializer).s21 = typeParametersSerializers;
-  defineProp(protoOf(OrchestrationExecutionUtilsJs), 'maxRetries', protoOf(OrchestrationExecutionUtilsJs).weu);
+  defineProp(protoOf(OrchestrationExecutionUtilsJs), 'maxRetries', protoOf(OrchestrationExecutionUtilsJs).xeu);
   protoOf($serializer_294).s21 = typeParametersSerializers;
   protoOf($serializer_295).s21 = typeParametersSerializers;
   protoOf($serializer_296).s21 = typeParametersSerializers;

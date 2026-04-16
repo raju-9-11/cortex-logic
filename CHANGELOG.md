@@ -4,6 +4,33 @@ All notable changes to `cortex-logic` are documented here.
 
 ---
 
+## [1.0.0] — 2026-04-16
+
+### Versioning reset
+
+Versioning reset to 1.0.0 as part of the Ara rebrand. This release includes:
+
+#### Added — Typed-profile JS/KMP bridge (`CognitiveEngineJs`)
+
+- `TYPED_PROFILE_SERIALIZERS` registry maps `atlas_profile`, `titan_profile`, `soma_profile`,
+  `titan_soma_profile`, and `ledger_profile` context keys to their Kotlin data classes.
+  Profiles now deserialize from JSON at the JS/KMP boundary instead of round-tripping as raw
+  strings, fixing the silent "clean slate" persona regression.
+- `decodeTypedProfileOrString` helper — falls back to JSON string on unknown keys or decode
+  failure, logging a console warning instead of silently swallowing the error.
+- `LENIENT_JSON` now sets `isLenient = true` and `explicitNulls = false` for better bridge
+  compatibility.
+
+#### Added — Profile-status gating (`PersonaFactory`)
+
+- `buildModuleContextBlock` now checks `{moduleId}_profile_status` (set by the TS layer) and
+  injects an explicit `[MODULE DATA STATUS]` block when data is loading, unavailable, or empty
+  — preventing the LLM from hallucinating data that hasn't loaded yet.
+- `warnIfTypedProfileLostInTransit` diagnostic detects when a typed profile key contains a raw
+  JSON string instead of the expected Kotlin data class, printing an actionable warning.
+
+---
+
 ## [2.0.0] — 2026-04-12
 
 ### Breaking — Remove `LedgerAutomationEngineJs`

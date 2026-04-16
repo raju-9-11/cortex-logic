@@ -44,7 +44,7 @@ class DefaultPersonaFactory : PersonaFactory {
 
     override fun assemble(
         moduleId: String,
-        identity: UserIdentity, 
+        identity: UserIdentity,
         nsv: NeuralStateVector,
         moduleContext: Map<String, Any?>,
         longTermSummary: String?,
@@ -57,6 +57,7 @@ class DefaultPersonaFactory : PersonaFactory {
         // them as baseRole. Once module pages migrate to passing typed profile data
         // via moduleContext (Phase 4), this fallback becomes unused.
         val baseRole = baseRoleFromContext(moduleContext)
+        warnIfTypedProfileLostInTransit(moduleId, moduleContext)
 
         val base = when {
             moduleId == "titan" -> {
@@ -327,6 +328,49 @@ class DefaultPersonaFactory : PersonaFactory {
         return (context["baseRole"] as? String)?.takeIf { it.isNotBlank() }
     }
 
+    /**
+     * Detects the classic "typed profile arrived as something else" failure mode that causes
+     * every persona to silently degrade to a data-less template. A key like `atlas_profile`
+     * is expected to be an `AtlasProfile` instance — if it's present but a `String`, the
+     * JS/KMP bridge failed to revive it and the persona will report "clean slate."
+     *
+     * This runs only when the suspect key is present, so it has zero overhead when typed
+     * revival works (and when modules don't pass a profile). It does not mutate state —
+     * purely diagnostic.
+     */
+    private fun warnIfTypedProfileLostInTransit(
+        moduleId: String,
+        moduleContext: Map<String, Any?>
+    ) {
+        val expected = when (moduleId) {
+            "atlas" -> "atlas_profile" to "AtlasProfile"
+            "titan" -> "titan_profile" to "TrainerProfile"
+            "ledger" -> "ledger_profile" to "LedgerProfile"
+            "soma" -> "soma_profile" to "SomaProfile"
+            else -> return
+        }
+        val (key, typeName) = expected
+        val value = moduleContext[key] ?: return
+        val isAlreadyTyped = when (key) {
+            "atlas_profile" -> value is AtlasProfile
+            "titan_profile" -> value is TrainerProfile
+            "ledger_profile" -> value is LedgerProfile
+            "soma_profile" -> value is SomaProfile
+            else -> false
+        }
+        if (isAlreadyTyped) return
+        val looksLikeRawJson = value is String && (value.startsWith("{") || value.startsWith("["))
+        val hint = when {
+            looksLikeRawJson -> "value is a raw JSON String — typed revival failed at the JS/KMP bridge (check earlier [CognitiveEngineJs] decode warning)"
+            value is String -> "value is a plain String — the JS layer may be sending a stringified blob instead of a structured object"
+            else -> "value is a ${value::class.simpleName ?: "unknown type"} (not a $typeName) — check that the JS hook passes the structured profile object, not a projection or wrapper"
+        }
+        println(
+            "[PersonaFactory] WARNING: moduleContext[\"$key\"] should be a $typeName but $hint. " +
+                "$moduleId persona will receive NO live data and may report an empty state."
+        )
+    }
+
     private fun fallbackBase(moduleId: String, identity: UserIdentity): String = when (moduleId) {
         "agnes" -> agnesBase()
         "titan" -> titanBase()
@@ -338,7 +382,41 @@ class DefaultPersonaFactory : PersonaFactory {
 
     private fun buildModuleContextBlock(moduleId: String, context: Map<String, Any?>): String {
         if (context.isEmpty()) return ""
-        
+
+        // ── Profile status gate ──────────────────────────────────────────
+        // TS modules set "{moduleId}_profile_status" to signal data availability.
+        // When profile data is missing due to an error or pending load, inject
+        // explicit instructions so the LLM doesn't hallucinate data.
+        val profileStatus = context["${moduleId}_profile_status"] as? String
+        if (profileStatus != null && profileStatus != "loaded") {
+            println(
+                "[PersonaFactory] $moduleId chat firing with ${moduleId}_profile_status=\"$profileStatus\" — " +
+                    "persona will be given a data-status block (no live profile). If you expected loaded data, " +
+                    "the profile subscription likely hadn't hydrated before the chat was sent."
+            )
+            val statusBlock = when (profileStatus) {
+                "loading" -> """
+                    [MODULE DATA STATUS]
+                    The user's data for this module is currently loading.
+                    Do NOT assume any profile data is available. If the user asks about their data, let them know it is still being fetched and suggest trying again shortly.
+                    You may still answer general questions.
+                """.trimIndent()
+                "unavailable" -> """
+                    [MODULE DATA STATUS]
+                    The user's profile data is temporarily unavailable due to a connectivity or access issue.
+                    Do NOT fabricate or hallucinate any data. If the user asks about their data, explain that it could not be loaded right now and suggest they check their connection or try again later.
+                    You may still answer general questions.
+                """.trimIndent()
+                "empty" -> """
+                    [MODULE DATA STATUS]
+                    The user has no profile data yet for this module. This is likely a new user who hasn't completed setup.
+                    Guide them through getting started rather than referring to nonexistent data.
+                """.trimIndent()
+                else -> ""
+            }
+            if (statusBlock.isNotBlank()) return statusBlock
+        }
+
         return when (moduleId) {
             "agnes" -> {
                 val onboardingComplete = context["onboardingComplete"] as? Boolean ?: true
