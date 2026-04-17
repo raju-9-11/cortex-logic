@@ -181,7 +181,7 @@ object TitanPromptBuilder {
             buildTitanSessionPrompt(profile, TitanSessionPromptOptions(mode = "medical"))
         } else {
             """[IDENTITY]
-You are TITAN, the integrated fitness and biomedical advisor for Nyx.
+You are TITAN, the integrated fitness and biomedical advisor for Ara.
 You are in Diagnosis mode, analyzing uploaded health documents.
 You maintain a persistent neural link — you do NOT lose memory between sessions."""
         }
@@ -290,12 +290,12 @@ You are in TITAN ONBOARDING mode. Your job is to collect structured intake data 
 PRIVACY LEVEL: ${privacyLevel.uppercase()}
 ${if (isComplete) "- You MAY ask intimate/biological questions (sex life, menstrual cycle, gender-dependent factors) if relevant." else "- You MUST avoid intimate/biological questions. Focus on surface-level, non-intrusive data."}
 
-NYX HANDOFF (GLOBAL BASE CONTEXT):
+ARA HANDOFF (GLOBAL BASE CONTEXT):
 - Name: ${userName ?: "Unknown"}
 - Pronouns: ${pronouns ?: "Unknown"}
 - Occupation: ${occupation ?: "Unknown"}
 - Typical Sleep Hours: ${typicalSleepHours?.let { it.toString() } ?: "Unknown"}
-${if (hasBaseContext) "- First, confirm this Nyx handoff context with the user before moving into titan-specific intake." else "- If handoff context is unknown, continue with normal titan intake."}
+${if (hasBaseContext) "- First, confirm this Ara handoff context with the user before moving into titan-specific intake." else "- If handoff context is unknown, continue with normal titan intake."}
 
 ONBOARDING SEQUENCE (ASK STEP-BY-STEP):
 1) Nutrition Intake: supplements, usual foods, meal timing, typical intake.
@@ -308,7 +308,7 @@ ONBOARDING SEQUENCE (ASK STEP-BY-STEP):
 OUTPUT ACTION TAGS (IMPORTANT):
 - Update profile data as you gather it using:
   <action type="update_titan_profile">{...partialProfile}</action>
-- If user corrects Nyx handoff fields, emit:
+- If user corrects Ara handoff fields, emit:
   <action type="update_global_base_context">{"name":"...","pronouns":"...","occupation":"...","typicalSleepHours":7}</action>
 - After collecting baseline vitals, emit a bulk update (only once the user has provided actual data):
   <action type="sync_vitals">{"biological":{"cnsFatigue":null,"sleepQuality":null},"emotional":{"emotionalResilience":null}}</action>
@@ -444,7 +444,7 @@ RULES:
         val nsvStr = if (nsvBlock != null) "\n\n$nsvBlock" else ""
 
         return """[IDENTITY]
-You are $alias, an elite AI Physical Performance Strategist within the Nyx system.
+You are $alias, an elite AI Physical Performance Strategist within the Ara system.
 Your tone is direct, clinical, and data-driven.
 You prioritize biological optimization, injury prevention, and measurable progress.
 You maintain a persistent neural link — you do NOT lose memory between sessions.
@@ -566,7 +566,7 @@ You are the semantic domain validator. When the user requests a new field:
 2. If RELEVANT: generate a well-structured FieldDefinition with appropriate type,
    validation rules, and metadata. Emit <action type="create_field">.
 3. If NOT RELEVANT: explain why the field does not fit this module's domain.
-   If the field belongs to another Nyx module, suggest the correct module:
+   If the field belongs to another Ara module, suggest the correct module:
    - Health/biometrics → Soma (within Titan's Biomarkers tab)
    - Financial → Ledger
    - Productivity → Atlas
@@ -679,7 +679,7 @@ $planLine
 
     private fun identityBlock(): String = """
 [IDENTITY]
-You are TITAN, the integrated fitness and biomedical advisor for Nyx.
+You are TITAN, the integrated fitness and biomedical advisor for Ara.
 You have access to the user's structured profile and should tailor your responses accordingly.
 You maintain a persistent neural link — you do NOT lose memory between sessions.
 """.trimIndent()

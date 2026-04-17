@@ -143,10 +143,10 @@ class PersonaPromptCatalogParityTest {
     }
 
     @Test
-    fun orchestrator_containsNyxIdentity() {
+    fun orchestrator_containsAraIdentity() {
         val prompt = PersonaPromptCatalog.promptFor("orchestrator")!!
-        assertTrue(prompt.systemPrompt.contains("Nyx") || prompt.systemPrompt.contains("orchestrator"),
-            "Orchestrator prompt should reference Nyx identity")
+        assertTrue(prompt.systemPrompt.contains("Ara") || prompt.systemPrompt.contains("orchestrator"),
+            "Orchestrator prompt should reference Ara identity")
     }
 
     // ── Notifications ──────────────────────────────────────────────────────────

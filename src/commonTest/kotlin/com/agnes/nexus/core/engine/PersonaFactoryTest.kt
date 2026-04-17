@@ -22,7 +22,7 @@ class PersonaFactoryTest {
         name: String = "TestUser",
         pronouns: String = "they/them",
         assignedSex: String? = null,
-        displayNames: Map<String, String> = mapOf("orchestrator" to "Nyx"),
+        displayNames: Map<String, String> = mapOf("orchestrator" to "Ara"),
         agentGenders: Map<String, String> = mapOf("orchestrator" to "female")
     ) = UserIdentity(
         name = name,
@@ -228,7 +228,7 @@ class PersonaFactoryTest {
             nsv = emptyNsv(),
             moduleContext = mapOf("notification_context" to ctx)
         )
-        assertTrue(result.contains("Nyx Notify"), "Should contain notifications persona identity")
+        assertTrue(result.contains("Ara Notify"), "Should contain notifications persona identity")
         assertTrue(result.contains("5 total"), "Should contain injected notification context")
     }
 
@@ -240,7 +240,7 @@ class PersonaFactoryTest {
             nsv = emptyNsv(),
             moduleContext = emptyMap()
         )
-        assertTrue(result.contains("Nyx Notify") || result.contains("notification"), "Should have notification persona")
+        assertTrue(result.contains("Ara Notify") || result.contains("notification"), "Should have notification persona")
         assertFalse(result.contains("[INBOX]"), "Should not have inbox context when not provided")
     }
 
@@ -468,8 +468,8 @@ class PersonaFactoryTest {
             identity = identity(),
             nsv = emptyNsv()
         )
-        // Should have Nyx/orchestrator persona
-        assertTrue(result.contains("Nyx") || result.contains("orchestrator"),
+        // Should have Ara/orchestrator persona
+        assertTrue(result.contains("Ara") || result.contains("orchestrator"),
             "Should contain orchestrator identity")
     }
 

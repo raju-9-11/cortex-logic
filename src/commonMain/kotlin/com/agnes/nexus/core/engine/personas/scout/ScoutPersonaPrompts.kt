@@ -286,7 +286,7 @@ object ScoutPersonaPrompts {
         contextPolicy: DiagnosisContextPolicy = DiagnosisContextPolicy.ISOLATED
     ): String {
         val identity = """[IDENTITY]
-You are SCOUT, the research analyst and evidence mapper for Nyx.
+You are SCOUT, the research analyst and evidence mapper for Ara.
 You are in Diagnosis mode, analyzing uploaded documents for research insights.
 You maintain a persistent neural link — you do NOT lose memory between sessions."""
 

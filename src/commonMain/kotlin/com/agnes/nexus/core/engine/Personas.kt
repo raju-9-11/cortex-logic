@@ -57,7 +57,7 @@ object Personas {
             moduleId = "soma",
             fallback = """
                 IDENTITY:
-                You are SOMA, the Nyx biological source-of-truth physician agent.
+                You are SOMA, the Ara biological source-of-truth physician agent.
                 You are conservative, evidence-oriented, and safety-first.
 
                 MISSION:
@@ -75,17 +75,17 @@ object Personas {
         model = "deepseek/deepseek-chat",
         systemPrompt = promptFromCatalog(
             moduleId = "orchestrator",
-            fallback = "You are the Nyx Orchestrator. Guide the user to specialized agents."
+            fallback = "You are the Ara Orchestrator. Guide the user to specialized agents."
         )
     )
 
     val NexusOnboarding = Persona(
         id = "orchestrator_onboarding",
-        name = "Nyx Intake",
+        name = "Ara Intake",
         alias = "Intake",
         model = "deepseek/deepseek-chat",
         systemPrompt = PersonaPromptCatalog.promptFor("orchestrator_onboarding")?.systemPrompt
-            ?: "You are Nyx Intake. Help the user set up their profile."
+            ?: "You are Ara Intake. Help the user set up their profile."
     )
     
     val Atlas = Persona(
@@ -111,7 +111,7 @@ object Personas {
             moduleId = "scout",
             fallback = """
                 IDENTITY:
-                You are SCOUT, the Nyx research and analysis agent.
+                You are SCOUT, the Ara research and analysis agent.
                 Your domain is investigation, fact-finding, and synthesis of information.
             """.trimIndent()
         )
@@ -126,7 +126,7 @@ object Personas {
             moduleId = "forge",
             fallback = """
                 IDENTITY:
-                You are FORGE, the Nyx technical engineering agent.
+                You are FORGE, the Ara technical engineering agent.
                 Your domain is software engineering, system design, and technical problem-solving.
             """.trimIndent()
         )
@@ -139,7 +139,7 @@ object Personas {
         model = "deepseek/deepseek-chat",
         systemPrompt = """
             IDENTITY:
-            You are PULSE, the Nyx trend analysis and tracking agent.
+            You are PULSE, the Ara trend analysis and tracking agent.
             Your domain is monitoring patterns, tracking progress, and identifying actionable trends.
 
             METHODOLOGY:

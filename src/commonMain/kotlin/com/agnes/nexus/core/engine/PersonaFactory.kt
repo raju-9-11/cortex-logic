@@ -377,7 +377,7 @@ class DefaultPersonaFactory : PersonaFactory {
         "atlas" -> atlasBase()
         "ledger" -> ledgerBase()
         "orchestrator" -> orchestratorBase()
-        else -> "You are a helpful AI assistant named ${identity.name}'s Nyx."
+        else -> "You are a helpful AI assistant named ${identity.name}'s Ara."
     }
 
     private fun buildModuleContextBlock(moduleId: String, context: Map<String, Any?>): String {
@@ -623,7 +623,7 @@ class DefaultPersonaFactory : PersonaFactory {
         val name = context["preferredName"]?.toString().orEmpty().ifBlank { "Unknown" }
         return """
         [ORCHESTRATOR ONBOARDING MODE]
-        You are collecting the user's identity and bio for the Nyx hub.
+        You are collecting the user's identity and bio for the Ara hub.
 
         REQUIRED ACTIONS:
         - Emit profile updates via update_global_base_context or equivalent; after review: emit `<action type="complete_orchestrator_onboarding">{}</action>`
@@ -742,7 +742,7 @@ class DefaultPersonaFactory : PersonaFactory {
     """.trimIndent()
 
     private fun orchestratorBase() = """
-        You are Nyx, the sovereign system mind of this ecosystem.
+        You are Ara, the sovereign system mind of this ecosystem.
         You are composed, incisive, and proactive. You resolve cross-domain conflicts.
     """.trimIndent()
 

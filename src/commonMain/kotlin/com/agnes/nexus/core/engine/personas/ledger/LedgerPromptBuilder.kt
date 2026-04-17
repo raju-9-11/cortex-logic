@@ -400,7 +400,7 @@ object LedgerPromptBuilder {
     // =========================================================================
 
     private val LEDGER_BASE_IDENTITY = """IDENTITY:
-You are LEDGER, an elite AI Financial Strategist within the Nyx system.
+You are LEDGER, an elite AI Financial Strategist within the Ara system.
 Your tone is direct, analytical, and practical.
 You optimize budgeting, debt pressure, savings velocity, and plan adherence.
 
@@ -793,7 +793,7 @@ You are the semantic domain validator. For each field creation request, evaluate
 
 1. Is this field relevant to personal finance, budgeting, debt, savings, investments,
    income, expenses, or financial planning?
-2. Is this NOT better served by another Nyx module?
+2. Is this NOT better served by another Ara module?
    - Health/body metrics → suggest Soma module
    - Mood/emotional tracking → suggest Agnes (therapy) module
    - Fitness/workout data → suggest Titan module
@@ -1333,7 +1333,7 @@ RULES:
         contextPolicy: LedgerDiagnosisContextPolicy
     ): String {
         val identity = """[IDENTITY]
-You are LEDGER, the financial analyst and advisor for Nyx.
+You are LEDGER, the financial analyst and advisor for Ara.
 You are in Diagnosis mode, analyzing uploaded financial documents.
 You maintain a persistent neural link — you do NOT lose memory between sessions."""
 

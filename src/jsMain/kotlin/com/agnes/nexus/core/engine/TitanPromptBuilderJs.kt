@@ -52,7 +52,7 @@ class TitanPromptBuilderJs {
      * Build the onboarding system prompt for Titan intake.
      *
      * @param privacyLevel       `"complete"` or `"basic"` / `"standard"`.
-     * @param userName           User's preferred name (from Nyx handoff).
+     * @param userName           User's preferred name (from Ara handoff).
      * @param pronouns           User's pronouns.
      * @param occupation         User's occupation.
      * @param typicalSleepHours  Typical sleep hours (nullable).
