@@ -57,11 +57,13 @@ class CredentialStoreJs(
         val openrouter = getKey(KEY_OPENROUTER) ?: ""
         val gemini = getKey(KEY_GEMINI) ?: ""
         val grok = getKey(KEY_GROK) ?: ""
+        val mercury = getKey(KEY_MERCURY) ?: ""
 
         val keys = ApiKeyProvider.ApiKeys(
             openrouterKey = openrouter,
             geminiKey = gemini,
-            grokKey = grok
+            grokKey = grok,
+            mercuryKey = mercury
         )
         cachedKeys = keys
         return keys
@@ -78,7 +80,7 @@ class CredentialStoreJs(
     /**
      * Store an API key for the given provider.
      *
-     * @param provider One of `"openrouter"`, `"gemini"`, `"grok"`.
+     * @param provider One of `"openrouter"`, `"gemini"`, `"grok"`, `"mercury"`.
      * @param key      The raw API key string.
      * @param onComplete Called when the key is persisted.
      * @param onError    Called if persistence fails.
@@ -93,6 +95,7 @@ class CredentialStoreJs(
             "openrouter" -> KEY_OPENROUTER
             "gemini" -> KEY_GEMINI
             "grok" -> KEY_GROK
+            "mercury" -> KEY_MERCURY
             else -> {
                 onError("Unknown provider: $provider")
                 return
@@ -114,6 +117,7 @@ class CredentialStoreJs(
             "openrouter" -> KEY_OPENROUTER
             "gemini" -> KEY_GEMINI
             "grok" -> KEY_GROK
+            "mercury" -> KEY_MERCURY
             else -> {
                 onError("Unknown provider: $provider")
                 return
@@ -139,7 +143,7 @@ class CredentialStoreJs(
         onError: (String) -> Unit
     ) {
         cachedKeys = null
-        var remaining = 3
+        var remaining = 4
         var firstError: String? = null
 
         val onOne = {
@@ -157,6 +161,7 @@ class CredentialStoreJs(
         jsDeleteKey(KEY_OPENROUTER, onOne, onOneError)
         jsDeleteKey(KEY_GEMINI, onOne, onOneError)
         jsDeleteKey(KEY_GROK, onOne, onOneError)
+        jsDeleteKey(KEY_MERCURY, onOne, onOneError)
     }
 
     /**
@@ -182,7 +187,13 @@ class CredentialStoreJs(
                     return@jsGetEncrypted
                 }
                 jsGetEncrypted(KEY_GROK, { xKey ->
-                    onComplete(xKey != null && xKey.isNotBlank())
+                    if (xKey != null && xKey.isNotBlank()) {
+                        onComplete(true)
+                        return@jsGetEncrypted
+                    }
+                    jsGetEncrypted(KEY_MERCURY, { mKey ->
+                        onComplete(mKey != null && mKey.isNotBlank())
+                    }, onError)
                 }, onError)
             }, onError)
         }, onError)
@@ -203,5 +214,6 @@ class CredentialStoreJs(
         const val KEY_OPENROUTER = "nexus_credential_openrouter"
         const val KEY_GEMINI = "nexus_credential_gemini"
         const val KEY_GROK = "nexus_credential_grok"
+        const val KEY_MERCURY = "nexus_credential_mercury"
     }
 }

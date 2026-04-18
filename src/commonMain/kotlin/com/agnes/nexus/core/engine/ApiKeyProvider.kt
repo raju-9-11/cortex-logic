@@ -12,9 +12,13 @@ interface ApiKeyProvider {
     data class ApiKeys(
         val openrouterKey: String = "",
         val geminiKey: String = "",
-        val grokKey: String = ""
+        val grokKey: String = "",
+        val mercuryKey: String = ""
     ) {
         fun hasAnyKey(): Boolean =
-            openrouterKey.isNotBlank() || geminiKey.isNotBlank() || grokKey.isNotBlank()
+            openrouterKey.isNotBlank() ||
+                geminiKey.isNotBlank() ||
+                grokKey.isNotBlank() ||
+                mercuryKey.isNotBlank()
     }
 }

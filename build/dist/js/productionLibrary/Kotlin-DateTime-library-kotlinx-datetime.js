@@ -393,7 +393,7 @@
     return tmp;
   }
   initMetadataForInterface(AbstractWithOffsetBuilder, 'AbstractWithOffsetBuilder', VOID, VOID, [WithUtcOffset]);
-  initMetadataForClass(Builder, 'Builder', VOID, VOID, [AbstractDateTimeFormatBuilder, AbstractWithDateTimeBuilder, AbstractWithOffsetBuilder, WithTime, WithUtcOffset, WithDate]);
+  initMetadataForClass(Builder, 'Builder', VOID, VOID, [AbstractDateTimeFormatBuilder, AbstractWithDateTimeBuilder, AbstractWithOffsetBuilder, WithTime, WithDate, WithUtcOffset]);
   initMetadataForClass(AbstractDateTimeFormat, 'AbstractDateTimeFormat');
   initMetadataForClass(DateTimeComponentsFormat, 'DateTimeComponentsFormat', VOID, AbstractDateTimeFormat);
   initMetadataForClass(TwoDigitNumber, 'TwoDigitNumber');

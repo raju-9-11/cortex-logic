@@ -84,25 +84,44 @@ class CognitiveEngineJs {
      * @param openrouterKey  OpenRouter API key (preferred; used when non-blank).
      * @param geminiKey      Google Gemini API key.
      * @param grokKey        xAI Grok API key.
+     * @param mercuryKey     Inception Labs Mercury API key.
      * @param preferredModel Model ID override, e.g. `"anthropic/claude-3-5-sonnet"`.
      *                       Defaults to [LlmClient]'s internal `DEFAULT_MODEL` when blank.
      * @param isMockMode     When true, all requests return canned responses without
      *                       making real API calls. Automatically activated when all
      *                       keys are blank.
+     * @param preferredProvider One of `"openrouter"`, `"google"` (alias `"gemini"`),
+     *                       `"grok"`, `"mercury"`, or blank. When set and the matching
+     *                       key is non-blank, requests are routed to that provider's
+     *                       native endpoint instead of the static key-priority chain.
      */
     fun init(
         openrouterKey: String = "",
         geminiKey: String = "",
         grokKey: String = "",
+        mercuryKey: String = "",
         preferredModel: String = "",
-        isMockMode: Boolean = false
+        isMockMode: Boolean = false,
+        preferredProvider: String = ""
     ) {
         isMock = isMockMode
+
+        val resolvedProvider = preferredProvider.takeIf { it.isNotBlank() }
+
+        if (!isMockMode) {
+            validateProviderKey(resolvedProvider, ApiKeyProvider.ApiKeys(
+                openrouterKey = openrouterKey,
+                geminiKey = geminiKey,
+                grokKey = grokKey,
+                mercuryKey = mercuryKey
+            ))
+        }
 
         val keyProvider = JsApiKeyProvider(
             openrouterKey = openrouterKey,
             geminiKey = geminiKey,
-            grokKey = grokKey
+            grokKey = grokKey,
+            mercuryKey = mercuryKey
         )
         val httpClient = HttpClient(Js)
         val transport = KtorLlmTransport(httpClient)
@@ -111,12 +130,14 @@ class CognitiveEngineJs {
             LlmClient(
                 apiKeyProvider = keyProvider,
                 transport = transport,
-                defaultModel = preferredModel
+                defaultModel = preferredModel,
+                preferredProvider = resolvedProvider
             )
         } else {
             LlmClient(
                 apiKeyProvider = keyProvider,
-                transport = transport
+                transport = transport,
+                preferredProvider = resolvedProvider
             )
         }
 
@@ -146,7 +167,8 @@ class CognitiveEngineJs {
         preferredModel: String = "",
         isMockMode: Boolean = false,
         onReady: () -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
+        preferredProvider: String = ""
     ): CancellableTask {
         credentialStore = store
         isMock = isMockMode
@@ -159,6 +181,12 @@ class CognitiveEngineJs {
                     isMock = true
                 }
 
+                val resolvedProvider = preferredProvider.takeIf { it.isNotBlank() }
+
+                if (!isMock) {
+                    validateProviderKey(resolvedProvider, keys)
+                }
+
                 val keyProvider = store.toApiKeyProvider()
                 val httpClient = HttpClient(Js)
                 val transport = KtorLlmTransport(httpClient)
@@ -167,12 +195,14 @@ class CognitiveEngineJs {
                     LlmClient(
                         apiKeyProvider = keyProvider,
                         transport = transport,
-                        defaultModel = preferredModel
+                        defaultModel = preferredModel,
+                        preferredProvider = resolvedProvider
                     )
                 } else {
                     LlmClient(
                         apiKeyProvider = keyProvider,
-                        transport = transport
+                        transport = transport,
+                        preferredProvider = resolvedProvider
                     )
                 }
 
@@ -206,7 +236,8 @@ class CognitiveEngineJs {
     fun reinitFromCredentialStore(
         preferredModel: String = "",
         onReady: () -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
+        preferredProvider: String = ""
     ) {
         val store = credentialStore
         if (store == null) {
@@ -215,7 +246,7 @@ class CognitiveEngineJs {
         }
         // Invalidate the store's cache so it re-fetches from encrypted storage.
         store.clearCredentials()
-        initWithCredentialStore(store, preferredModel, isMock, onReady, onError)
+        initWithCredentialStore(store, preferredModel, isMock, onReady, onError, preferredProvider)
     }
 
     /**
@@ -610,6 +641,23 @@ class CognitiveEngineJs {
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
+
+    private fun validateProviderKey(provider: String?, keys: ApiKeyProvider.ApiKeys) {
+        when (provider?.lowercase()) {
+            "openrouter" -> require(keys.openrouterKey.isNotBlank()) {
+                "Provider 'openrouter' selected but OPENROUTER_API_KEY is missing."
+            }
+            "google", "gemini" -> require(keys.geminiKey.isNotBlank()) {
+                "Provider 'google' selected but GEMINI_API_KEY is missing."
+            }
+            "grok" -> require(keys.grokKey.isNotBlank()) {
+                "Provider 'grok' selected but GROK_API_KEY is missing."
+            }
+            "mercury" -> require(keys.mercuryKey.isNotBlank()) {
+                "Provider 'mercury' selected but MERCURY_API_KEY is missing."
+            }
+        }
+    }
 
     /**
      * Parses a JSON array string into a [List] of [Message].

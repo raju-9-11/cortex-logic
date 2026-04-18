@@ -14,16 +14,19 @@ package com.agnes.nexus.core.engine
  * @param openrouterKey OpenRouter API key (preferred provider).
  * @param geminiKey     Google Gemini API key.
  * @param grokKey       xAI Grok API key.
+ * @param mercuryKey    Inception Labs Mercury API key.
  */
 internal class JsApiKeyProvider(
     private val openrouterKey: String = "",
     private val geminiKey: String = "",
-    private val grokKey: String = ""
+    private val grokKey: String = "",
+    private val mercuryKey: String = ""
 ) : ApiKeyProvider {
 
     override suspend fun apiKeys(): ApiKeyProvider.ApiKeys = ApiKeyProvider.ApiKeys(
         openrouterKey = openrouterKey,
         geminiKey = geminiKey,
-        grokKey = grokKey
+        grokKey = grokKey,
+        mercuryKey = mercuryKey
     )
 }

@@ -14,7 +14,8 @@ class LlmClient(
     private val transport: LlmTransport,
     private val defaultModel: String = DEFAULT_MODEL,
     private val guestModel: String = GUEST_MODEL,
-    private val isGuest: Boolean = false
+    private val isGuest: Boolean = false,
+    private val preferredProvider: String? = null
 ) : LlmProvider {
 
     override fun stream(
@@ -43,32 +44,53 @@ class LlmClient(
         val keys = apiKeyProvider.apiKeys()
         if (!keys.hasAnyKey()) {
             throw IllegalStateException(
-                "No API key configured. Add OPENROUTER_API_KEY (or GEMINI_API_KEY / GROK_API_KEY)."
+                "No API key configured. Add OPENROUTER_API_KEY (or GEMINI_API_KEY / GROK_API_KEY / MERCURY_API_KEY)."
             )
         }
 
+        // Provider-first routing: if the caller explicitly chose a provider, honor it
+        // verbatim. Model is passed through unchanged — the UI is responsible for pairing
+        // (provider, model); any mismatch surfaces as an API-level error rather than being
+        // silently coerced here. If the chosen provider's key is blank, we hard-fail with a
+        // clear error rather than silently falling back to another provider — silent fallback
+        // masks configuration errors (e.g. user picks Mercury, key is absent, requests go to
+        // Grok with a Mercury model id → cryptic 404).
+        when (preferredProvider?.lowercase()) {
+            "openrouter" -> return if (keys.openrouterKey.isNotBlank()) {
+                ProviderConfig(OPENROUTER_ENDPOINT, keys.openrouterKey, model)
+            } else throw IllegalStateException(
+                "Provider 'openrouter' selected but OPENROUTER_API_KEY is missing."
+            )
+            "google", "gemini" -> return if (keys.geminiKey.isNotBlank()) {
+                ProviderConfig(GEMINI_ENDPOINT, keys.geminiKey, model)
+            } else throw IllegalStateException(
+                "Provider 'google' selected but GEMINI_API_KEY is missing."
+            )
+            "grok" -> return if (keys.grokKey.isNotBlank()) {
+                ProviderConfig(GROK_ENDPOINT, keys.grokKey, model)
+            } else throw IllegalStateException(
+                "Provider 'grok' selected but GROK_API_KEY is missing."
+            )
+            "mercury" -> return if (keys.mercuryKey.isNotBlank()) {
+                ProviderConfig(MERCURY_ENDPOINT, keys.mercuryKey, model)
+            } else throw IllegalStateException(
+                "Provider 'mercury' selected but MERCURY_API_KEY is missing."
+            )
+            else -> Unit  // null / empty / unknown → fall through to key-priority chain.
+        }
+
+        // Fallback: static key-priority chain (openrouter > gemini > grok > mercury).
+        // Reached only when no preferredProvider was specified.
         if (keys.openrouterKey.isNotBlank()) {
-            return ProviderConfig(
-                endpoint = OPENROUTER_ENDPOINT,
-                authorization = keys.openrouterKey,
-                model = model
-            )
+            return ProviderConfig(OPENROUTER_ENDPOINT, keys.openrouterKey, model)
         }
-
         if (keys.geminiKey.isNotBlank()) {
-            val geminiModel = if (model.startsWith("gemini-")) model else "gemini-2.0-flash-001"
-            return ProviderConfig(
-                endpoint = GEMINI_ENDPOINT,
-                authorization = keys.geminiKey,
-                model = geminiModel
-            )
+            return ProviderConfig(GEMINI_ENDPOINT, keys.geminiKey, model)
         }
-
-        return ProviderConfig(
-            endpoint = GROK_ENDPOINT,
-            authorization = keys.grokKey,
-            model = model
-        )
+        if (keys.grokKey.isNotBlank()) {
+            return ProviderConfig(GROK_ENDPOINT, keys.grokKey, model)
+        }
+        return ProviderConfig(MERCURY_ENDPOINT, keys.mercuryKey, model)
     }
 
     private fun buildMessages(
@@ -130,6 +152,7 @@ class LlmClient(
         const val OPENROUTER_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
         const val GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
         const val GROK_ENDPOINT = "https://api.x.ai/v1/chat/completions"
+        const val MERCURY_ENDPOINT = "https://api.inceptionlabs.ai/v1/chat/completions"
         const val DEFAULT_MODEL = "deepseek/deepseek-chat"
         const val GUEST_MODEL = "x-ai/grok-3-mini-beta"
     }
