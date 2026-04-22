@@ -104,6 +104,26 @@ object NsvOwnershipService {
     fun getMetricOwners(metric: String): List<String> =
         WRITE_PERMISSIONS.entries.filter { metric in it.value }.map { it.key }
 
+    /**
+     * Identifies which metrics from the [readableMetrics] list are stale.
+     * @param readableMetrics List of dotted metric paths (e.g. "biological.cnsFatigue").
+     * @param lastUpdated Map of dotted metric paths to ISO 8601 timestamp strings.
+     * @param thresholdDays Age limit in days.
+     * @param nowMs Current epoch ms.
+     * @return List of stale metric paths.
+     */
+    fun getStaleMetrics(
+        readableMetrics: List<String>,
+        lastUpdated: Map<String, String>,
+        thresholdDays: Int = 1,
+        nowMs: Long = 0L
+    ): List<String> {
+        if (nowMs == 0L) return emptyList()
+        return readableMetrics.filter { metric ->
+            isMetricStale(lastUpdated[metric], thresholdDays, nowMs)
+        }
+    }
+
     /** Whether [moduleId] is the sole owner of [metric]. */
     fun isExclusiveOwner(moduleId: String, metric: String): Boolean {
         val owners = getMetricOwners(metric)

@@ -24,7 +24,7 @@ enum class ProposalStatus {
 
 @Serializable
 enum class ProposalTargetType {
-    CORE, EXTENSION, FIELD_VALUE, FIELD_DEFINITION
+    CORE, EXTENSION, FIELD_VALUE, FIELD_DEFINITION, ARCHIVE
 }
 
 @Serializable

@@ -65,6 +65,32 @@ class FieldProposalService(
         return ProposalApplicationResult(nextExtensibility, pendingProposal)
     }
 
+    fun proposeArchiveField(
+        moduleId: String,
+        fieldId: String,
+        rationale: String,
+        extensibility: ModuleProfileExtensibility
+    ): ProposalApplicationResult {
+        val timestamp = Clock.System.now().toString()
+        val pId = generateId()
+        val pendingProposal = FieldProposal(
+            id = pId,
+            proposalId = pId,
+            moduleId = moduleId,
+            target = ProposalTarget(ProposalTargetType.ARCHIVE, fieldId = fieldId),
+            payload = JsonObject(mapOf("fieldId" to JsonPrimitive(fieldId), "action" to JsonPrimitive("archive"))),
+            source = FieldSource.SYSTEM,
+            status = ProposalStatus.PROPOSED,
+            rationale = rationale,
+            createdAt = timestamp,
+            updatedAt = timestamp
+        )
+        val nextProposalState = extensibility.proposalState.copy(
+            queued = extensibility.proposalState.queued + pendingProposal
+        )
+        return ProposalApplicationResult(extensibility.copy(proposalState = nextProposalState), pendingProposal)
+    }
+
     private fun applyProposal(
         moduleId: String,
         actionType: String,
@@ -104,6 +130,7 @@ class FieldProposalService(
             )
             ProposalTargetType.CORE -> ProposalApplicationResult(stagedExtensibility, pendingProposal)
             ProposalTargetType.EXTENSION -> ProposalApplicationResult(stagedExtensibility, pendingProposal)
+            ProposalTargetType.ARCHIVE -> ProposalApplicationResult(stagedExtensibility, pendingProposal)
         }
     }
 
@@ -151,7 +178,10 @@ class FieldProposalService(
             extensibility, proposal, listOf(validationError("PARSE_ERROR", "Failed to parse normalized definition"))
         )
 
-        val updatedDefinitions = extensibility.customFieldDefinitions.filter { it.id != normalizedDefinition.id } + normalizedDefinition
+        val timestamp = Clock.System.now().toString()
+        val definitionWithTimestamp = normalizedDefinition.copy(lastAccessedAt = timestamp)
+
+        val updatedDefinitions = extensibility.customFieldDefinitions.filter { it.id != definitionWithTimestamp.id } + definitionWithTimestamp
         SchemaRegistry.setExtensions(moduleId, updatedDefinitions)
         return approveAndApply(extensibility.copy(customFieldDefinitions = updatedDefinitions), proposal, normPayload)
     }
@@ -181,7 +211,20 @@ class FieldProposalService(
             put(fieldId, normValue)
         })
 
-        return approveAndApply(extensibility.copy(validatedCustomFieldValues = updatedValues), proposal, normPayload)
+        // Update lastAccessedAt on the definition
+        val timestamp = Clock.System.now().toString()
+        val updatedDefinitions = extensibility.customFieldDefinitions.map {
+            if (it.id == fieldId) it.copy(lastAccessedAt = timestamp) else it
+        }
+
+        return approveAndApply(
+            extensibility.copy(
+                customFieldDefinitions = updatedDefinitions,
+                validatedCustomFieldValues = updatedValues
+            ),
+            proposal,
+            normPayload
+        )
     }
 
     private fun approveAndApply(

@@ -361,6 +361,19 @@ object NotificationContentResolver {
                 )
             }
 
+            // ----------------------------------------------------------------
+            // Schema & System Optimization
+            // ----------------------------------------------------------------
+
+            "SCHEMA_ARCHIVE_PROPOSED" -> {
+                val fieldName = data.str("fieldName") ?: "a custom field"
+                val moduleId = data.str("moduleId") ?: "system"
+                NotificationContent(
+                    title = "\uD83D\uDCC1 Nexus \u2014 Schema Optimization",
+                    body = "The field '$fieldName' in $moduleId hasn't been used recently. Proposing to archive it to optimize your soul state."
+                )
+            }
+
             // Unknown / internal-only event types — caller decides the fallback.
             else -> null
         }

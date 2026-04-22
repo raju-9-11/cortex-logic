@@ -257,19 +257,23 @@ class DefaultPersonaFactory : PersonaFactory {
             Bio: ${identity.bio ?: "N/A"}
         """.trimIndent()
 
+        val nowMs = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+        // Round to nearest hour for cache key to avoid constant misses while still capturing staleness shifts
+        val cacheHour = nowMs / (1000 * 60 * 60)
+
         // Bypass NSV formatting for modules with no read permissions; cache the result
         // per (moduleId, nsv state) to skip repeated formatting within a session.
         val readableMetrics = com.agnes.ara.core.domain.service.NsvOwnershipService.getReadableMetrics(moduleId)
         val nsvBlock = when {
             readableMetrics.isEmpty() -> ""
             globalSoul != null -> {
-                val key = "$moduleId|${nsv.hashCode()}|soul|${globalSoul.hashCode()}"
+                val key = "$moduleId|${nsv.hashCode()}|soul|${globalSoul.hashCode()}|$cacheHour"
                 nsvBlockCache.getOrPut(key) { globalSoul.formatForPrompt() }
                     .also { if (nsvBlockCache.size > 20) nsvBlockCache.remove(nsvBlockCache.keys.first()) }
             }
             else -> {
-                val key = "$moduleId|${nsv.hashCode()}"
-                nsvBlockCache.getOrPut(key) { buildScopedNsvBlock(moduleId, nsv) }
+                val key = "$moduleId|${nsv.hashCode()}|$cacheHour"
+                nsvBlockCache.getOrPut(key) { buildScopedNsvBlock(moduleId, nsv, nowMs) }
                     .also { if (nsvBlockCache.size > 20) nsvBlockCache.remove(nsvBlockCache.keys.first()) }
             }
         }
@@ -661,7 +665,11 @@ class DefaultPersonaFactory : PersonaFactory {
         return value.replace(Regex("[\\x00-\\x1f\\x7f]"), "").take(maxLen)
     }
 
-    private fun buildScopedNsvBlock(moduleId: String, nsv: NeuralStateVector): String {
+    private fun buildScopedNsvBlock(
+        moduleId: String,
+        nsv: NeuralStateVector,
+        nowMs: Long = 0L
+    ): String {
         val lines = mutableListOf<String>()
         lines.add("[NEURAL STATE VECTOR]")
 
@@ -670,6 +678,13 @@ class DefaultPersonaFactory : PersonaFactory {
         val e = nsv.emotional
         val c = nsv.cognitive
         val r = nsv.resource
+
+        val readableMetrics = com.agnes.ara.core.domain.service.NsvOwnershipService.getReadableMetrics(moduleId)
+        val staleMetrics = if (nowMs > 0L) {
+            com.agnes.ara.core.domain.service.NsvOwnershipService.getStaleMetrics(
+                readableMetrics, nsv.lastUpdated, thresholdDays = 1, nowMs = nowMs
+            )
+        } else emptyList()
 
         when (moduleId) {
             "orchestrator" -> {
@@ -714,6 +729,13 @@ class DefaultPersonaFactory : PersonaFactory {
             else -> {
                 c.energyBudget?.let { lines.add("  Energy Budget: $it/10") }
             }
+        }
+
+        if (staleMetrics.isNotEmpty()) {
+            lines.add("\n[STALE_DATA_WARNING]")
+            lines.add("The following metrics have not been updated in over 24 hours and may no longer reflect the user's current state:")
+            staleMetrics.forEach { lines.add("- $it") }
+            lines.add("\nPROTOCOL: If your response depends on these metrics, ask the user to verify if they are still accurate before making high-stakes recommendations.")
         }
         
         return if (lines.size > 1) lines.joinToString("\n") else ""

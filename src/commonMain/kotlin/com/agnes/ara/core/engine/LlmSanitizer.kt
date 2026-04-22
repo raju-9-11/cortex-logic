@@ -15,7 +15,8 @@ data class SanitizedResult(
     val internalThoughts: String? = null,
     val isThinking: Boolean = false,
     val isActing: Boolean = false,
-    val currentActionType: String? = null
+    val currentActionType: String? = null,
+    val internalDirectives: Array<String> = emptyArray()
 )
 
 @JsExport
@@ -88,10 +89,37 @@ class LlmSanitizer {
     fun sanitize(content: String, retainSpacings: Boolean = false): SanitizedResult {
         if (content.isEmpty()) return SanitizedResult("")
 
+        val directives = mutableListOf<String>()
+
         // 0. Normalize LLM-hallucinated /action slash format → proper XML
         // Some models emit `/action type="...">{...}` (slash-command style) instead of `<action type="...">{...}</action>`.
         // Rewrite to `<action type="...">` so all downstream regexes handle it uniformly.
         val normalized = content.replace(Regex("""/action(\s+type=["'][^"']+["']>)"""), "<action$1")
+
+        // Extract <action type="..."> directives
+        Regex("""<action\b([^>]*)>""", RegexOption.IGNORE_CASE).findAll(normalized).forEach { match ->
+            val attrs = match.groupValues[1]
+            val typeMatch = Regex("""type\s*=\s*["']([^"']+)["']""", RegexOption.IGNORE_CASE).find(attrs)
+            val actionType = typeMatch?.groupValues?.get(1) ?: "unknown"
+            directives.add("[ACTION: $actionType]")
+        }
+
+        // Extract [action type="..."] directives
+        Regex("""\[action\s+type=["']?([^"'\s\]]+)["']?\]""", RegexOption.IGNORE_CASE).findAll(normalized).forEach { match ->
+            directives.add("[ACTION: ${match.groupValues[1]}]")
+        }
+
+        // Extract <tool_call_begin> directives
+        Regex("""<tool_call_begin>([\s\S]*?)<tool_call_end>""", RegexOption.IGNORE_CASE).findAll(normalized).forEach { match ->
+            val body = match.groupValues[1]
+            val name = body.split("<tool_sep>").firstOrNull()?.trim() ?: "unknown"
+            directives.add("[TOOL_CALL: $name]")
+        }
+
+        // Extract <tool_call> directives
+        if (normalized.contains("<tool_call>")) {
+            directives.add("[TOOL_CALL_RAW]")
+        }
 
         // 1. Extract thought content (first match wins, cross-matched tags supported)
         val thoughtMatch = Regex("<thought>([\\s\\S]*?)</thought>").find(normalized)
@@ -160,7 +188,8 @@ class LlmSanitizer {
             internalThoughts = thoughtText,
             isThinking = isThinking,
             isActing = isActing,
-            currentActionType = currentActionType
+            currentActionType = currentActionType,
+            internalDirectives = directives.toTypedArray()
         )
     }
 

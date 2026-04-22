@@ -83,7 +83,8 @@ data class FieldDefinition(
     val validation: ValidationRules? = null,
     val metadata: JsonObject? = null,
     val options: List<FieldOption>? = null,
-    val properties: Map<String, FieldDefinition>? = null
+    val properties: Map<String, FieldDefinition>? = null,
+    val lastAccessedAt: String? = null
 )
 
 @Serializable
