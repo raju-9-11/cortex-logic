@@ -18,7 +18,7 @@
   var imul = Math.imul;
   var Unit_instance = kotlin_kotlin.$_$.i5;
   var protoOf = kotlin_kotlin.$_$.ic;
-  var THROW_CCE = kotlin_kotlin.$_$.vg;
+  var THROW_CCE = kotlin_kotlin.$_$.wg;
   var Continuation = kotlin_kotlin.$_$.ba;
   var initMetadataForClass = kotlin_kotlin.$_$.eb;
   var VOID = kotlin_kotlin.$_$.i;
@@ -32,7 +32,7 @@
   var toString = kotlin_kotlin.$_$.mc;
   var isInterface = kotlin_kotlin.$_$.tb;
   var IllegalStateException_init_$Create$ = kotlin_kotlin.$_$.a2;
-  var toString_0 = kotlin_kotlin.$_$.ai;
+  var toString_0 = kotlin_kotlin.$_$.bi;
   var atomic$int$1 = kotlin_org_jetbrains_kotlinx_atomicfu.$_$.e;
   var atomic$ref$1 = kotlin_org_jetbrains_kotlinx_atomicfu.$_$.d;
   var initMetadataForObject = kotlin_kotlin.$_$.kb;
@@ -49,22 +49,22 @@
   var minusKey = kotlin_kotlin.$_$.z9;
   var ContinuationInterceptor = kotlin_kotlin.$_$.aa;
   var RuntimeException_init_$Create$ = kotlin_kotlin.$_$.m2;
-  var addSuppressed = kotlin_kotlin.$_$.ih;
+  var addSuppressed = kotlin_kotlin.$_$.jh;
   var getStringHashCode = kotlin_kotlin.$_$.cb;
-  var Enum = kotlin_kotlin.$_$.lg;
+  var Enum = kotlin_kotlin.$_$.mg;
   var startCoroutine = kotlin_kotlin.$_$.ia;
-  var noWhenBranchMatchedException = kotlin_kotlin.$_$.uh;
-  var Long = kotlin_kotlin.$_$.qg;
+  var noWhenBranchMatchedException = kotlin_kotlin.$_$.vh;
+  var Long = kotlin_kotlin.$_$.rg;
   var intercepted = kotlin_kotlin.$_$.u9;
   var ArrayDeque_init_$Create$ = kotlin_kotlin.$_$.o;
-  var RuntimeException = kotlin_kotlin.$_$.ug;
+  var RuntimeException = kotlin_kotlin.$_$.vg;
   var RuntimeException_init_$Init$ = kotlin_kotlin.$_$.l2;
   var captureStack = kotlin_kotlin.$_$.pa;
-  var Error_0 = kotlin_kotlin.$_$.mg;
+  var Error_0 = kotlin_kotlin.$_$.ng;
   var Error_init_$Init$ = kotlin_kotlin.$_$.l1;
   var Element = kotlin_kotlin.$_$.fa;
   var StringBuilder_init_$Create$ = kotlin_kotlin.$_$.j1;
-  var throwUninitializedPropertyAccessException = kotlin_kotlin.$_$.zh;
+  var throwUninitializedPropertyAccessException = kotlin_kotlin.$_$.ai;
   var ArrayList_init_$Create$ = kotlin_kotlin.$_$.p;
   var CancellationException = kotlin_kotlin.$_$.q9;
   var ArrayList = kotlin_kotlin.$_$.j5;
@@ -76,10 +76,10 @@
   var anyToString = kotlin_kotlin.$_$.ma;
   var Companion_instance = kotlin_kotlin.$_$.d5;
   var _Result___init__impl__xyqfz8 = kotlin_kotlin.$_$.y2;
-  var createFailure = kotlin_kotlin.$_$.mh;
-  var UnsupportedOperationException = kotlin_kotlin.$_$.hh;
+  var createFailure = kotlin_kotlin.$_$.nh;
+  var UnsupportedOperationException = kotlin_kotlin.$_$.ih;
   var atomicfu$AtomicRefArray$ofNulls = kotlin_org_jetbrains_kotlinx_atomicfu.$_$.a;
-  var ensureNotNull = kotlin_kotlin.$_$.nh;
+  var ensureNotNull = kotlin_kotlin.$_$.oh;
   var toLong = kotlin_kotlin.$_$.kc;
   var IllegalArgumentException_init_$Create$ = kotlin_kotlin.$_$.w1;
   var atomic$long$1 = kotlin_org_jetbrains_kotlinx_atomicfu.$_$.c;
@@ -87,20 +87,20 @@
   var ArrayList_init_$Create$_0 = kotlin_kotlin.$_$.q;
   var NoSuchElementException_init_$Create$ = kotlin_kotlin.$_$.e2;
   var compareTo = kotlin_kotlin.$_$.va;
-  var last = kotlin_kotlin.$_$.ke;
+  var last = kotlin_kotlin.$_$.le;
   var _Char___init__impl__6a9atx = kotlin_kotlin.$_$.q2;
   var initMetadataForCompanion = kotlin_kotlin.$_$.fb;
-  var IllegalStateException = kotlin_kotlin.$_$.pg;
+  var IllegalStateException = kotlin_kotlin.$_$.qg;
   var IllegalStateException_init_$Init$ = kotlin_kotlin.$_$.z1;
-  var NoSuchElementException = kotlin_kotlin.$_$.rg;
+  var NoSuchElementException = kotlin_kotlin.$_$.sg;
   var NoSuchElementException_init_$Init$ = kotlin_kotlin.$_$.f2;
   var getKClass = kotlin_kotlin.$_$.g;
   var copyOf = kotlin_kotlin.$_$.q6;
-  var throwKotlinNothingValueException = kotlin_kotlin.$_$.xh;
+  var throwKotlinNothingValueException = kotlin_kotlin.$_$.yh;
   var FunctionAdapter = kotlin_kotlin.$_$.la;
   var initMetadataForLambda = kotlin_kotlin.$_$.jb;
-  var Exception = kotlin_kotlin.$_$.ng;
-  var toLongOrNull = kotlin_kotlin.$_$.mf;
+  var Exception = kotlin_kotlin.$_$.og;
+  var toLongOrNull = kotlin_kotlin.$_$.nf;
   var createCoroutineUnintercepted_0 = kotlin_kotlin.$_$.s9;
   var startCoroutineUninterceptedOrReturnNonGeneratorVersion = kotlin_kotlin.$_$.v9;
   var plus_0 = kotlin_kotlin.$_$.j8;
@@ -109,7 +109,7 @@
   var getKClassFromExpression = kotlin_kotlin.$_$.f;
   var removeFirstOrNull = kotlin_kotlin.$_$.l8;
   var KtMutableList = kotlin_kotlin.$_$.s5;
-  var coerceIn = kotlin_kotlin.$_$.yc;
+  var coerceIn = kotlin_kotlin.$_$.zc;
   var CancellationException_init_$Init$ = kotlin_kotlin.$_$.e1;
   var CancellationException_init_$Create$_0 = kotlin_kotlin.$_$.f1;
   var HashSet_init_$Create$ = kotlin_kotlin.$_$.v;
@@ -206,11 +206,6 @@
   initMetadataForCoroutine($hasNextCOROUTINE$6, CoroutineImpl);
   initMetadataForClass(SendBroadcast, 'SendBroadcast', VOID, VOID, [Waiter]);
   initMetadataForClass(BufferedChannelIterator, 'BufferedChannelIterator', VOID, VOID, [Waiter], [0, 3]);
-  function close$default(cause, $super) {
-    cause = cause === VOID ? null : cause;
-    return $super === VOID ? this.m13(cause) : $super.m13.call(this, cause);
-  }
-  initMetadataForInterface(SendChannel, 'SendChannel', VOID, VOID, VOID, [1]);
   function cancel$default_0(cause, $super) {
     cause = cause === VOID ? null : cause;
     var tmp;
@@ -223,7 +218,12 @@
     return tmp;
   }
   initMetadataForInterface(ReceiveChannel, 'ReceiveChannel', VOID, VOID, VOID, [0]);
-  initMetadataForClass(BufferedChannel, 'BufferedChannel', VOID, VOID, [SendChannel, ReceiveChannel], [1, 4, 0, 3]);
+  function close$default(cause, $super) {
+    cause = cause === VOID ? null : cause;
+    return $super === VOID ? this.m13(cause) : $super.m13.call(this, cause);
+  }
+  initMetadataForInterface(SendChannel, 'SendChannel', VOID, VOID, VOID, [1]);
+  initMetadataForClass(BufferedChannel, 'BufferedChannel', VOID, VOID, [ReceiveChannel, SendChannel], [1, 4, 0, 3]);
   initMetadataForClass(WaiterEB, 'WaiterEB');
   initMetadataForClass(ReceiveCatching, 'ReceiveCatching', VOID, VOID, [Waiter]);
   initMetadataForObject(Factory, 'Factory');

@@ -57,6 +57,12 @@ if (typeof Math.clz32 === 'undefined') {
     };
   }(Math.log, Math.LN2);
 }
+if (typeof String.prototype.startsWith === 'undefined') {
+  Object.defineProperty(String.prototype, 'startsWith', {value: function (searchString, position) {
+    position = position || 0;
+    return this.lastIndexOf(searchString, position) === position;
+  }});
+}
 if (typeof String.prototype.endsWith === 'undefined') {
   Object.defineProperty(String.prototype, 'endsWith', {value: function (searchString, position) {
     var subjectString = this.toString();
@@ -66,12 +72,6 @@ if (typeof String.prototype.endsWith === 'undefined') {
     position -= searchString.length;
     var lastIndex = subjectString.indexOf(searchString, position);
     return lastIndex !== -1 && lastIndex === position;
-  }});
-}
-if (typeof String.prototype.startsWith === 'undefined') {
-  Object.defineProperty(String.prototype, 'startsWith', {value: function (searchString, position) {
-    position = position || 0;
-    return this.lastIndexOf(searchString, position) === position;
   }});
 }
 //endregion
@@ -1255,6 +1255,9 @@ if (typeof String.prototype.startsWith === 'undefined') {
   function coerceAtMost_0(_this__u8e3s4, maximumValue) {
     return _this__u8e3s4 > maximumValue ? maximumValue : _this__u8e3s4;
   }
+  function coerceAtMost_1(_this__u8e3s4, maximumValue) {
+    return _this__u8e3s4 > maximumValue ? maximumValue : _this__u8e3s4;
+  }
   function contains_7(_this__u8e3s4, value) {
     // Inline function 'kotlin.let' call
     var it = toIntExactOrNull(value);
@@ -1361,7 +1364,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
       throw IllegalArgumentException_init_$Create$_0(toString_1(message));
     }
     // Inline function 'kotlin.text.substring' call
-    var endIndex = coerceAtMost_0(n, _this__u8e3s4.length);
+    var endIndex = coerceAtMost_1(n, _this__u8e3s4.length);
     // Inline function 'kotlin.js.asDynamic' call
     return _this__u8e3s4.substring(0, endIndex);
   }
@@ -1380,7 +1383,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
       throw IllegalArgumentException_init_$Create$_0(toString_1(message));
     }
     // Inline function 'kotlin.text.substring' call
-    var startIndex = coerceAtMost_0(n, _this__u8e3s4.length);
+    var startIndex = coerceAtMost_1(n, _this__u8e3s4.length);
     // Inline function 'kotlin.js.asDynamic' call
     return _this__u8e3s4.substring(startIndex);
   }
@@ -4867,7 +4870,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
     $this.z5();
     retry: while (true) {
       var hash_0 = hash($this, key);
-      var tentativeMaxProbeDistance = coerceAtMost_0(imul($this.x6_1, 2), _get_hashSize__tftcho($this) / 2 | 0);
+      var tentativeMaxProbeDistance = coerceAtMost_1(imul($this.x6_1, 2), _get_hashSize__tftcho($this) / 2 | 0);
       var probeDistance = 0;
       while (true) {
         var index = $this.w6_1[hash_0];
@@ -4920,7 +4923,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
     var hash_0 = removedHash;
     var hole = removedHash;
     var probeDistance = 0;
-    var patchAttemptsLeft = coerceAtMost_0(imul($this.x6_1, 2), _get_hashSize__tftcho($this) / 2 | 0);
+    var patchAttemptsLeft = coerceAtMost_1(imul($this.x6_1, 2), _get_hashSize__tftcho($this) / 2 | 0);
     while (true) {
       var _unary__edvuaz = hash_0;
       hash_0 = _unary__edvuaz - 1 | 0;
@@ -8322,7 +8325,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
   function formatBytesInto(_this__u8e3s4, dst, dstOffset, startIndex, endIndex) {
     var dstIndex = dstOffset;
     if (startIndex < 4) {
-      dstIndex = formatBytesInto_0(_this__u8e3s4.a1_1, dst, dstIndex, startIndex, coerceAtMost_0(endIndex, 4));
+      dstIndex = formatBytesInto_0(_this__u8e3s4.a1_1, dst, dstIndex, startIndex, coerceAtMost_1(endIndex, 4));
     }
     if (endIndex > 4) {
       formatBytesInto_0(_this__u8e3s4.z_1, dst, dstIndex, coerceAtLeast(startIndex - 4 | 0, 0), endIndex - 4 | 0);
@@ -11232,7 +11235,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
   function throwNotContainedAt(_this__u8e3s4, index, endIndex, part, partName) {
     _init_properties_HexExtensions_kt__wu8rc3();
     // Inline function 'kotlin.text.substring' call
-    var endIndex_0 = coerceAtMost_0(index + part.length | 0, endIndex);
+    var endIndex_0 = coerceAtMost_1(index + part.length | 0, endIndex);
     // Inline function 'kotlin.js.asDynamic' call
     var substring = _this__u8e3s4.substring(index, endIndex_0);
     throw NumberFormatException_init_$Create$_0('Expected ' + partName + ' "' + part + '" at index ' + index + ', but was ' + substring);
@@ -12307,7 +12310,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
   };
   function indexOf_8(_this__u8e3s4, other, startIndex, endIndex, ignoreCase, last) {
     last = last === VOID ? false : last;
-    var indices = !last ? numberRangeToNumber(coerceAtLeast(startIndex, 0), coerceAtMost_0(endIndex, charSequenceLength(_this__u8e3s4))) : downTo(coerceAtMost_0(startIndex, get_lastIndex_3(_this__u8e3s4)), coerceAtLeast(endIndex, 0));
+    var indices = !last ? numberRangeToNumber(coerceAtLeast(startIndex, 0), coerceAtMost_1(endIndex, charSequenceLength(_this__u8e3s4))) : downTo(coerceAtMost_1(startIndex, get_lastIndex_3(_this__u8e3s4)), coerceAtLeast(endIndex, 0));
     var tmp;
     if (typeof _this__u8e3s4 === 'string') {
       tmp = typeof other === 'string';
@@ -12403,7 +12406,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
       return listOf(toString_1(_this__u8e3s4));
     }
     var isLimited = limit > 0;
-    var result = ArrayList_init_$Create$_0(isLimited ? coerceAtMost_0(limit, 10) : 10);
+    var result = ArrayList_init_$Create$_0(isLimited ? coerceAtMost_1(limit, 10) : 10);
     $l$loop: do {
       var tmp1 = currentOffset;
       // Inline function 'kotlin.text.substring' call
@@ -12458,7 +12461,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
       // Inline function 'kotlin.js.asDynamic' call
       return _this__u8e3s4.lastIndexOf(str, startIndex);
     }
-    var inductionVariable = coerceAtMost_0(startIndex, get_lastIndex_3(_this__u8e3s4));
+    var inductionVariable = coerceAtMost_1(startIndex, get_lastIndex_3(_this__u8e3s4));
     if (0 <= inductionVariable)
       do {
         var index = inductionVariable;
@@ -12622,7 +12625,7 @@ if (typeof String.prototype.startsWith === 'undefined') {
       var index = !last ? indexOf_7(_this__u8e3s4, string, startIndex) : lastIndexOf_0(_this__u8e3s4, string, startIndex);
       return index < 0 ? null : to(index, string);
     }
-    var indices = !last ? numberRangeToNumber(coerceAtLeast(startIndex, 0), charSequenceLength(_this__u8e3s4)) : downTo(coerceAtMost_0(startIndex, get_lastIndex_3(_this__u8e3s4)), 0);
+    var indices = !last ? numberRangeToNumber(coerceAtLeast(startIndex, 0), charSequenceLength(_this__u8e3s4)) : downTo(coerceAtMost_1(startIndex, get_lastIndex_3(_this__u8e3s4)), 0);
     if (typeof _this__u8e3s4 === 'string') {
       var inductionVariable = indices.c1_1;
       var last_0 = indices.d1_1;
@@ -15307,143 +15310,144 @@ if (typeof String.prototype.startsWith === 'undefined') {
   _.$_$.sc = coerceAtLeast;
   _.$_$.tc = coerceAtMost;
   _.$_$.uc = coerceAtMost_0;
-  _.$_$.vc = coerceIn_1;
-  _.$_$.wc = coerceIn_2;
-  _.$_$.xc = coerceIn_0;
-  _.$_$.yc = coerceIn;
-  _.$_$.zc = contains_7;
-  _.$_$.ad = downTo;
-  _.$_$.bd = step;
-  _.$_$.cd = until;
-  _.$_$.dd = KClass;
-  _.$_$.ed = KMutableProperty0;
-  _.$_$.fd = KMutableProperty1;
-  _.$_$.gd = KProperty0;
-  _.$_$.hd = KProperty1;
-  _.$_$.id = KTypeParameter;
-  _.$_$.jd = mapNotNull;
-  _.$_$.kd = toList_2;
-  _.$_$.ld = Regex;
-  _.$_$.md = chunked;
-  _.$_$.nd = concatToString;
-  _.$_$.od = concatToString_0;
-  _.$_$.pd = contains_10;
-  _.$_$.qd = contains_9;
-  _.$_$.rd = decodeToString;
-  _.$_$.sd = decodeToString_0;
-  _.$_$.td = dropLast_0;
-  _.$_$.ud = drop_0;
-  _.$_$.vd = encodeToByteArray;
-  _.$_$.wd = endsWith;
-  _.$_$.xd = equals_0;
-  _.$_$.yd = firstOrNull_0;
-  _.$_$.zd = first_1;
-  _.$_$.ae = indexOfAny;
-  _.$_$.be = indexOf_7;
-  _.$_$.ce = indexOf_6;
-  _.$_$.de = isBlank;
-  _.$_$.ee = isDigit;
-  _.$_$.fe = isSurrogate;
-  _.$_$.ge = isWhitespace;
-  _.$_$.he = get_lastIndex_3;
-  _.$_$.ie = lastIndexOf;
-  _.$_$.je = lastIndexOf_0;
-  _.$_$.ke = last_2;
-  _.$_$.le = lineSequence;
-  _.$_$.me = lines;
-  _.$_$.ne = padStart;
-  _.$_$.oe = removePrefix;
-  _.$_$.pe = removeSuffix;
-  _.$_$.qe = removeSurrounding;
-  _.$_$.re = repeat;
-  _.$_$.se = replace;
-  _.$_$.te = replace_0;
-  _.$_$.ue = reversed_0;
-  _.$_$.ve = single_2;
-  _.$_$.we = split_0;
-  _.$_$.xe = split;
-  _.$_$.ye = startsWith;
-  _.$_$.ze = startsWith_3;
-  _.$_$.af = startsWith_1;
-  _.$_$.bf = substringAfter_0;
-  _.$_$.cf = substringAfter;
-  _.$_$.df = substringBefore;
-  _.$_$.ef = substringBefore_0;
-  _.$_$.ff = take_1;
-  _.$_$.gf = toBooleanStrictOrNull;
-  _.$_$.hf = toDoubleOrNull;
-  _.$_$.if = toDouble;
-  _.$_$.jf = toIntOrNull;
-  _.$_$.kf = toInt;
-  _.$_$.lf = toInt_0;
-  _.$_$.mf = toLongOrNull;
-  _.$_$.nf = toLong_0;
-  _.$_$.of = toString_3;
-  _.$_$.pf = toString_2;
-  _.$_$.qf = toUByte;
-  _.$_$.rf = toUInt;
-  _.$_$.sf = toULongOrNull;
-  _.$_$.tf = toULong;
-  _.$_$.uf = toUShort;
-  _.$_$.vf = trimEnd_0;
-  _.$_$.wf = trimEnd;
-  _.$_$.xf = trimIndent;
-  _.$_$.yf = trimMargin;
-  _.$_$.zf = trimStart;
-  _.$_$.ag = trim_0;
-  _.$_$.bg = trim;
-  _.$_$.cg = uppercaseChar;
-  _.$_$.dg = Duration;
-  _.$_$.eg = Uuid;
-  _.$_$.fg = ArithmeticException;
-  _.$_$.gg = Char;
-  _.$_$.hg = Comparable;
-  _.$_$.ig = Comparator;
-  _.$_$.jg = DeepRecursiveFunction;
-  _.$_$.kg = DeepRecursiveScope;
-  _.$_$.lg = Enum;
-  _.$_$.mg = Error_0;
-  _.$_$.ng = Exception;
-  _.$_$.og = IllegalArgumentException;
-  _.$_$.pg = IllegalStateException;
-  _.$_$.qg = Long;
-  _.$_$.rg = NoSuchElementException;
-  _.$_$.sg = Pair;
-  _.$_$.tg = Result;
-  _.$_$.ug = RuntimeException;
-  _.$_$.vg = THROW_CCE;
-  _.$_$.wg = THROW_IAE;
-  _.$_$.xg = Triple;
-  _.$_$.yg = UByteArray;
-  _.$_$.zg = UByte;
-  _.$_$.ah = UIntArray;
-  _.$_$.bh = UInt;
-  _.$_$.ch = ULongArray;
-  _.$_$.dh = ULong;
-  _.$_$.eh = UShortArray;
-  _.$_$.fh = UShort;
-  _.$_$.gh = Unit;
-  _.$_$.hh = UnsupportedOperationException;
-  _.$_$.ih = addSuppressed;
-  _.$_$.jh = arrayOf;
-  _.$_$.kh = closeFinally;
-  _.$_$.lh = countTrailingZeroBits;
-  _.$_$.mh = createFailure;
-  _.$_$.nh = ensureNotNull;
-  _.$_$.oh = invoke;
-  _.$_$.ph = isFinite;
-  _.$_$.qh = isFinite_0;
-  _.$_$.rh = isNaN_0;
-  _.$_$.sh = lazy_0;
-  _.$_$.th = lazy;
-  _.$_$.uh = noWhenBranchMatchedException;
-  _.$_$.vh = plus_5;
-  _.$_$.wh = stackTraceToString;
-  _.$_$.xh = throwKotlinNothingValueException;
-  _.$_$.yh = throwOnFailure;
-  _.$_$.zh = throwUninitializedPropertyAccessException;
-  _.$_$.ai = toString_0;
-  _.$_$.bi = to;
+  _.$_$.vc = coerceAtMost_1;
+  _.$_$.wc = coerceIn_1;
+  _.$_$.xc = coerceIn_2;
+  _.$_$.yc = coerceIn_0;
+  _.$_$.zc = coerceIn;
+  _.$_$.ad = contains_7;
+  _.$_$.bd = downTo;
+  _.$_$.cd = step;
+  _.$_$.dd = until;
+  _.$_$.ed = KClass;
+  _.$_$.fd = KMutableProperty0;
+  _.$_$.gd = KMutableProperty1;
+  _.$_$.hd = KProperty0;
+  _.$_$.id = KProperty1;
+  _.$_$.jd = KTypeParameter;
+  _.$_$.kd = mapNotNull;
+  _.$_$.ld = toList_2;
+  _.$_$.md = Regex;
+  _.$_$.nd = chunked;
+  _.$_$.od = concatToString;
+  _.$_$.pd = concatToString_0;
+  _.$_$.qd = contains_10;
+  _.$_$.rd = contains_9;
+  _.$_$.sd = decodeToString;
+  _.$_$.td = decodeToString_0;
+  _.$_$.ud = dropLast_0;
+  _.$_$.vd = drop_0;
+  _.$_$.wd = encodeToByteArray;
+  _.$_$.xd = endsWith;
+  _.$_$.yd = equals_0;
+  _.$_$.zd = firstOrNull_0;
+  _.$_$.ae = first_1;
+  _.$_$.be = indexOfAny;
+  _.$_$.ce = indexOf_7;
+  _.$_$.de = indexOf_6;
+  _.$_$.ee = isBlank;
+  _.$_$.fe = isDigit;
+  _.$_$.ge = isSurrogate;
+  _.$_$.he = isWhitespace;
+  _.$_$.ie = get_lastIndex_3;
+  _.$_$.je = lastIndexOf;
+  _.$_$.ke = lastIndexOf_0;
+  _.$_$.le = last_2;
+  _.$_$.me = lineSequence;
+  _.$_$.ne = lines;
+  _.$_$.oe = padStart;
+  _.$_$.pe = removePrefix;
+  _.$_$.qe = removeSuffix;
+  _.$_$.re = removeSurrounding;
+  _.$_$.se = repeat;
+  _.$_$.te = replace;
+  _.$_$.ue = replace_0;
+  _.$_$.ve = reversed_0;
+  _.$_$.we = single_2;
+  _.$_$.xe = split_0;
+  _.$_$.ye = split;
+  _.$_$.ze = startsWith;
+  _.$_$.af = startsWith_3;
+  _.$_$.bf = startsWith_1;
+  _.$_$.cf = substringAfter_0;
+  _.$_$.df = substringAfter;
+  _.$_$.ef = substringBefore;
+  _.$_$.ff = substringBefore_0;
+  _.$_$.gf = take_1;
+  _.$_$.hf = toBooleanStrictOrNull;
+  _.$_$.if = toDoubleOrNull;
+  _.$_$.jf = toDouble;
+  _.$_$.kf = toIntOrNull;
+  _.$_$.lf = toInt;
+  _.$_$.mf = toInt_0;
+  _.$_$.nf = toLongOrNull;
+  _.$_$.of = toLong_0;
+  _.$_$.pf = toString_3;
+  _.$_$.qf = toString_2;
+  _.$_$.rf = toUByte;
+  _.$_$.sf = toUInt;
+  _.$_$.tf = toULongOrNull;
+  _.$_$.uf = toULong;
+  _.$_$.vf = toUShort;
+  _.$_$.wf = trimEnd_0;
+  _.$_$.xf = trimEnd;
+  _.$_$.yf = trimIndent;
+  _.$_$.zf = trimMargin;
+  _.$_$.ag = trimStart;
+  _.$_$.bg = trim_0;
+  _.$_$.cg = trim;
+  _.$_$.dg = uppercaseChar;
+  _.$_$.eg = Duration;
+  _.$_$.fg = Uuid;
+  _.$_$.gg = ArithmeticException;
+  _.$_$.hg = Char;
+  _.$_$.ig = Comparable;
+  _.$_$.jg = Comparator;
+  _.$_$.kg = DeepRecursiveFunction;
+  _.$_$.lg = DeepRecursiveScope;
+  _.$_$.mg = Enum;
+  _.$_$.ng = Error_0;
+  _.$_$.og = Exception;
+  _.$_$.pg = IllegalArgumentException;
+  _.$_$.qg = IllegalStateException;
+  _.$_$.rg = Long;
+  _.$_$.sg = NoSuchElementException;
+  _.$_$.tg = Pair;
+  _.$_$.ug = Result;
+  _.$_$.vg = RuntimeException;
+  _.$_$.wg = THROW_CCE;
+  _.$_$.xg = THROW_IAE;
+  _.$_$.yg = Triple;
+  _.$_$.zg = UByteArray;
+  _.$_$.ah = UByte;
+  _.$_$.bh = UIntArray;
+  _.$_$.ch = UInt;
+  _.$_$.dh = ULongArray;
+  _.$_$.eh = ULong;
+  _.$_$.fh = UShortArray;
+  _.$_$.gh = UShort;
+  _.$_$.hh = Unit;
+  _.$_$.ih = UnsupportedOperationException;
+  _.$_$.jh = addSuppressed;
+  _.$_$.kh = arrayOf;
+  _.$_$.lh = closeFinally;
+  _.$_$.mh = countTrailingZeroBits;
+  _.$_$.nh = createFailure;
+  _.$_$.oh = ensureNotNull;
+  _.$_$.ph = invoke;
+  _.$_$.qh = isFinite;
+  _.$_$.rh = isFinite_0;
+  _.$_$.sh = isNaN_0;
+  _.$_$.th = lazy_0;
+  _.$_$.uh = lazy;
+  _.$_$.vh = noWhenBranchMatchedException;
+  _.$_$.wh = plus_5;
+  _.$_$.xh = stackTraceToString;
+  _.$_$.yh = throwKotlinNothingValueException;
+  _.$_$.zh = throwOnFailure;
+  _.$_$.ai = throwUninitializedPropertyAccessException;
+  _.$_$.bi = toString_0;
+  _.$_$.ci = to;
   //endregion
   return _;
 }));
