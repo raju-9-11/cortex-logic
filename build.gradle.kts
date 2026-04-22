@@ -1,4 +1,4 @@
-group = "com.agnes.nexus"
+group = "com.agnes.ara"
 version = "1.0.1"
 
 plugins {
@@ -68,14 +68,14 @@ kotlin {
 sqldelight {
     databases {
         create("NexusDatabase") {
-            packageName.set("com.agnes.nexus.core.db")
+            packageName.set("com.agnes.ara.core.db")
             srcDirs("src/commonMain/sqldelight")
         }
     }
 }
 
 android {
-    namespace = "com.agnes.nexus.cortex"
+    namespace = "com.agnes.ara.cortex"
     compileSdk = 35
     defaultConfig {
         minSdk = 26

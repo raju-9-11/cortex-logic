@@ -19,7 +19,7 @@ Consumers (agnes, nexus-android) are **pure adapters**: they render UI, persist 
 
 ---
 
-## Package: `com.agnes.nexus.core.domain.automation`
+## Package: `com.agnes.ara.core.domain.automation`
 
 ### Domain model (`AutomationModels.kt`)
 

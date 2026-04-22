@@ -47,7 +47,7 @@ Versioning reset to 1.0.0 as part of the Ara rebrand. This release includes:
 
 This release establishes cortex-logic as the single authoritative source for all automation behavior. No breaking changes — existing consumers continue to work unchanged. `LedgerAutomationEngineJs` is now deprecated with a warning; replacement is `AutomationServiceJs`.
 
-#### New: `com.agnes.nexus.core.domain.automation` package
+#### New: `com.agnes.ara.core.domain.automation` package
 
 - **`AutomationModels.kt`** — Typed domain model replacing the stringly-typed flat representation:
   - `sealed class TriggerType` with 7 variants (each owns its own parameters — no more threshold grab-bag)

@@ -6,7 +6,7 @@ Kotlin Multiplatform library containing the Nexus core engine — personas, doma
 
 Artifacts are automatically published to GitHub Packages on every push to `main` via the [publish workflow](.github/workflows/publish.yml).
 
-**Coordinates:** `com.agnes.nexus:cortex:<version>`
+**Coordinates:** `com.agnes.ara:cortex:<version>`
 
 ## Consuming in Android (nexus-android)
 
@@ -49,7 +49,7 @@ dependencyResolutionManagement {
 In `app/build.gradle.kts`:
 
 ```kotlin
-api("com.agnes.nexus:cortex:1.5.1")
+api("com.agnes.ara:cortex:1.5.1")
 ```
 
 ### CI / GitHub Actions
